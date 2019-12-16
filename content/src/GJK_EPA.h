@@ -13,10 +13,11 @@
 
 #define GEOMETRIC_TOLLERANCE float(HULL_GEOMETRIC_TOLLERANCE)
 
-//#define ENABLE_LOG //when enabled, every time a proximity query is invoked (calling GJK_EPA::Are_in_collision, GJK_EPA::Get_penetration or GJK_EPA::Get_distance ) a JSON containing all the steps done by the solver is produced, see also the documentation. It should be used only for debugging purpose  
+//#define ENABLE_LOG //when enabled, every time a proximity query is invoked (a call to GJK_EPA::Are_in_collision, GJK_EPA::Get_penetration or GJK_EPA::Get_distance ) a JSON containing all the steps done by the solver is produced. 
+//If you found any bug using GJK_EPA, send to andrecasa91@gmail the JSON obtained when invoking the proximity query for which the bug manifested  
 #ifdef ENABLE_LOG
 #include <fstream>
-#define log_location std::string("../Result_visualization/Log_JSON") //When ENABLE_LOG is defined, the debugging JSON (see above) is produced at the location specified in this string. Change the location to fit your need.
+#define log_location std::string("Log_JSON") //When ENABLE_LOG is defined, the debugging JSON (see above) is produced
 #endif
 #include <list>
 #include "Hull.h"
