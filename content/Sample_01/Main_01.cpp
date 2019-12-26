@@ -37,7 +37,7 @@ int main() {
 	result_logger.Add_politope(cloud_A);
 	result_logger.Add_politope(cloud_B);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_01");
+	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_01"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
 	result_logger.Clear();
 //consider the same pair, but with a rototraslation for the points in shape B
@@ -54,7 +54,7 @@ int main() {
 	trasform_points(&transformed, cloud_B, Angles_XYZ, Traslation_XYZ);  //this is just for the debuggin purpose
 	result_logger.Add_politope(transformed);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_02");
+	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_02"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
 
 
@@ -74,7 +74,7 @@ int main() {
 	result_logger.Add_politope(cloud_A);
 	result_logger.Add_politope(cloud_B);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_03");
+	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_03"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
 //consider the same pair but with a rototrastlation
 	solver.Set_shape_B_transformed(&cloud_B, Angles_XYZ, Traslation_XYZ);
@@ -87,7 +87,7 @@ int main() {
 	trasform_points(&transformed, cloud_B, Angles_XYZ, Traslation_XYZ);  //this is just for the debuggin purpose
 	result_logger.Add_politope(transformed);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_04");
+	result_logger.Write_JSON("../Result_visualization/Sample_01_Log_04"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
 	system("pause");
 	return 0;

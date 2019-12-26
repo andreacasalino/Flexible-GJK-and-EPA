@@ -50,7 +50,7 @@ int main() {
 	trasform_points(&transformed, cloud_B, Angles_XYZ, Traslation_XYZ);   //this is just for the debuggin purpose
 	result_logger.Add_politope(transformed);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_02_Log_01");
+	result_logger.Write_JSON("../Result_visualization/Sample_02_Log_01"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
 
 
@@ -74,7 +74,7 @@ int main() {
 	trasform_points(&transformed, cloud_B, Angles_XYZ, Traslation_XYZ);
 	result_logger.Add_politope(transformed);
 	result_logger.Add_line(Point_in_A, Point_in_B);
-	result_logger.Write_JSON("../Result_visualization/Sample_02_Log_02");
+	result_logger.Write_JSON("../Result_visualization/Sample_02_Log_02"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 	
 	system("pause");
 	return 0;

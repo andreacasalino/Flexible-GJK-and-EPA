@@ -13,3 +13,5 @@ Samples are contained in:
 ./content/Sample_01/Main_01.cpp
 ./content/Sample_01/Main_02.cpp
 ./content/Sample_01/Main_03.cpp
+
+Results of the Samples can be displayed using the script python ./Result_visualization/Main.py
