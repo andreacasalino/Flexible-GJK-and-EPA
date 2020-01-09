@@ -80,6 +80,5 @@ int main() {
 //log results
 	result_logger.Write_JSON("../Result_visualization/Sample_03_Log"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 
-	system("pause");
 	return 0;
 }

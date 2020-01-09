@@ -76,6 +76,5 @@ int main() {
 	result_logger.Add_line(Point_in_A, Point_in_B);
 	result_logger.Write_JSON("../Result_visualization/Sample_02_Log_02"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
 	
-	system("pause");
 	return 0;
 }
