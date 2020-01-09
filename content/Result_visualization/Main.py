@@ -39,7 +39,9 @@ def plot_data(data, color, ax, plot_lines = 1):
             L_y =[data['Lines'][l]['V'][0][1], data['Lines'][l]['V'][1][1]]
             L_z =[data['Lines'][l]['V'][0][2], data['Lines'][l]['V'][1][2]]
             ax.plot( L_x ,L_y , L_z, 'k--', linewidth=0.5)
-            ax.plot( L_x ,L_y , L_z, 'go', markersize=10)    
+            ax.plot( L_x ,L_y , L_z, 'go', markersize=10)
+            ax.text(L_x[0] ,L_y[0] , L_z[0], r"$\rho_A$", color='black')
+            ax.text(L_x[1] ,L_y[1] , L_z[1], r"$\rho_B$", color='black')
 
 def plot_Log(file):
     
@@ -55,6 +57,8 @@ def plot_Log(file):
     plot_data(data, color, ax)
     
     if(len(data['Politopes']) == 2):
+        plt.title(r"$\mathcal{A}$ and $\mathcal{B}$")        
+        
         Delta = [data['Lines'][0]['V'][0][0]- data['Lines'][0]['V'][1][0] , data['Lines'][0]['V'][0][1]- data['Lines'][0]['V'][1][1], data['Lines'][0]['V'][0][2]- data['Lines'][0]['V'][1][2]]
         for v in range(0 ,len(data['Politopes'][1]['V'])):
             data['Politopes'][1]['V'][v][0] = data['Politopes'][1]['V'][v][0] + Delta[0]
@@ -63,6 +67,7 @@ def plot_Log(file):
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         plot_data(data, color, ax, 0)
+        plt.title(r"$\mathcal{A}$ and $\mathcal{B}^{'}=\mathcal{B} + (\rho_A - \rho_B  )$")
         
     plt.show()
 
@@ -73,4 +78,4 @@ def plot_Log(file):
 #drawed with the traslation that:
     # is the penetration vector in case of a collision
     # allows the objects to become close to each other in case of collision absence
-plot_Log('Sample_01_Log_04') #change the name of the input file according to which log you want to display
+plot_Log('Sample_03_Log') #change the name of the input file according to which log you want to display

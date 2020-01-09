@@ -46,7 +46,7 @@ void Logger::Write_JSON(const std::string& target_file) {
 
 	std::ofstream f(target_file);
 	if (!f.is_open())
-		abort(); //bad path for target_file
+		throw 0; //bad path for target_file
 
 	size_t k, K;
 

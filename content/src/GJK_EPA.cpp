@@ -6,6 +6,8 @@
  **/
 
 #include "GJK_EPA.h"
+#include <cmath>
+#include <cfloat>
 using namespace std;
 
 

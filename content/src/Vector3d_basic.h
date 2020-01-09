@@ -10,6 +10,7 @@
 #define __VECTOR3D_BASIC_H__
 
 #include <list>
+#include <cmath>
 
 #define PI 3.1416f
 
@@ -40,7 +41,7 @@ public:
 */
 float rand_unif(const float& low, const float& upper) {
 
-	if (upper < low) abort();
+	if (upper < low) throw 0;
 
 	return  low + (upper - low) *  (float)rand() / (float)RAND_MAX;
 
