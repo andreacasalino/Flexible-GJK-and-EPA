@@ -10,6 +10,7 @@
 #define __HULL_H__
 
 #include <list>
+#include <cmath>
 
 #define HULL_GEOMETRIC_TOLLERANCE (float)1e-3
 

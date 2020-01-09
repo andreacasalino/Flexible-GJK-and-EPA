@@ -2,7 +2,7 @@ All files are contained in ./content/
 
 ./content/GJK.h, ./content/GJK.cpp and ./content/Hull.h contain all the functionalities for performing proximity queries with the GJK or EPA algorithm. 
 
-The proposed code is cross-platform. 
+The proposed code is cross-platform: only standard c++ libraries are included. 
 
 With respect to other similar solvers, the one proposed allow the possibility to:
  -specify a roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
