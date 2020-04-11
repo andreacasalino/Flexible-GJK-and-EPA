@@ -423,9 +423,9 @@ void GJK_EPA::Plex::finishing_loop() {
 		}
 	}
 
-	if (this->plex_dim == 1) {
-		this->Emitter->Points[0] = this->plex[1]->P_in_shapeA;
-		this->Emitter->Points[1] = this->plex[1]->P_in_shapeB;
+	if ((this->plex_dim == 1) || (this->plex_dim == 0)) {
+		this->Emitter->Points[0] = this->plex[0]->P_in_shapeA;
+		this->Emitter->Points[1] = this->plex[0]->P_in_shapeB;
 	}
 	else if(this->plex_dim == 2) {
 		float coeff[3];
