@@ -1,0 +1,10 @@
+dare risalto a doc in README (anche in altre repo)
+unify guard lock for headers
+uase everywhere std::size_t
+remove redundant spaces in function bodies
+replace it++ ++it
+use for_each when possible
+specify in doc that results are not anymore saved into the solver
+mettere Plex::Normals in Coordinate pointer se ci sono move operation
+delete copy move c'tor and assign op
+aggiornare doc

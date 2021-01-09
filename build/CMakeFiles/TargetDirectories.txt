@@ -1,0 +1,10 @@
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/CMakeFiles/rebuild_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/CMakeFiles/edit_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Lib/CMakeFiles/rebuild_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Lib/CMakeFiles/GJK-EPA.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Lib/CMakeFiles/edit_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Samples/CMakeFiles/edit_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Samples/CMakeFiles/rebuild_cache.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Samples/CMakeFiles/Sample03.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Samples/CMakeFiles/Sample01.dir
+/home/andrea/Scrivania/Flexible-GJK-and-EPA/build/Samples/CMakeFiles/Sample02.dir

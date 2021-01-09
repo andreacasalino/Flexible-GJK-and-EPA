@@ -1,0 +1,2 @@
+/usr/bin/ar qc libGJK-EPA.a CMakeFiles/GJK-EPA.dir/src/Epa.cpp.o CMakeFiles/GJK-EPA.dir/src/GjkEpa.cpp.o CMakeFiles/GJK-EPA.dir/src/GjkPlex.cpp.o CMakeFiles/GJK-EPA.dir/src/Hull.cpp.o CMakeFiles/GJK-EPA.dir/src/shape/RoundDecorator.cpp.o CMakeFiles/GJK-EPA.dir/src/shape/TransformDecorator.cpp.o
+/usr/bin/ranlib libGJK-EPA.a

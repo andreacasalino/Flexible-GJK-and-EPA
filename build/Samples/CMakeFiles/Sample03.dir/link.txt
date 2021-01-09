@@ -1,0 +1,1 @@
+/usr/bin/g++-9  -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Os -DNDEBUG -rdynamic CMakeFiles/Sample03.dir/Sample03.cpp.o -o Sample03  ../Lib/libGJK-EPA.a 
