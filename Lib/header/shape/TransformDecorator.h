@@ -21,11 +21,11 @@ namespace flx::shape {
         void setRotationXYZ(const Coordinate& rotation_XYZ);
 
         inline const Coordinate& getTraslation() const { return this->traslation; };
-        inline void setTraslation(const Coordinate& rotation) { this->traslation = rotation; };
+        inline void setTraslation(const Coordinate& newTraslation) { this->traslation = newTraslation; };
 
-    private:
         void getSupport(Coordinate& result, const Coordinate& direction) const override;
 
+    private:
         float rotation[3][3]; //[rows][columns]
         Coordinate traslation;
         std::unique_ptr<ConvexShape> shape;

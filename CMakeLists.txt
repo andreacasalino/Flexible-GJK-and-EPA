@@ -8,7 +8,7 @@ set(VERSION_PATCH 0)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 option(LIB_OPT "Compile shared libraries (ON) or static (OFF)" OFF)
-option(BUILD_SAMPLES "Build the samples showing how to use EFG" ON)
+option(BUILD_SAMPLES "Build the samples showing how to use the package" ON)
 project(Flexible-GJK-and-EPA VERSION ${VERSION})
 
 # Must use GNUInstallDirs to install libraries into correct

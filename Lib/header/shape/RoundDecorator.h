@@ -18,9 +18,9 @@ namespace flx::shape {
 
         inline const float& getRay() const { return this->ray; };
 
-    private:
         void getSupport(Coordinate& result, const Coordinate& direction) const override;
 
+    private:
         float ray;
         std::unique_ptr<ConvexShape> shape;
     };

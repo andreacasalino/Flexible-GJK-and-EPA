@@ -1,3 +1,9 @@
+option(BUILD_EXAMPLE_00 "Build Example_00" ON)
+if(BUILD_EXAMPLE_00)
+    add_executable(Sample00 Sample00.cpp)
+    target_link_libraries(Sample00 PUBLIC flx::GJK-EPA)
+endif()
+
 option(BUILD_EXAMPLE_01 "Build Example_01" ON)
 if(BUILD_EXAMPLE_01)
     add_executable(Sample01 Sample01.cpp)
