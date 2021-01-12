@@ -9,20 +9,7 @@
 #include <shape/TransformDecorator.h>
 #include <list>
 #include <iostream>
-
-class V {
-public:
-    V(const float& x, const float& y, const float& z) {
-        this->v = {x, y, z};
-    };
-
-    inline float x() const { return this->v.x; };
-    inline float y() const { return this->v.y; };
-    inline float z() const { return this->v.z; };
-
-private:
-    flx::Coordinate v;
-};
+#include "VectorSample.h"
 
 std::ostream& operator<<(std::ostream& s, const flx::Coordinate& c) {
     s << "<" << c.x << "," << c.y << "," << c.z << ">";

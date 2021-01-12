@@ -13,18 +13,15 @@
 namespace flx { 
 	class GjkEpa {
 	public:
-		GjkEpa();
+		GjkEpa() = default;
 
 		struct ShapePair {
 			const shape::ConvexShape& shapeA;
 			const shape::ConvexShape& shapeB;
 		};
 
-		/** \brief Returns true if the last set pair of shapes is in collision, otherwise returns false.
-		* \details The shapes can be set using GJK_EPA::Set_shape_A; GJK_EPA::Set_shape_B;
-		GJK_EPA::Set_shape_A_transformed or GJK_EPA::Set_shape_B_transformed.
-		In case at least one of the shape was not set, an exception is raised.
-		*/
+		/** @brief Returns true if the passed set of shapes is in collision, otherwise returns false.
+		 */
 		bool isCollisionPresent(const ShapePair& pair);
 
 		struct CoordinatePair {
@@ -33,6 +30,14 @@ namespace flx {
 		};
 
 		enum ResultType { closestPoint, penetrationVector };
+		/** @brief Perform a complex query on the passed shape.
+		 *  The pair of coordinates returned in result has the following meaning:
+		 * 		- if the shapes are not in collision are the closest points in the pair
+		 * 		- if the shapes are in collision is the penetration vector
+		 *  @return the meaning to give to result
+		 *  @param the pair of shapes the query is about
+		 *  @param the result of the query
+		 */
 		ResultType doComplexQuery(const ShapePair& pair, CoordinatePair& result);
 
 	private:

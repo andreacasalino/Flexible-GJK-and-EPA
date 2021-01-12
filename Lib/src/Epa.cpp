@@ -22,7 +22,7 @@ namespace flx {
 									   ,const std::list<const hull::Facet*>& changed) const final {
 			auto it = added.begin(), itEnd = added.end();
 			for(it; it!=itEnd; ++it)  this->distancesToOrigin.find(*it)->second = dot((*it)->N, *(*it)->A);
-			for(it; it!=itEnd; ++it)  this->distancesToOrigin.find(*it)->second = dot((*it)->N, *(*it)->A);			
+			for(it = added.begin(); it!=itEnd; ++it)  this->distancesToOrigin.find(*it)->second = dot((*it)->N, *(*it)->A);			
 		};
 
 		void RemovedFacets(const std::list<const hull::Facet*>& removed) const final{

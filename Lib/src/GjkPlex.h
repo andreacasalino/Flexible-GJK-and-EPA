@@ -5,8 +5,8 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#ifndef FLX_GJK_PLEX_H
-#define FLX_GJK_PLEX_H
+#ifndef FLX_PLEX_H
+#define FLX_PLEX_H
 
 #include <GjkEpa.h>
 #include <memory>
