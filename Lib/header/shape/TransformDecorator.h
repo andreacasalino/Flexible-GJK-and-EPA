@@ -8,11 +8,10 @@
 #ifndef FLX_TRSFDECORATOR_H
 #define FLX_TRSFDECORATOR_H
 
-#include <shape/ConvexShape.h>
-#include <memory>
+#include <shape/ConvexDecorator.h>
 
 namespace flx::shape {
-    class TransformDecorator : public ConvexShape {
+    class TransformDecorator : public ConvexDecorator {
     public:
         TransformDecorator(std::unique_ptr<ConvexShape> shape);
         TransformDecorator(std::unique_ptr<ConvexShape> shape, const Coordinate& position, const Coordinate& rotation_XYZ = {0.f,0.f,0.f});
@@ -25,10 +24,12 @@ namespace flx::shape {
 
         void getSupport(Coordinate& result, const Coordinate& direction) const override;
 
+        void toRelative(Coordinate& point);
+        void toAbsolute(Coordinate& point);
+
     private:
         float rotation[3][3]; //[rows][columns]
         Coordinate traslation;
-        std::unique_ptr<ConvexShape> shape;
         mutable Coordinate transformedDirection;
     };
 }

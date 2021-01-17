@@ -45,6 +45,8 @@ namespace flx::shape {
             result.z = extremal->z();            
         };
 
+        inline const Container& getPoints() const { return this->vertices; };
+
     private:
         std::shared_ptr<Container> vertices;
     };

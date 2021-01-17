@@ -150,9 +150,9 @@ namespace flx::hull {
 		const Coordinate* A, *B, *C;
 		Facet* AB, *BC, *CA;
 		itN = Visible_group.begin();
-		size_t kboard;
+		size_t kboard, initialVisibleSize = Visible_group.size();
 		std::list<const Facet*> removed, changed, created;
-		for (k = 0; k < Visible_group.size(); ++k) {
+		for (k = 0; k < initialVisibleSize; ++k) {
 			kboard = 0;
 			A = (*itN)->A; B = (*itN)->B; C = (*itN)->C;
 			AB = (*itN)->Neighbour[0]; BC = (*itN)->Neighbour[1]; CA = (*itN)->Neighbour[2];

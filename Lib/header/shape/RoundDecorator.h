@@ -8,11 +8,10 @@
 #ifndef FLX_ROUNDDECORATOR_H
 #define FLX_ROUNDDECORATOR_H
 
-#include <shape/ConvexShape.h>
-#include <memory>
+#include <shape/ConvexDecorator.h>
 
 namespace flx::shape {
-    class RoundDecorator : public ConvexShape {
+    class RoundDecorator : public ConvexDecorator {
     public:
         RoundDecorator(std::unique_ptr<ConvexShape> shape, const float& ray);
 
@@ -22,7 +21,6 @@ namespace flx::shape {
 
     private:
         float ray;
-        std::unique_ptr<ConvexShape> shape;
     };
 }
 

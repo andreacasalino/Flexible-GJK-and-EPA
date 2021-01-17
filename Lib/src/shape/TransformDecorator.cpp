@@ -11,7 +11,7 @@
 
 namespace flx::shape {
     TransformDecorator::TransformDecorator(std::unique_ptr<ConvexShape> shape)
-        : shape(std::move(shape)) {
+        : ConvexDecorator(std::move(shape)) {
         if(nullptr == this->shape) throw flx::Error("found null shape when building TransformDecorator");
         if(nullptr != dynamic_cast<TransformDecorator*>(this->shape.get())) throw flx::Error("found null shape when building TransformDecorator");
         // initialize transformation with identity homogeneus matrix

@@ -8,3 +8,4 @@ specify in doc that results are not anymore saved into the solver
 mettere Plex::Normals in Coordinate pointer se ci sono move operation
 delete copy move c'tor and assign op
 aggiornare doc
+remove <iostream> from Epa.cpp

@@ -46,6 +46,7 @@ private:
 
 #include <GjkEpa.h>
 #include <iostream>
+#include <fstream>
 
 void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx::GjkEpa::CoordinatePair& result) {
     auto res = solver.doComplexQuery(pair, result);
@@ -59,5 +60,42 @@ void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx
     std::cout << "<" << result.pointB.x << "," << result.pointB.y << "," << result.pointB.z << ">" << std::endl;;
     std::cout << std::endl;
 }
+
+void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx::GjkEpa::CoordinatePair& result, const std::string& fileName) {
+    doComplexQuery(solver, pair, result);
+    std::fstream f(fileName);
+    if(!f.is_open()) return;
+    
+    auto printVertices = [&f](const std::list<Vector>& collection) {
+        f << "{\"V\":[";
+        auto it= collection.begin();
+        f << std::endl << '[' << it->x() << ","<< it->y() << ","<< it->z() << ']';
+        f << std::endl << ']}';
+    };
+
+    std::list<Vector> temp;
+    auto getCloud = [&temp](const shape::ConvexShape* shp){
+        const shape::TransformDecorator* trsf = dynamic_cast<const shape::TransformDecorator*>(shp);
+        if(nullptr == trsf) {
+            temp = dynamic_cast<const shape::ConvexCloud*>(shp)->getPoints();
+            return;
+        }
+        // todo
+    };
+
+    f << '{' << std::endl;
+    f << "\"Politopes\":[";
+    getCloud(&pair.shapeA);
+    printVertices(temp);
+    f << ",";
+    getCloud(&pair.shapeB);
+    printVertices(temp);
+    f << std::endl << ']';
+
+    f << "\"Lines\":";
+    temp = {result.pointA, result.pointB};
+    printVertices(temp);
+    f << '}';
+};
 
 #endif
