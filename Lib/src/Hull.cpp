@@ -93,24 +93,13 @@ namespace flx::hull {
 
 		diff(delta1, this->Mid_point, *facet.A);
 		float dot_normal = dot(facet.N, delta1);
-		if (dot_normal >= 0.f) {
-			facet.N.x = facet.N.x;
-			facet.N.y = facet.N.y;
-			facet.N.z = facet.N.z;
-		}
-
+		if (dot_normal >= 0.f) invert(facet.N);
 		//normalize
-		dot_normal = normSquared(facet.N);
-		if (dot_normal < 1e-7) {
-			facet.N.x = COEFF_NORMAL_DIRECTION * facet.N.x;
-			facet.N.y = COEFF_NORMAL_DIRECTION * facet.N.y;
-			facet.N.z = COEFF_NORMAL_DIRECTION * facet.N.z;
-		}
+		dot_normal = norm(facet.N);
+		if (dot_normal < 1e-7) prod(facet.N, COEFF_NORMAL_DIRECTION);
 		else {
 			dot_normal = 1.f / dot_normal;
-			facet.N.x = dot_normal * facet.N.x;
-			facet.N.y = dot_normal * facet.N.y;
-			facet.N.z = dot_normal * facet.N.z;
+			prod(facet.N, dot_normal);
 		}
 	}
 
@@ -150,7 +139,7 @@ namespace flx::hull {
 		const Coordinate* A, *B, *C;
 		Facet* AB, *BC, *CA;
 		itN = Visible_group.begin();
-		size_t kboard, initialVisibleSize = Visible_group.size();
+		std::size_t kboard, initialVisibleSize = Visible_group.size();
 		std::list<const Facet*> removed, changed, created;
 		for (k = 0; k < initialVisibleSize; ++k) {
 			kboard = 0;

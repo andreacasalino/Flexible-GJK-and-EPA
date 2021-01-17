@@ -38,7 +38,6 @@ namespace flx {
 		this->searchDirection = this->vertices[1]->vertexDiff;
 		invert(this->searchDirection);
 		normalizeInPlace(this->searchDirection);
-		Coordinate temp;
 		while (true) {
 			this->user.getSupportMinkowskiDiff(this->pair, this->searchDirection, *this->vertices[0]);
 			if(dot(this->vertices[0]->vertexDiff, this->searchDirection) <= GEOMETRIC_TOLLERANCE) {
