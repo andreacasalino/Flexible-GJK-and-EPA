@@ -1,8 +1,8 @@
 /**
  * Author:    Andrea Casalino
  * Created:   03.12.2019
-*
-* report any bug to andrecasa91@gmail.com.
+ *
+ * report any bug to andrecasa91@gmail.com.
  **/
 
 #include <GjkEpa.h>

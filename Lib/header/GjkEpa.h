@@ -9,6 +9,9 @@
 #define FLX_GJK_EPA_H
 
 #include <shape/ConvexShape.h>
+#ifdef FLX_LOGGER_ENABLED
+#include <string>
+#endif
 
 namespace flx { 
 	class GjkEpa {
@@ -22,7 +25,11 @@ namespace flx {
 
 		/** @brief Returns true if the passed set of shapes is in collision, otherwise returns false.
 		 */
-		bool isCollisionPresent(const ShapePair& pair);
+		bool isCollisionPresent(const ShapePair& pair
+#ifdef FLX_LOGGER_ENABLED
+		, std::string logFile = ""
+#endif
+		);
 
 		struct CoordinatePair {
 			Coordinate pointA;
@@ -38,7 +45,11 @@ namespace flx {
 		 *  @param the pair of shapes the query is about
 		 *  @param the result of the query
 		 */
-		ResultType doComplexQuery(const ShapePair& pair, CoordinatePair& result);
+		ResultType doComplexQuery(const ShapePair& pair, CoordinatePair& result
+#ifdef FLX_LOGGER_ENABLED
+		, std::string logFile = ""
+#endif
+		);
 
 	private:
 		struct MinkowskiCoordinate {
@@ -46,12 +57,11 @@ namespace flx {
 			Coordinate vertexB;
 			Coordinate vertexDiff;
 		};
-		void getSupportMinkowskiDiff(const ShapePair& pair, MinkowskiCoordinate& result);
+		void getSupportMinkowskiDiff(const ShapePair& pair, const Coordinate& direction, MinkowskiCoordinate& result);
 		
 		class Plex;
 
-		class EpaHullObserver;
-		void epa(const Plex& lastPlex, CoordinatePair& result);
+		class Epa;
 
 		enum ClosestElement { vertex_A, edge_AB, edge_AC, face_ABC };
 		static ClosestElement getClosestInSegment(const Coordinate& A, const Coordinate& B, float* miximg_coeff);
@@ -74,8 +84,6 @@ namespace flx {
 			result.z += coeff[2] * C.z;
 		};
 
-	// data
-		Coordinate searchDirection;
 	// cache to speed up computations
 		Coordinate searchDirectionTwin;
 	};

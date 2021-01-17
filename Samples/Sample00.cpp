@@ -6,39 +6,31 @@
  **/
 
 #include <shape/ConvexCloud.h>
-#include <shape/TransformDecorator.h>
-#include <list>
-#include <iostream>
-#include "VectorSample.h"
+/**
+ * Author:    Andrea Casalino
+ * Created:   03.12.2019
+ *
+ * report any bug to andrecasa91@gmail.com.
+ **/
 
-std::ostream& operator<<(std::ostream& s, const flx::Coordinate& c) {
-    s << "<" << c.x << "," << c.y << "," << c.z << ">";
-    return s;
-};
+#include <GjkEpa.h>
+#include <shape/ConvexCloud.h>
+#include <shape/TransformDecorator.h>
+#include "Utils.h"
+using namespace std;
+using namespace flx;
 
 int main() {
-    std::unique_ptr<flx::shape::ConvexShape> shape;
-    {
-        std::shared_ptr<std::list<V>> coordinates = std::make_shared<std::list<V>>();
-        coordinates->emplace_back(1.f, 0.f, 0.f);
-        coordinates->emplace_back(-1.f, 0.f, 0.f);
-        coordinates->emplace_back(0.f, 1.f, 0.f);
-        coordinates->emplace_back(0.f, -1.f, 0.f);
-        coordinates->emplace_back(0.f, 0.f, 1.f);
-        coordinates->emplace_back(0.f, 0.f, -1.f);
-        shape = std::make_unique<flx::shape::ConvexCloud<std::list<V>>>(coordinates);
-    }
-    shape = std::make_unique<flx::shape::TransformDecorator>(std::move(shape));
-    // static_cast<flx::shape::TransformDecorator*>(shape.get())->setTraslation(flx::Coordinate{0.2f, 0.2f, 0.f}); 
-    static_cast<flx::shape::TransformDecorator*>(shape.get())->setRotationXYZ(flx::Coordinate{0.f, 0.f, 0.2f}); 
+    std::unique_ptr<shape::ConvexShape> shapeA = std::make_unique<shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(10));    
+    std::unique_ptr<shape::ConvexShape> shapeB = std::make_unique<shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(10));
+    
+    shapeB = std::make_unique<shape::TransformDecorator>(std::move(shapeB));
+    static_cast<shape::TransformDecorator*>(shapeB.get())->setTraslation({3.f, 3.f, 3.f});
 
-    flx::Coordinate result;
+    GjkEpa solver;
 
-    shape->getSupport(result , flx::Coordinate{1.f, 0.1f, 0.f});
-    std::cout << result << std::endl;
-
-    shape->getSupport(result , flx::Coordinate{-1.f, 0.f, 0.f});
-    std::cout << result << std::endl;
+    GjkEpa::CoordinatePair result;
+    solver.doComplexQuery({*shapeA, *shapeB}, result, "Iterations.txt");
 
     return EXIT_SUCCESS;
 }

@@ -6,17 +6,19 @@
  **/
 
 #include <GjkEpa.h>
-#include "Hull.h"
-#include "GjkPlex.h"
+#include "Plex.h"
+#include "Epa.h"
+#ifdef FLX_LOGGER_ENABLED
+#include "Logger.h"
+#endif
 
 namespace flx {
+	void GjkEpa::getSupportMinkowskiDiff(const ShapePair& pair, const Coordinate& direction, MinkowskiCoordinate& result) {
+		pair.shapeA.getSupport(result.vertexA , direction);
 
-	void GjkEpa::getSupportMinkowskiDiff(const GjkEpa::ShapePair& pair, MinkowskiCoordinate& result) {
-		pair.shapeA.getSupport(result.vertexA , this->searchDirection);
-
-		this->searchDirectionTwin.x = -this->searchDirection.x;
-		this->searchDirectionTwin.y = -this->searchDirection.y;
-		this->searchDirectionTwin.z = -this->searchDirection.z;
+		this->searchDirectionTwin.x = -direction.x;
+		this->searchDirectionTwin.y = -direction.y;
+		this->searchDirectionTwin.z = -direction.z;
 		pair.shapeB.getSupport(result.vertexB, this->searchDirectionTwin);
 		
 		diff(result.vertexDiff, result.vertexA, result.vertexB);
@@ -97,16 +99,42 @@ namespace flx {
 		}
 	}
 
-	bool GjkEpa::isCollisionPresent(const ShapePair& pair) {
-		Plex plex(*this, pair);
+	bool GjkEpa::isCollisionPresent(const ShapePair& pair
+#ifdef FLX_LOGGER_ENABLED
+		, std::string logFile
+#endif
+	) {
+#ifdef FLX_LOGGER_ENABLED
+		std::shared_ptr<Logger> logger = std::make_shared<Logger>(logFile);
+#endif
+		Plex plex(*this, pair
+#ifdef FLX_LOGGER_ENABLED
+		, logger
+#endif
+		);
 		return plex.isCollisionPresent();
 	}
 
-	GjkEpa::ResultType GjkEpa::doComplexQuery(const ShapePair& pair, CoordinatePair& result) {
-		Plex plex(*this, pair);
+	GjkEpa::ResultType GjkEpa::doComplexQuery(const ShapePair& pair, CoordinatePair& result
+#ifdef FLX_LOGGER_ENABLED
+		, std::string logFile
+#endif
+	) {
+#ifdef FLX_LOGGER_ENABLED
+		std::shared_ptr<Logger> logger = std::make_shared<Logger>(logFile);
+#endif
+		Plex plex(*this, pair
+#ifdef FLX_LOGGER_ENABLED
+		, logger
+#endif
+		);
 		if(plex.isCollisionPresent()) {
 			// EPA
-			this->epa(plex, result);
+			Epa(plex, result
+#ifdef FLX_LOGGER_ENABLED
+			, logger
+#endif
+		);
 			return ResultType::penetrationVector;
 		}
 		// second phase of GJK

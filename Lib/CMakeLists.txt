@@ -23,3 +23,7 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/header>
         $<INSTALL_INTERFACE:header>
 )
+
+if(LOGGER_OPT)
+target_compile_definitions(${PROJECT_NAME} PUBLIC FLX_LOGGER_ENABLED)
+endif()
