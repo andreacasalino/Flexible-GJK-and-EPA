@@ -10,8 +10,9 @@
 
 #include <Coordinate.h>
 #include <list>
-#include <stdlib.h>  // for drand48_r
-#include <memory>
+#include <random>
+#include <shape/TransformDecorator.h>
+#include <shape/ConvexCloud.h>
 
 /**
  * @brief Just an example of coordinate representation that can be used 
@@ -28,14 +29,13 @@ public:
     inline float z() const { return this->v.z; };
 
     inline static std::shared_ptr<std::list<Vector>> getRandomCloud(const std::size_t& samplesNumber) {
-        drand48_data data;
-        double sample[3];
+        float sample[3];
         std::shared_ptr<std::list<Vector>> samples = std::make_shared<std::list<Vector>>();
         for(std::size_t k=0; k<samplesNumber; ++k) {
-            drand48_r(&data, &sample[0]);
-            drand48_r(&data, &sample[1]);
-            drand48_r(&data, &sample[2]);
-            samples->emplace_back(static_cast<float>(sample[0]), static_cast<float>(sample[1]), static_cast<float>(sample[2]));
+            sample[0] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            sample[1] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            sample[2] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            samples->emplace_back(sample[0], sample[1], sample[2]);
         }
         return samples;
     };
@@ -74,13 +74,20 @@ void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx
     };
 
     std::list<Vector> temp;
-    auto getCloud = [&temp](const shape::ConvexShape* shp){
-        const shape::TransformDecorator* trsf = dynamic_cast<const shape::TransformDecorator*>(shp);
+    auto getCloud = [&temp](const flx::shape::ConvexShape* shp){
+        const flx::shape::TransformDecorator* trsf = dynamic_cast<const flx::shape::TransformDecorator*>(shp);
         if(nullptr == trsf) {
-            temp = dynamic_cast<const shape::ConvexCloud*>(shp)->getPoints();
-            return;
+            temp = dynamic_cast<const flx::shape::ConvexCloud<std::list<Vector>>*>(shp)->getPoints();
         }
-        // todo
+        else {
+            temp = dynamic_cast<const flx::shape::ConvexCloud<std::list<Vector>>*>(&trsf->getShape())->getPoints();
+            flx::Coordinate c;
+            for (auto it = temp.begin(); it != temp.end(); ++it) {
+                c = {it->x(), it->y(), it->z()};
+                trsf->transform(c);
+                *it = Vector(c.x, c.y, c.z);
+            }
+        }    
     };
 
     f << '{' << std::endl;
@@ -92,8 +99,9 @@ void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx
     printVertices(temp);
     f << std::endl << ']';
 
-    f << "\"Lines\":";
-    temp = {result.pointA, result.pointB};
+    f << ",\"Lines\":";
+    temp = { Vector(result.pointA.x, result.pointA.y, result.pointA.z), 
+             Vector(result.pointB.x, result.pointB.y, result.pointB.z) };
     printVertices(temp);
     f << '}';
 };

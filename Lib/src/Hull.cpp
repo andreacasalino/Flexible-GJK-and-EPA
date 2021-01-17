@@ -9,7 +9,7 @@
 #include <Error.h>
 
 namespace flx::hull {
-	constexpr int COEFF_NORMAL_DIRECTION = 1e6;
+	constexpr float COEFF_NORMAL_DIRECTION = 1e6;
 
 	Hull::Hull(const Coordinate& A, const Coordinate& B, const  Coordinate& C, const Coordinate& D, const Observer* obs) { 
 		this->observer = obs;

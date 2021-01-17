@@ -43,13 +43,7 @@ namespace flx::shape {
         this->transformedDirection.y = this->rotation[0][1]*direction.x + this->rotation[1][1]*direction.y + this->rotation[2][1]*direction.z;
         this->transformedDirection.z = this->rotation[0][2]*direction.x + this->rotation[1][2]*direction.y + this->rotation[2][2]*direction.z;
         this->shape->getSupport(result, this->transformedDirection);
-        float temp[3];
-        temp[0] = this->rotation[0][0]*result.x + this->rotation[0][1]*result.y + this->rotation[0][2]*result.z + this->traslation.x;
-        temp[1] = this->rotation[1][0]*result.x + this->rotation[1][1]*result.y + this->rotation[1][2]*result.z + this->traslation.y;
-        temp[2] = this->rotation[2][0]*result.x + this->rotation[2][1]*result.y + this->rotation[2][2]*result.z + this->traslation.z;
-        result.x = temp[0];
-        result.y = temp[1];
-        result.z = temp[2];
+        this->transform(result);
     }
 
     void TransformDecorator::setRotationXYZ(const Coordinate& rotation_XYZ) {

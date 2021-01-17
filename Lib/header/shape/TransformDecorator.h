@@ -24,8 +24,15 @@ namespace flx::shape {
 
         void getSupport(Coordinate& result, const Coordinate& direction) const override;
 
-        void toRelative(Coordinate& point);
-        void toAbsolute(Coordinate& point);
+        inline void transform(Coordinate& point) const {
+            float temp[3];
+            temp[0] = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y + this->rotation[0][2] * point.z + this->traslation.x;
+            temp[1] = this->rotation[1][0] * point.x + this->rotation[1][1] * point.y + this->rotation[1][2] * point.z + this->traslation.y;
+            temp[2] = this->rotation[2][0] * point.x + this->rotation[2][1] * point.y + this->rotation[2][2] * point.z + this->traslation.z;
+            point.x = temp[0];
+            point.y = temp[1];
+            point.z = temp[2];
+        };
 
     private:
         float rotation[3][3]; //[rows][columns]
