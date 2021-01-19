@@ -14,18 +14,21 @@ using namespace flx;
 
 int main() {
     GjkEpa solver;
-    GjkEpa::CoordinatePair result;
 
     std::unique_ptr<shape::ConvexShape> shapeA = std::make_unique<shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(10));    
     std::unique_ptr<shape::ConvexShape> shapeB = std::make_unique<shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(10));
-
-    solver.doComplexQuery({*shapeA, *shapeB}, result, "LogPenetration.json");
+   
+    {
+        SampleLogger result("Result1.json");
+        result.doComplexQuery(solver, { *shapeA, *shapeB });
+    }
 
     shapeB = std::make_unique<shape::TransformDecorator>(std::move(shapeB));
     static_cast<shape::TransformDecorator*>(shapeB.get())->setTraslation({3.f, 3.f, 3.f});
-
-    solver.doComplexQuery({*shapeA, *shapeB}, result, "LogClosest.json");
-    //doComplexQuery(solver, { *shapeA, *shapeB }, result, "LogClosest.json");
+    {
+        SampleLogger result("Result2.json");
+        result.doComplexQuery(solver, { *shapeA, *shapeB });
+    }
 
     return EXIT_SUCCESS;
 }

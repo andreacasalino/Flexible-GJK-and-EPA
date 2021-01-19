@@ -9,22 +9,30 @@
 #include <fstream>
 #include <Error.h>
 #include <math.h>
+#include <iostream>
 
 std::shared_ptr<std::list<Vector>> Vector::getRandomCloud(const std::size_t& samplesNumber) {
-    float sample[3];
     std::shared_ptr<std::list<Vector>> samples = std::make_shared<std::list<Vector>>();
     for (std::size_t k = 0; k < samplesNumber; ++k) {
-        sample[0] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        sample[1] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        sample[2] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        samples->emplace_back(sample[0], sample[1], sample[2]);
+        samples->emplace_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX), 
+                              static_cast<float>(rand()) / static_cast<float>(RAND_MAX), 
+                              static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     }
     return samples;
 };
 
-void SampleLogger::print(const std::string& fileName) const {
-    std::ofstream f(fileName);
-    if (!f.is_open()) throw flx::Error("invalid log file location");
+SampleLogger::SampleLogger(const std::string& fileName)
+    : shapes("Politopes")
+    , results("Lines")
+    , logFile(fileName) {
+}
+
+SampleLogger::~SampleLogger() {
+    std::ofstream f(this->logFile);
+    if (!f.is_open()) {
+        std::cout << this->logFile << " it is an invalid log file location" << std::endl;
+        return;
+    }
     f << '{' << std::endl;
     f << this->shapes.str() << std::endl;
     f << ',' << this->results.str() << std::endl;
@@ -32,7 +40,7 @@ void SampleLogger::print(const std::string& fileName) const {
 }
 
 SampleLogger::VerticesArray::VerticesArray(const std::string& name) {
-    this->stream << '\"' << name << '\":[';
+    this->stream << '\"' << name << "\":[";
 }
 
 void SampleLogger::VerticesArray::add(const std::list<Vector>& element) {
@@ -48,10 +56,10 @@ void SampleLogger::VerticesArray::add(const std::list<Vector>& element) {
         this->stream << '[' << it->x() << "," << it->y() << "," << it->z() << ']' << std::endl;
         ++it;
         for (it; it != element.end(); ++it) {
-            this->stream << ',[' << it->x() << "," << it->y() << "," << it->z() << ']' << std::endl;
+            this->stream << ",[" << it->x() << "," << it->y() << "," << it->z() << ']' << std::endl;
         }
     }
-    this->stream << ']}' << std::endl;
+    this->stream << "]}" << std::endl;
 }
 
 std::string SampleLogger::VerticesArray::str() {
@@ -89,9 +97,6 @@ std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::TransformD
     return temp;
 }
 
-constexpr float PI = 3.14159f;
-constexpr std::uint8_t N_ALFA = 5;
-constexpr std::uint8_t N_BETA = 10;
 class Interval {
 public:
     Interval(const float& min, const float& max, const std::size_t& nPoints) 
@@ -114,6 +119,9 @@ private:
     const float delta;
     const float min;
 };
+constexpr float PI = 3.14159f;
+constexpr std::uint8_t N_ALFA = 5;
+constexpr std::uint8_t N_BETA = 10;
 std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::RoundDecorator& shape) {
     auto temp = getDescribingCloud(shape.getShape());
 
@@ -125,7 +133,6 @@ std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::RoundDecor
     float Calfa, Salfa, Cbeta, Sbeta;
     float coor[3];
     for (std::size_t d = 0; d < dim; ++d) {
-
         for (beta = 0; beta < N_BETA; ++beta) {
             alfaInterval.reset();
             Cbeta = std::cosf(betaInterval.eval());
@@ -137,11 +144,35 @@ std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::RoundDecor
                 coor[1] = Calfa * Sbeta * shape.getRay() + it->y();
                 coor[2] = Salfa * shape.getRay() + it->z();
                 temp.emplace_back(coor[0], coor[1], coor[2]);
+                ++betaInterval;
             }
+            ++alfaInterval;
         }
-
         ++it;
     }
 
     return temp;
+}
+
+void SampleLogger::doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair) {
+    flx::GjkEpa::CoordinatePair result;
+    flx::GjkEpa::ResultType res = solver.doComplexQuery(pair, result
+#ifdef FLX_LOGGER_ENABLED
+        , std::string{ "SolverLog" + std::to_string(++this->logCounter) }
+#endif
+    );
+
+    this->addShape(pair.shapeA);
+    this->addShape(pair.shapeB);
+    this->addQueryResult(result);
+
+    if (flx::GjkEpa::ResultType::closestPoint == res) {
+        std::cout << "collision absent, closest points" << std::endl;
+    }
+    else {
+        std::cout << "collision present, penetration depth" << std::endl;
+    }
+    std::cout << "<" << result.pointA.x << "," << result.pointA.y << "," << result.pointA.z << ">" << std::endl;
+    std::cout << "<" << result.pointB.x << "," << result.pointB.y << "," << result.pointB.z << ">" << std::endl;
+    std::cout << std::endl;
 }

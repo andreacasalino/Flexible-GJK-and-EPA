@@ -39,9 +39,8 @@ private:
 
 class SampleLogger {
 public:
-    SampleLogger() = default;
-
-    void print(const std::string& fileName) const;
+    SampleLogger(const std::string& fileName);
+    ~SampleLogger();
 
     inline void addShape(const flx::shape::ConvexShape& shape) { this->shapes.add(getDescribingCloud(shape)); };
 
@@ -49,6 +48,8 @@ public:
         this->results.add({ Vector(result.pointA.x, result.pointA.y, result.pointA.z)
                           , Vector(result.pointB.x, result.pointB.y, result.pointB.z) });
     };
+
+    void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair);
 
 private:
     static std::list<Vector> getDescribingCloud(const flx::shape::ConvexShape& shape);
@@ -70,19 +71,11 @@ private:
     };
     mutable VerticesArray shapes;
     mutable VerticesArray results;
-};
 
-//void doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair, flx::GjkEpa::CoordinatePair& result) {
-//    auto res = solver.doComplexQuery(pair, result);
-//    if(flx::GjkEpa::closestPoint == res) {
-//        std::cout << "collision absent, closest points" << std::endl;
-//    }
-//    else {
-//        std::cout << "collision present, penetration depth" << std::endl;
-//    }
-//    std::cout << "<" << result.pointA.x << "," << result.pointA.y << "," << result.pointA.z << ">" << std::endl;;
-//    std::cout << "<" << result.pointB.x << "," << result.pointB.y << "," << result.pointB.z << ">" << std::endl;;
-//    std::cout << std::endl;
-//}
+    std::string logFile;
+#ifdef FLX_LOGGER_ENABLED
+    std::size_t logCounter = 0;
+#endif
+};
 
 #endif
