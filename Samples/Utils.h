@@ -74,7 +74,7 @@ private:
 
     std::string logFile;
 #ifdef FLX_LOGGER_ENABLED
-    std::size_t logCounter = 0;
+    static std::size_t logCounter;
 #endif
 };
 

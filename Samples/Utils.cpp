@@ -154,11 +154,13 @@ std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::RoundDecor
     return temp;
 }
 
+std::size_t SampleLogger::logCounter = 0;
+
 void SampleLogger::doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapePair& pair) {
     flx::GjkEpa::CoordinatePair result;
     flx::GjkEpa::ResultType res = solver.doComplexQuery(pair, result
 #ifdef FLX_LOGGER_ENABLED
-        , std::string{ "SolverLog" + std::to_string(++this->logCounter) }
+        , std::string{ "SolverLog" + std::to_string(++logCounter) }
 #endif
     );
 
