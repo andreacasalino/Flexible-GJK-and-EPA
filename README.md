@@ -1,19 +1,18 @@
-All files are contained in ./content/
+This library contains the implementations of the **[GJK](https://en.wikipedia.org/wiki/Gilbert–Johnson–Keerthi_distance_algorithm)** and **[EPA](http://uu.diva-portal.org/smash/get/diva2:343820/FULLTEXT01.pdf)** algorithms.
+They are used a lot in the domain of computer graphics, to:
 
-./content/GJK.h, ./content/GJK.cpp and ./content/Hull.h contain all the functionalities for performing proximity queries with the GJK or EPA algorithm. 
+ * detect collisions between pairs of convex shapes
+ * get the closest pair of points between pairs of convex shapes
+ * get the penetration vector between pairs of convex shapes
 
-The proposed code is cross-platform: only standard c++ libraries are included. 
+With respect to other similar solvers, the one proposed allows to easily:
 
-With respect to other similar solvers, the one proposed allow the possibility to:
- -specify a roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
- -the shapes to consider are passed as list of 3D coordinates. The type describing the coordinates is a template, therefore you can use with no 
-  further effort the 3D representation that you prefer.
-
-./content/GJK_EPA.pdf explains the theory behind the lines of codes as well as how to use the GJK_EPA class.
-
-Samples are contained in:
-./content/Sample_01/Main_01.cpp
-./content/Sample_01/Main_02.cpp
-./content/Sample_01/Main_03.cpp
-
-Results of the Samples can be displayed using the script python ./Result_visualization/Main.py
+ * account fot roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
+ * manage template objects represting 3d coordinates in order to use your favourite algebra library ([Eigen](https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html), etc...)
+ 
+Before diving into the code, have a look at the documentation inside ./doc.
+This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) configure the project.
+ 
+The package is contained in ./Lib, while ./Samples contains samples showing how to use this library.
+In particular, after running the samples, some .json files will be produced storing the results.
+You can use the script pyhton ./Samples/Plotter.py to visualize them in a **3d plot**.

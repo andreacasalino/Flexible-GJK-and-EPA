@@ -170,7 +170,7 @@ void SampleLogger::doComplexQuery(flx::GjkEpa& solver, const flx::GjkEpa::ShapeP
     this->addShape(pair.shapeB);
     this->addQueryResult(result);
 
-    if (flx::GjkEpa::ResultType::closestPoint == res) {
+    if (flx::GjkEpa::ResultType::closestPoints == res) {
         std::cout << "collision absent, closest points" << std::endl;
     }
     else {

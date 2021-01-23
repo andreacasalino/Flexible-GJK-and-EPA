@@ -139,7 +139,7 @@ namespace flx {
 		}
 		// second phase of GJK
 		plex.finishingLoop(result);
-		return ResultType::closestPoint;
+		return ResultType::closestPoints;
 	}
 
 	void GjkEpa::computeOutsideNormal(Coordinate& N, const Coordinate& P1, const Coordinate& P2, const Coordinate& P3, const Coordinate& Pother) {
