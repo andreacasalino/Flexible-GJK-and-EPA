@@ -10,42 +10,43 @@
 #include <shape/TransformDecorator.h>
 #include "Utils.h"
 using namespace std;
-using namespace flx;
 
 int main() {
 // build the solver to use for the subsequent queries
-	GjkEpa solver;
-// used later
-	flx::GjkEpa::CoordinatePair result;
-	std::shared_ptr<std::list<Vector>> pointBufferA, pointBufferB;
-{
-// get random shapes with few points, centred around the origin
-	pointBufferA = Vector::getRandomCloud(50);
-	pointBufferB = Vector::getRandomCloud(50);
-	shape::ConvexCloud<std::list<Vector>> shapeA(pointBufferA);
-	shape::ConvexCloud<std::list<Vector>> shapeB(pointBufferB);
-// collision is expected
-	doComplexQuery(solver, {shapeA, shapeB}, result);
-// translate one of the shape
-	shape::TransformDecorator shapeB_traslated(std::make_unique<shape::ConvexCloud<std::list<Vector>>>(pointBufferA));
-	shapeB_traslated.setTraslation(flx::Coordinate{3.f, 3.f, 3.f});
-// no collision is expected now
-	doComplexQuery(solver, {shapeA, shapeB}, result);
-}
+	flx::GjkEpa solver;
+	
+// get random shapes with few points, centred around the origin: a collision detection is expected
+	std::unique_ptr<flx::shape::ConvexShape> shapeA = std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(50));
+	std::unique_ptr<flx::shape::ConvexShape> shapeB = std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(50));
+	{
+		SampleLogger result("Result_1_a.json");
+		result.doComplexQuery(solver, { *shapeA, *shapeB });
+	}
+
+// translate one of the shape away: no collision is expected anymore
+	shapeB = std::make_unique<flx::shape::TransformDecorator>(std::move(shapeB));
+	static_cast<flx::shape::TransformDecorator*>(shapeB.get())->setTraslation({ 3.f, 3.f, 3.f });
+	{
+		SampleLogger result("Result_1_b.json");
+		result.doComplexQuery(solver, { *shapeA, *shapeB });
+	}
 
 // repeat above steps with bigger point clouds
-{
-	pointBufferA = Vector::getRandomCloud(500);
-	pointBufferB = Vector::getRandomCloud(500);
-	shape::ConvexCloud<std::list<Vector>> shapeA(pointBufferA);
-	shape::ConvexCloud<std::list<Vector>> shapeB(pointBufferB);
-// collision is expected
-	doComplexQuery(solver, {shapeA, shapeB}, result);
-	shape::TransformDecorator shapeB_traslated(std::make_unique<shape::ConvexCloud<std::list<Vector>>>(pointBufferA));
-	shapeB_traslated.setTraslation(flx::Coordinate{3.f, 3.f, 3.f});
-// no collision is expected now
-	doComplexQuery(solver, {shapeA, shapeB}, result);
-}
+	shapeA = std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(500));
+	shapeB = std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(500));
+	{
+		SampleLogger result("Result_1_c.json");
+		result.doComplexQuery(solver, { *shapeA, *shapeB });
+	}
+
+	shapeB = std::make_unique<flx::shape::TransformDecorator>(std::move(shapeB));
+	static_cast<flx::shape::TransformDecorator*>(shapeB.get())->setTraslation({ 3.f, 3.f, 3.f });
+	{
+		SampleLogger result("Result_1_d.json");
+		result.doComplexQuery(solver, { *shapeA, *shapeB });
+	}
+
+// analyze the .json storing the results using the python script Plotter.py
 
 	return EXIT_SUCCESS;
 }

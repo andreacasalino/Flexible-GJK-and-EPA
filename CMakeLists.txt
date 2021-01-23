@@ -70,7 +70,7 @@ include(AutoCollect)
 include(Log)
 include(SetInstallRPath)
 
-option(LOGGER_OPT "Diagnostic log enabled (ON) or disabled (OFF)" ON)
+option(LOGGER_OPT "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
 add_subdirectory(Lib)
 if(BUILD_SAMPLES)
     add_subdirectory(Samples)

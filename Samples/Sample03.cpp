@@ -5,80 +5,61 @@
 * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "../src/GJK_EPA.h"
-#include "../src/Vector3d_basic.h"
-#include "../src/Result_Log.h"
+#include <GjkEpa.h>
+#include <shape/ConvexCloud.h>
+#include <shape/TransformDecorator.h>
+#include "Utils.h"
 using namespace std;
 
-struct shape {
-	list<v3>		Points;		//vertices
-	v3				Angles;		//orientation: rotation along x -> rotation along y -> rotation along z
-	v3				Traslations; //poisition 
-};
+typedef std::unique_ptr<flx::shape::ConvexShape> ShapePtr;
 
 // Add to the list of politopes a random poligon, with a random position and orientation
-void add_random_shape( list<shape>* shapes ) {
+void addRandomShape(std::list<ShapePtr>& poligons) {
+	auto randUnif = [](const float& min_val, const float& max_val) {
+		float delta = max_val - min_val;
+		return min_val + delta * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+	};
 
-	shapes->push_back(shape());
+	poligons.emplace_back(std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(Vector::getRandomCloud(rand() % 9 + 5)));
 
-	size_t N_edge = rand() % 9 + 3;
-	get_3dpoligon(&shapes->back().Points, N_edge);
+	flx::Coordinate rot = { randUnif(-3.14159f, 3.14159f) , randUnif(-3.14159f, 3.14159f) , randUnif(-3.14159f, 3.14159f) };
+	flx::Coordinate trasl = { randUnif(-5.f, 5.f) , randUnif(-5.f, 5.f) , randUnif(-5.f, 5.f) };
 
-	shapes->back().Angles._x = rand_unif(-PI, PI);
-	shapes->back().Angles._y = rand_unif(-PI, PI);
-	shapes->back().Angles._z = rand_unif(-PI, PI);
-
-	shapes->back().Traslations._x = rand_unif(-5.f, 5.f);
-	shapes->back().Traslations._y = rand_unif(-5.f, 5.f);
-	shapes->back().Traslations._z = rand_unif(-5.f, 5.f);
-
+	poligons.back() = std::make_unique<flx::shape::TransformDecorator>(std::move(poligons.back()), trasl, rot);
 }
 
 //see Sample_01 and Sample_02 before this one
 int main() {
-
 	size_t N_shapes = 5;
-	list<shape> shapes;
+	list<ShapePtr> shapes;
 
 //build the solver to use for the subsequent queries
-	GJK_EPA solver;
-//build a logger to save the results (only for debugging purposes)
-	Logger result_logger;
+	flx::GjkEpa solver;
+	SampleLogger result("Result_3.json");
 
 // sample N_shapes politopes
-	list<v3> trasformed_points;
-	for (size_t k = 0; k < N_shapes; k++) {
-		add_random_shape(&shapes);
-		trasform_points(&trasformed_points, shapes.back().Points, shapes.back().Angles, shapes.back().Traslations); //this is just for the debuggin purpose
-		result_logger.Add_politope(trasformed_points); //add the sampled politope to the list of shapes to log in the JSON
+	for (size_t k = 0; k < N_shapes; ++k) {
+		addRandomShape(shapes);
+		result.addShape(*shapes.back());
 	}
 
-//check all the possible pairs: every pair is checked a single time.
+//check all the possible pairs
 	auto it2 = shapes.begin();
-	v3 Point_in_A, Point_in_B;
+	flx::GjkEpa::CoordinatePair resultVector;
 	for (auto it = shapes.begin(); it != shapes.end(); it++) {
 		it2 = it;
-		it2++;
-		for (it2; it2 != shapes.end(); it2++) {
-			solver.Set_shape_A_transformed(&it->Points, it->Angles, it->Traslations);
-			solver.Set_shape_B_transformed(&it2->Points, it2->Angles, it2->Traslations);
-
-//collision check
-			if (solver.Are_in_collision()) {
-//collision detected: compute penetration distance
-				solver.Get_penetration(&Point_in_A, &Point_in_B);
-				result_logger.Add_line(Point_in_A, Point_in_B);
-			}
-			else {
-//collision absent: compute closest points
-				solver.Get_distance(&Point_in_A, &Point_in_B);
-				result_logger.Add_line(Point_in_A, Point_in_B);
-			}
+		++it2;
+		for (it2; it2 != shapes.end(); ++it2) {
+			flx::GjkEpa::ResultType res = solver.doComplexQuery({**it, **it2}, resultVector
+#ifdef FLX_LOGGER_ENABLED
+				, ""
+#endif
+			);
+			result.addQueryResult(resultVector);
 		}
 	}
 
-//log results
-	result_logger.Write_JSON("../Result_visualization/Sample_03_Log"); //you can use the python script in ../Result_visualization/Main.py to visualize the results
+// analyze the .json storing the results using the python script Plotter.py
 
-	return 0;
+	return EXIT_SUCCESS;
 }
