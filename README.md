@@ -19,3 +19,5 @@ In particular, after running the samples, some .json files will be produced stor
 You can use the script pyhton ./Samples/Plotter.py to visualize each result in a **3d plot**, by running
 
  * `python Plotter.py $(name of the file to plot)`
+ 
+ ![Sample](https://github.com/andreacasalino/Flexible-GJK-and-EPA/sample.png)
