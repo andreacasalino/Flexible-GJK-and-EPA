@@ -1,0 +1,111 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'closest_triangle.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{784.40816748bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.68308293)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{closest_triangle.pdf}}%
+    \put(0.10851593,0.12909962){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$D = \big ( P_3 - P_1 \big ) \wedge \big ( P_2 -P_1  \big )$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{closest_triangle.pdf}}%
+    \put(0.12503657,0.36133888){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{closest_triangle.pdf}}%
+    \put(0,0.37826286){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0.1647977,0.49698421){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.04839952,0.59464386){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.15944646,0.41878604){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_{closest}$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{closest_triangle.pdf}}%
+    \put(0.13080711,0.55470949){\color[rgb]{1,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{closest region}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{closest_triangle.pdf}}%
+    \put(0.38713962,0.36133888){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{closest_triangle.pdf}}%
+    \put(0.21156451,0.45338775){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0.3763622,0.57210911){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.259964,0.66976874){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.36061548,0.49985481){\color[rgb]{1,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{closest region}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{closest_triangle.pdf}}%
+    \put(0.4559561,0.39031416){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{closest_triangle.pdf}}%
+    \put(0.71405887,0.41161505){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.59766073,0.50927468){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.62564836,0.47524981){\color[rgb]{1,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{closest region}}}}%
+    \put(0.56603286,0.29175669){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{closest_triangle.pdf}}%
+    \put(0.77736815,0.36133888){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{closest_triangle.pdf}}%
+    \put(0.84156352,0.4731875){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0.94623738,0.5721091){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.82983924,0.66976874){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.76678046,0.50806446){\color[rgb]{1,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{closest region}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{closest_triangle.pdf}}%
+    \put(0.12503657,0.0657593){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{closest_triangle.pdf}}%
+    \put(-0,0.08268332){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0.16479769,0.20140466){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.04839952,0.30247907){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{closest_triangle.pdf}}%
+    \put(0.38713959,0.06835183){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{closest_triangle.pdf}}%
+    \put(0.3763622,0.27912207){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=15]{closest_triangle.pdf}}%
+    \put(0.36204945,0.21057984){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$D = \big ( P_1 \wedge P_2 \big ) \wedge \big ( P_2 - P_1 \big )$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=16]{closest_triangle.pdf}}%
+    \put(0.45595606,0.09669818){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=17]{closest_triangle.pdf}}%
+    \put(0.59766073,0.2156587){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.60756406,0.04256946){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=18]{closest_triangle.pdf}}%
+    \put(0.42058235,0.00413288){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$D = \big ( P_1 \wedge P_3 \big ) \wedge \big ( P_3 - P_1 \big )$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=19]{closest_triangle.pdf}}%
+    \put(0.77736815,0.07641545){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{origin}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=20]{closest_triangle.pdf}}%
+    \put(0.84156351,0.1882641){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=21]{closest_triangle.pdf}}%
+    \put(0.81295793,0.15364598){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$D = -P_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=22]{closest_triangle.pdf}}%
+  \end{picture}%
+\endgroup%
