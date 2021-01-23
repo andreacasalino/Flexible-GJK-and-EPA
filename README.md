@@ -7,7 +7,7 @@ They are used a lot in the domain of computer graphics, to:
 
 With respect to other similar solvers, the one proposed allows to easily:
 
- * account fot roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
+ * account for roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
  * manage template objects represting 3d coordinates in order to use your favourite algebra library ([Eigen](https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html), etc...)
  
 Before diving into the code, have a look at ./doc/GJK_EPA.pdf.
