@@ -11,9 +11,10 @@ With respect to other similar solvers, the one proposed allows to easily:
  * manage template objects represting 3d coordinates in order to use your favourite algebra library ([Eigen](https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html), etc...)
  
 Before diving into the code, have a look at ./doc/GJK_EPA.pdf.
-This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) configure the project.
+
+This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) to configure the project.
  
-The package is contained in ./Lib, while ./Samples contains samples showing how to use this library.
+The relevant code is contained in ./Lib, while ./Samples contains samples showing how to use this library.
 In particular, after running the samples, some .json files will be produced storing the results.
 You can use the script pyhton ./Samples/Plotter.py to visualize each result in a **3d plot**, by running
 
