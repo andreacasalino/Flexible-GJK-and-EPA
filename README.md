@@ -10,7 +10,7 @@ With respect to other similar solvers, the one proposed allows to easily:
  * account fot roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
  * manage template objects represting 3d coordinates in order to use your favourite algebra library ([Eigen](https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html), etc...)
  
-Before diving into the code, have a look at the documentation inside ./doc.
+Before diving into the code, have a look at ./doc/GJK_EPA.pdf.
 This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) configure the project.
  
 The package is contained in ./Lib, while ./Samples contains samples showing how to use this library.

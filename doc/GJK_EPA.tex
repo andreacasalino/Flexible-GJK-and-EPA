@@ -1,0 +1,503 @@
+\documentclass{article}
+\author{Andrea Casalino}
+\title{How to use the GjkEpa solver}
+
+\RequirePackage[margin=2cm]{geometry}
+\geometry{left=2cm,right=2cm,marginparwidth=6.8cm,marginparsep=1.5cm,top=1.5cm,bottom=1.5cm,footskip=2\baselineskip}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[default]{lato}
+\usepackage{graphicx,color, import}
+\usepackage{amssymb, amsmath}
+%\usepackage{hyperref}
+\usepackage{url}
+\usepackage[]{algorithm2e}
+\usepackage[toc,page]{appendix}
+
+\begin{document}
+\maketitle
+
+\newpage
+\section{Collision check for convex sets}
+
+The G.J.K. (Gilbert–Johnson–Keerthi) algorithm was designed to check whether two convex sets are or not in collision.
+An extension of this algorithm is also able, when the two sets don't collide, to compute the closest points. The euclidean distance between these two points can be assumed as the distance between the shapes.
+\\
+the EPA (Expanding Polytope Algorithm) algorithm was developed with the aim of computing the penetration depth of two convex sets. Clearly, the EPA algorithm can be applied only to the those pairs that overlaps. i.e. those pairs presenting a collision. 
+\\
+The GJK and the EPA algorithm are integrated into a single class: GjkEpa. They are internally invoked at the proper time when a certain proximity query is called.
+
+\subsubsection{convex shapes}
+\label{Sec:shapes_cnvx}
+
+The generic convex shape  $\mathcal{S}$, is a set of points for which it holds that:
+\begin{eqnarray}
+\mathcal{S} \mathit{\,is\,convex} & \Rightarrow & \forall S_{A,B} \in \mathcal{S} \wedge \forall r\in[0,1] 
+\\
+& \Rightarrow & S_A + r \cdot (S_B - S_A) = S(r) \in \mathcal{S}
+\end{eqnarray}
+i.e. the segment connecting the generic pair of points $S_A, S_B \in \mathcal{S}$, is entirely contained in $\mathcal{S}$. Examples of convex and non convex shapes are reported in Figure \ref{fig:convexity}.
+The shapes addressed by GjkEpa are the convex hulls of a set of 3d coordinates $\lbrace S_1, \cdots, S_n \rbrace$. Any internal point of such shapes can be obtained as a convex combination of the vertices $S_{1,\cdots,n}$:
+\begin{eqnarray}
+S \in \mathcal{S} \Rightarrow \exists c_{1,\cdots,n} \geq 0 \,\,\, s.t. \,\,\, 
+S = \sum_{i=1}^n S_i \cdot c_i \,\,\, \wedge \,\,\, \sum_{i=1}^n c_i = 1
+\end{eqnarray}
+\\
+Generally speaking, the coordinates of a point in the 3D space assume a different values according to the frame adopted for describing the position that point, see Appendix \ref{Sec:homog}. 
+Usually, the coordinates of points $S_{1,\cdots,n}$ are given in a certain local frame $(L)$, whose motion during time is coherent with the motion of the object they represent. The positions of $S_{1,\cdots,n}$ w.r.t. the local frame don't change during time, while the absolute positions can be computed considering an homogeneous matrix $M_{0L}=\lbrace R_{0L}, T_{0L} \rbrace$ \footnote{$R_{0L}$  is a rotation matrix (see also Appendix \ref{Sec:rot_XYZ}) describing the relative orientation while $T_{0L}$ is the relative position of the origin.}:
+\begin{eqnarray}
+M_{0L} = \begin{bmatrix} R_{0L} & T_{0L} \\ \begin{bmatrix} 0 & 0 & 0 \end{bmatrix} & 1  \end{bmatrix}
+ \end{eqnarray} 
+$M_{0L}$ describes the relative position and the orientation of the local frame w.r.t. a fixed absolute one $(0)$. The absolute position of a point $S_{i\,\,\,(0)}$ can be computed as follows:
+\begin{eqnarray}
+S_{i\,\,\,(0)} = R_{0L} S_{i\,\,\,(L)} + T_{0L}
+\end{eqnarray}
+where $S_{i\,\,\,(L)}$ denotes the coordinate values w.r.t. the local frame $(L)$.
+\\
+The $Support$ operator is much relevant for the GJK mechanism. Formally it is defined as follows \footnote{$\langle,\rangle$ stands for the dot product: $\langle a,b \rangle= a_x \cdot b_x + a_y \cdot b_y + a_z \cdot b_z $}
+\begin{eqnarray}
+S^*_D = Support \bigg ( \mathcal{S} , D \bigg) &=& argmax_{S\in \mathcal{S}} \bigg \lbrace \langle S, D \rangle \bigg \rbrace  \\
+ 											 &=& argmax_{S_{1,\cdots,n}} \bigg \lbrace \langle S_i, D \rangle \bigg \rbrace 
+\label{eq:supp_02}									 
+\end{eqnarray}
+i.e. the support of $\mathcal{S}$ in a certain direction $D$, is the furthest point $S^*_D \in \mathcal{S}$ in the direction $D$, see also Figure \ref{fig:Support}. The simplification done in equation (\ref{eq:supp_02}) expresses the fact that the farthest point in any direction $D$ must be one of the vertices $S_{1,\cdots,n}$.
+When dealing with moving objects, the $Support$ computation can be done considering matrix $M_{0L}$, without explicitly compute the absolute coordinates $S_{0,\cdots,n \,\,\, (0)}$. Indeed, the direction $D_{(0)}$, expressed in the absolute frame, can be firstly converted in the local one:
+\begin{eqnarray}
+D_{(L)} = R_{0L}^T \cdot D_{(0)}
+\end{eqnarray}
+Then, the farthest point $S^*_{D\,\,\,(L)}$ is searched in the local frame $(L)$ considering the coordinates $S_{1,\cdots,n \,\,\, (L)}$, applying equation (\ref{eq:supp_02}). Finally, the farthest point coordinates in the absolute frame are computed:
+\begin{eqnarray}
+S^*_{D\,\,\,(0)} = R_{0L} \cdot S^*_{D\,\,\,(L)} + T_{0L} 
+\end{eqnarray}
+Figure \ref{fig:Support_om} summarizes the above considerations.
+
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.7 \columnwidth}
+\import{./image/}{convexity.pdf_tex} 
+	\caption{Examples of a convex shape (left) and a non convex one (right). The segment connecting any pair of points within the shape, it's entirely contained in the shape itself. This is not true for the non convex example on the right.}
+	\label{fig:convexity}
+\end{figure} 
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{Support.pdf_tex} 
+	\caption{Example of support computation on a convex shape.}
+	\label{fig:Support}
+\end{figure} 
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{Support_rototrasl.pdf_tex} 
+	\caption{Steps involved in the computation of the furthest point of a shape whose position and orientation is described by an homogeneous matrix $M_{0L}$. }
+	\label{fig:Support_om}
+\end{figure} 
+
+\subsubsection{Minkowski difference}
+
+Both the GJK and the EPA algorithm, exploit the properties of the Minkowski difference. The Minkowski difference of a pair of shapes $\mathcal{A}, \mathcal{B}$ (not necessary convex) is described as follows:
+\begin{eqnarray}
+\mathcal{A} \ominus \mathcal{B} = \bigg \lbrace c \bigg| \forall a\in \mathcal{A}, \forall b\in \mathcal{B} \Rightarrow c=a-b \,\,\,   \bigg \rbrace
+\end{eqnarray}
+In case $\mathcal{A}$, $\mathcal{B}$ are convex, the set represented by the Minkowski difference is also convex. Moreover, in case the two shapes are in collision, the Minkowski difference contains the origin, since there must be two points $a\in\mathcal{A},b\in\mathcal{B}$ such that $a=b$.
+On the opposite, when $\mathcal{A}$ and $\mathcal{B}$ are disjointed, the distance of the Minkowski difference w.r.t. the origin is the distance of the two shapes. Figure \ref{fig:Mink_diff} reports an example of Minkowski difference computations.
+\\
+The $Support$ of the Minkowski difference can be computed as follows:
+\begin{eqnarray}
+Support \bigg( \mathcal{A} \ominus \mathcal{B} , D \bigg) =
+Support \bigg( \mathcal{A} , D \bigg) - Support \bigg( \mathcal{B} , -D \bigg)
+\label{eq:Mink_supp}
+\end{eqnarray}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{Mink_diff.pdf_tex} 
+	\caption{Example of Minkowski differences on the bottom, on the top the pairs for which the differences were computed. In case of overlapping pairs (case on the left), the Minkowski difference contains the origin. }
+	\label{fig:Mink_diff}
+\end{figure} 
+
+\section{GJK algorithm}
+\label{Sec:cases}
+
+The aim of the GJK algorithm is to find the closest point of $\mathcal{M}$ (a politope representing the Minkowski difference of a pair of shapes) w.r.t. the origin, without explicitly compute all the vertices pertaining to $\mathcal{M}$.
+This can be done in an iterative fashion, updating at each iteration a $Plex$ and a searching direction. The term $Plex$ refers to a compact set of points, which is essentially the convex hull of a small collection of vertices. We will sometimes refer to the $Plex$, considering its list of points $ \lbrace P_1, P_2, \cdots \rbrace$. The list of vertices in the $Plex$ are temporally ordered: $P_1$ is the last point added to the plex, while the last point in the list is the oldest one. 
+Basically, we avoid to entirely characterize $\mathcal{M}$,  by reasoning at every step on a restricted sub set of $\mathcal{M}$, i.e. the $Plex$.
+\\
+In order to explain the GJK mechanism, we initially suppose to reason on a Minkoski difference $\mathcal{M}$ not containing the origin (i.e. originated by two not colliding shapes). We can compute an initial point in $\mathcal{M}$ by taking the $Support$ in an initial direction $D$ equal to $\hat{x}$, i.e. the versor of the $x$ axis. Therefore, the initial $Plex$ is defined as follows:
+\begin{eqnarray}
+Plex = \lbrace P_1 \rbrace = \lbrace Support ( \mathcal{M} , \hat{x} ) \rbrace
+\end{eqnarray}
+Since the aim is to get as much as possible closest to the origin, we set the searching direction $D$ equal to $-P_1$.
+After initializing $Plex$ and $D$, the searching loop can start. At every iteration, the $Plex$ is enriched with the $Support$ of $\mathcal{M}$ in the actual direction $D$, obtaining $Plex^*$. The closest point to the origin in $Plex^*$ is computed and then, according to which is the closest region in $Plex^*$, the $Plex$ and the searching direction $D$ to consider for the subsequent iteration are updated. The updating process is repeated till it becomes evident that the closest region to the origin is reached.
+The pseudocode reported in Algorithm \ref{alg:GJK_01} summarizes the evolving steps.
+The updating task, taking into account $Plex^*$, considers 3 possible cases:
+\begin{itemize}
+\item case a:  $Plex^* = \lbrace P_1 , P_2 \rbrace$, i.e. $Plex^*$ is a segment. In this case we can notice that every point $P$ in the segment can be computed as the following combination:
+\begin{eqnarray}
+P(s) &=& P_1 + s \cdot (P_2 - P_1) \,\,\,\,\, 0 \leq s \leq 1 \nonumber\\
+     &=& (1-s) \cdot P_1 + s \cdot P_2
+\end{eqnarray}
+Finding the closest point can be cast in a constrained optimization problem. Let $\Delta$ be the squared distance to the origin of the generic point in the segment. $\Delta$ can be computed as follows:
+\begin{eqnarray}
+\Delta(s) &=&  P(s)_x^2 + P(s)_y^2 + P(s)_z^2  \nonumber\\
+&=& \langle P(s), P(s) \rangle \nonumber\\
+&=& \langle P_1 + s \cdot (P_2 - P_1), P_1 + s \cdot (P_2 - P_1) \rangle \nonumber\\
+&=& \langle P_1 , P_1 \rangle + 2 s \cdot \langle P_1 , P_2 - P_1 \rangle + s^2 \cdot \langle P_2 - P_1 , P_2 - P_1 \rangle
+\end{eqnarray}
+If we get rid of the constraint about $s$, we can compute the minimum of the above expression by taking the point for which 
+the derivative of the above expression is equal to zero:
+\begin{eqnarray}
+\frac{\partial \Delta}{\partial s} &=& 0 \nonumber\\
+2 \big( \langle P_1, P_2 - P_1 \rangle + s \cdot \langle P_2 - P_1, P_2 - P_1 \rangle \big) &=& 0 \nonumber\\
+s_{optimum} &=& \frac{-\langle P_1, P_2 - P_1 \rangle}{\langle P_2 - P_1, P_2 - P_1 \rangle}
+\end{eqnarray}
+In the case $0 \leq s_{optimum} \leq 1 $, the closest point to the origin $P_{closest}$ is simply:
+\begin{eqnarray}
+P_{closest} = P_1 \cdot (1 - s_{optimum}) + P_2 \cdot s_{optimum}
+\label{eq:mix_seg_01}
+\end{eqnarray}  
+$P_{closest}$ is contained in the segment representing the actual plex. Therefore, the closest region to the origin is the segment itself: the new $Plex$ to consider is equal to  $Plex^*$ and the new searching direction is set equal to \footnote{The operator $\wedge$ indicates the cross product of the two vectors: $c = a \wedge b = \begin{bmatrix} c_x = a_y \cdot b_z - a_z \cdot b_y  & c_y = a_z \cdot b_x - a_x \cdot b_z & c_z = a_x \cdot b_y - a_y \cdot b_x \end{bmatrix}$}:
+\begin{eqnarray}
+D = \big ( P_1 \wedge P_2 \big ) \wedge \big ( P_2 - P_1 \big )
+\end{eqnarray}
+This is done in order to have a direction orthogonal to $P_2 - P_1$ and at the same time pointing towards the origin.
+\\
+On the opposite, when $s_{optimum} \leq 0$:
+\begin{eqnarray}
+P_{closest} = P_1 = P_1 \cdot 1 + P_2 \cdot 0
+\label{eq:mix_seg_02}
+\end{eqnarray}
+The new plex to consider is simply $\lbrace P_1 \rbrace$, while the new searching direction is $-P_1$.
+Figure \ref{fig:update_seg} summarizes the two presented cases.
+The case for which $s_{optimum} \geq 1$ is not possible, since as stated at the beginning, the points are temporally ordered. Therefore, $P_2$ was the closest point at the previous iteration and $P_1$ was found imposing a searching direction equal to $-P_2$. Therefore the closest point cannot be $P_2$. 
+
+\item case b: $Plex^* = \lbrace P_1 , P_2, P_3 \rbrace$, i.e. $Plex^*$ is a triangular facet.
+Also for this case we can solve an optimization problem for computing the closest point. Every point $P$ within the facet 
+can be computed considering the following combination:
+\begin{eqnarray}
+P(\alpha , \beta) &=& P_1 + \alpha \cdot (P_2 - P_1) + \beta \cdot (P_3 - P_1) \nonumber\\
+&s.t.& \,\,\,\, 0 \leq \alpha \wedge 0 \leq \beta  \wedge \alpha + \beta \leq 1 \nonumber\\
+     &=& P_1 + \alpha \cdot \delta_1 + \beta \cdot \delta_2
+\end{eqnarray}
+As similarly done for case a, the closest point can be computed by taking the minimum of $\Delta$:
+\begin{eqnarray}
+\Delta(\alpha , \beta) &=& \langle P(\alpha , \beta), P(\alpha , \beta) \rangle \nonumber\\
+&=& \langle P_1 + \alpha \cdot \delta_1 + \beta \cdot \delta_2, P_1 + \alpha \cdot \delta_1 + \beta \cdot \delta_2 \rangle \nonumber\\
+&=& \langle P_1, P_1 \rangle + 2 \cdot \big( \alpha \cdot \langle \delta_1, P_1 \rangle + \beta \cdot \langle \delta_2, P_1 \rangle + \alpha \beta \cdot \langle \delta_1, \delta_2 \rangle \big) +
+\alpha ^ 2 \langle \delta_1, \delta_1 \rangle + \beta ^ 2 \langle \delta_2, \delta_2 \rangle
+\end{eqnarray}
+The optimal values are taken imposing the gradient of $\Delta$ equal to 0:
+\begin{eqnarray}
+\begin{bmatrix} \frac{\partial \Delta}{\partial \alpha} \\ \frac{\partial \Delta}{\partial \beta} \end{bmatrix} &=&
+2 \begin{bmatrix} 
+\langle \delta_1, P_1\rangle + \beta \cdot \langle \delta_1, \delta_2\rangle + \alpha \cdot \langle \delta_1, \delta_1 \rangle \\ 
+\langle \delta_2, P_1\rangle + \alpha \cdot \langle \delta_1, \delta_2\rangle + \beta \cdot \langle \delta_2, \delta_2 \rangle
+\end{bmatrix} = \begin{bmatrix} 0 \\  0 \end{bmatrix} \nonumber\\
+\begin{bmatrix}
+\langle \delta_1, \delta_1 \rangle & \langle \delta_1, \delta_2 \rangle \\ 
+\langle \delta_1, \delta_2 \rangle & \langle \delta_2, \delta_2 \rangle 
+\end{bmatrix} \begin{bmatrix} \alpha \\ \beta \end{bmatrix} &=& 
+\begin{bmatrix} -\langle \delta_1, P_1 \rangle \\ -\langle \delta_2, P_1 \rangle \end{bmatrix} \nonumber\\
+M \begin{bmatrix} \alpha \\ \beta \end{bmatrix} &=& V \nonumber\\
+\begin{bmatrix} \alpha_{optimum} \\ \beta_{optimum} \end{bmatrix} &=& M^{-1}V
+\end{eqnarray}
+The above computations lead to obtain the closest point to the origin lying in the plane defined by the 3 points $P_{1,2,3}$.
+Only when is verified that $0 \leq \alpha_{optimum}$, $0 \leq \beta_{optimum}$ and $\alpha_{optimum} + \beta_{optimum} \leq 1$, the closest point $P_{closest}$ belongs to $Plex^*$. In this circumstance $P_{closest}$ is computed in this way:
+\begin{eqnarray}
+P_{closest} = P_1 + P_2 \cdot \alpha_{optimum} + P_3 \cdot \beta_{optimum}
+\label{eq:mix_seg_03}
+\end{eqnarray}
+The plex to consider for the subsequent iteration is $Plex^*$ and the new searching direction $D$ is assumed as the normal of the plane  $P_{1,2,3}$, pointing towards the origin:
+\begin{eqnarray}
+\hat{D} &=& \big( P_2 - P_1 \big) \wedge \big( P_3 - P_1 \big) \\
+if \,\,\,\, \langle \hat{D}, P_1 \rangle > 0 \Rightarrow D &=& - \hat{D} \\
+else \,\,\,\, D &=& \hat{D} 
+\end{eqnarray}
+When the closest point is not contained in the facet, the closest region can be: vertex $P_1$ (the last added to the plex), the segment $P_{1,2}$ or the segment $P_{1,3}$. The steps reported for case a are applied independently for $P_{1,2}$ and $P_{1,3}$ and the region having the $P_{closest}$ point closer to the origin is assumed as the closest region. Consequently the plex and $D$ are updated, following the directions introduced in the previous case. For example if the closer region is $P_{1,3}$, points $P_1$ and $P_3$ are the only ones remaining in the plex and $D$ is assumed equal to $\big ( P_1 \wedge P_3 \big ) \wedge \big ( P_3 - P_1 \big )$. Figure \ref{fig:update_tri} summarizes the updating procedure.
+
+\item case c: $Plex^* = \lbrace P_1 , P_2, P_3, P_4 \rbrace$, i.e. $Plex^*$ is a tetrahedron.
+Here it is important to remark the fact that the facet $P_{2,3,4}$ cannot be the closest to the origin, since the corresponding points are the oldest ones in the vertices: the searching direction that leads to obtain $P_1$ was computed considering that points. Therefore, the closest region must be one of the facets having $P_1$ as a vertex, i.e. the facets $P_{1,2,3}$, $P_{1,2,4}$ and $P_{1,3,4}$. The points $P^{1,2,3}_{closest}$ , $P^{1,2,4}_{closest}$  and $P^{1,3,4}_{closest}$, with the obvious meaning of notation, are computed as indicated for case b and the closest one to the origin is found. The corresponding closest region in the plex is identified and the plex is updated as similarly done for the previous cases. Visual examples are provided in Figure \ref{fig:update_tetra}.
+
+\end{itemize}
+
+Figure \ref{fig:GJK_sample} reports an example of searching loop.  Notice that it is not necessary to know the entire set of vertices pertaining to the Minkowski difference $\mathcal{M}$, since only the $Support$ computation is needed. Although the example is planar, the considerations must be generalized to the 3D case, considering the updating rules provided above.
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.55 \columnwidth}
+\import{./image/}{closest_segment.pdf_tex} 
+	\caption{Examples of plex update. On the top, $Plex^*$, while on the bottom the updated $Plex$ and the new searching direction. }
+	\label{fig:update_seg}
+\end{figure} 
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{closest_triangle.pdf_tex} 
+	\caption{Examples of plex update. On the top, $Plex^*$, while on the bottom the updated $Plex$ and the new searching direction. }
+	\label{fig:update_tri}
+\end{figure} 
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{closest_tetra.pdf_tex} 
+	\caption{Examples of plex update. On the top, $Plex^*$, while on the bottom the updated $Plex$ and the new searching direction. }
+	\label{fig:update_tetra}
+\end{figure} 
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.95 \columnwidth}
+\import{./image/}{GJK_sample.pdf_tex} 
+	\caption{Examples of plex and searching direction updates: the search is terminated when the closest region of the Minkowski difference is found. }
+	\label{fig:GJK_sample}
+\end{figure}
+
+\begin{algorithm}[H]
+$P_1 = Support \bigg(\mathcal{M} , \hat{x} \bigg)$\;
+ $Plex = \lbrace P_1 \rbrace$\;
+ $D = -P_1$\;
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+ \While{$P^*_D \notin Plex$}{
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+$Plex^* = P^*_D \cup Plex$\; 
+  \If{$\left | Plex^* \right | = 2$}{
+   update following the steps of case a\;
+   }
+  \ElseIf{$\left | Plex^* \right | = 3$}{
+   update following the steps of case b\;
+   }
+  \ElseIf{$\left | Plex^* \right | = 4$}{
+   update following the steps of case c\;
+   }
+ }
+\caption{Computation of the closest region in the Minkowski difference $\mathcal{M}$.
+\label{alg:GJK_01}}
+\end{algorithm}
+
+\subsection{Simple collision check}
+
+Sometimes, we are not interested in finding the closest region of the Minkowski difference to the origin, since we want just to know whether it contains or not the origin, i.e. check whether two objects are or not in collision.
+This can be done by slightly modify the pseudo code of Algorithm \ref{alg:GJK_01}. Consider the first picture from the left of Figure \ref{fig:GJK_sample}: it is evident also from the initial update that the Minkowski difference depicted cannot contain the origin. Indeed, for the first $Support$ found, it is verified that $\langle D , M^*_D \rangle < 0$. This implies that $\mathcal{M}$ is a politope that is entirely above the plane having $D$ as normal and passing from $M^*_D$. For this reason, if we are simply interested in performing a collision check, we can stop the search at the first iteration.
+\\
+In the previous Section we assumed that the Minkowski difference did not contain the origin. Anyway, the updating process proposed can be still valid in the contrary case, arresting the search as soon as we detect that $Plex$ contains the origin. 
+Checking whether $Plex$ contains the origin is trivial for case a and b (since it happens when the closest point found has a null distance to the origin), while is a little bit more complex when dealing with case c. In the last case, we can notice that the tetrahedron represented by $Plex$ contains the origin only when the following is verified:
+\begin{eqnarray}
+\langle P_1 , n_1 \rangle \geq 0 \\
+\langle P_1 , n_2 \rangle \geq 0 \\
+\langle P_1 , n_3 \rangle \geq 0 
+\end{eqnarray}  
+where $n_{1,2,3}$ are the outside normals of the facets $P_{1,2,3}$, $P_{1,2,4}$ and $P_{1,3,4}$ respectively, see also Figure \ref{fig:tetra_origin}.
+\\
+Therefore, introducing the above additional checks, we obtain the GJK algorithm adopted for performing simple collision check. The corresponding pseudocode is reported by Algorithm \ref{alg:GJK_02}.
+
+\begin{algorithm}[H]
+$P_1 = Support \bigg(\mathcal{M} , \hat{x} \bigg)$\;
+ $Plex = \lbrace P_1 \rbrace$\;
+ $D = -P_1$\;
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+ \While{$P^*_D \notin Plex$}{
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+ \If{$\langle D , P^*_D \rangle < 0$}{
+ \Return collision absent\;
+   }
+$Plex^* = P^*_D \cup Plex$\; 
+ \If{$0 \in Plex^*$}{
+ \Return collision detected\;
+   }
+  \If{$\left | Plex^* \right | = 2$}{
+   update following the steps of case a\;
+   }
+  \ElseIf{$\left | Plex^* \right | = 3$}{
+   update following the steps of case b\;
+   }
+  \ElseIf{$\left | Plex^* \right | = 4$}{
+   update following the steps of case c\;
+   }
+ }
+\caption{GJK steps for performing a simple collision check.
+\label{alg:GJK_02}}
+\end{algorithm}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.35 \columnwidth}
+\import{./image/}{tetra_origin.pdf_tex} 
+	\caption{Example of a tetrahedron containing the origin. }
+	\label{fig:tetra_origin}
+\end{figure}
+
+
+\subsection{Absence of a collision: get the closest points}
+\label{Sec:closest_points}
+
+In case a collision between two shapes $\mathcal{A}$ and $\mathcal{B}$ is not present, Algorithm  \ref{alg:GJK_01} can be applied to obtain the closest $Plex$ to the origin. Then, the distance among the shapes can be assumed equal to the distance of the $Plex$ to the origin. Moreover, the closest points in the shapes generating the point in the Minkowski difference closer to the origin can be computed. Indeed, the closest point in the $Plex$ to the origin can be obtained as a combination in the form (equation (\ref{eq:mix_seg_01}), (\ref{eq:mix_seg_02}) and (\ref{eq:mix_seg_03})):
+\begin{eqnarray}
+P_{closest} = \sum_{i=1}^{\left | Plex \right |} c_i P_i
+\end{eqnarray}
+Every vertex $P_i \in Plex$ was obtained as a difference $A_i - B_i$, i.e. the $Supports$ in the two shapes to check, equation (\ref{eq:Mink_supp}). Therefore, the coefficients in the above equation can be used for computing the points in $\mathcal{A}$ and $\mathcal{B}$ whose difference leads to obtain the closest point to the origin of the Minkowski difference:
+\begin{eqnarray}
+A_{closest} = \sum_{i=1}^{\left | Plex \right |} c_i A_i \\
+B_{closest} = \sum_{i=1}^{\left | Plex \right |} c_i B_i
+\end{eqnarray}
+$A_{closest}$ and $B_{closest}$ are the closest pair of points in the two shapes. Clearly $\left \| A_{closest} - B_{closest} \right \|$ is equal to the distance of between $\mathcal{A}$ and $\mathcal{B}$. Figure \ref{fig:closest_point} reports an example.
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.85 \columnwidth}
+\import{./image/}{closest_example.pdf_tex} 
+	\caption{Example of closest points computation, for non colliding shapes. }
+	\label{fig:closest_point}
+\end{figure}
+
+
+
+\section{Collision detected: get the penetration depth}
+\label{Sec:penetration}
+
+In case of an overlapping pair $\mathcal{A}$,$\mathcal{B}$, we could be interested in determining the penetration vector $\rho$. Formally $\rho$ is defined in this way:
+\begin{eqnarray}
+\rho = argmin_{\rho} \bigg \lbrace \left \| \rho \right \|_2^2 \bigg | \mathcal{B}^* = \lbrace b^*=b+\rho \,\,\,\, \forall b \in \mathcal{B} \rbrace \Rightarrow 0 \notin \mathcal{A} \ominus \mathcal{B}  \bigg \rbrace
+\end{eqnarray}
+i.e. $\rho$ is the minimum length translation to apply for $\mathcal{B}$ to realize that $\mathcal{A}$ and $\mathcal{B}$ are not anymore in collision. $\rho$ can be computed as the following difference:
+\begin{eqnarray}
+\rho = \rho_A - \rho_B
+\end{eqnarray}
+where $\rho_A \in \mathcal{A}$ and $\rho_B \in \mathcal{B}$ can be obtained by using the EPA algorithm. Refer also to Figure \ref{fig:penetration_vector}.
+\\
+$\rho$ is a vector going from the origin to the closest point of the surface of $\mathcal{M} = \mathcal{A} \ominus \mathcal{B}$. In order to get such a point, an algorithm specular to the GJK can be adopted: the EPA algorithm. Also in this case, the entire shape of the Minkowski difference will not be explicitly computed. The algorithm starts by building an initial tetrahedron contained in $\mathcal{M}$ \footnote{The last $Plex$ obtained by the initial GJK iterations is considered as a starting point. In case it is not a tetrahedron, points are added, finding the $Support$ in proper directions. }. This initial politope is constantly inflated in order to find $\rho$. More precisely, at each iteration the closest facet to the origin is identified and the $Support$ in the direction of the outgoing normal of that facet is searched. In case a new vertex is found, it is used for updating the politope: a cone of new facets is build and an updated politope is obtained, see Figure \ref{fig:face_cone}. Otherwise, when the found vertex is already present in the politope, the last facet considered for the expansion is recognized to be the closest to the origin. Therefore, the procedure described in case b of Section \ref{Sec:cases} is adopted for precisely identify the closest point in the facet and consequently the penetration vector $\rho$. Algorithm \ref{alg:EPA} reports the pseudocode of the EPA algorithm. 
+Point $\rho_A$ and $\rho_B$ can be identified by following a procedure similar to the one adopted in Section \ref{Sec:closest_points} for identify the closest points of the shape. Indeed, considering the points characterizing the vertices of the closest facet to the origin, $P_{1,2,3}$, the penetration vector can be obtained as a combination in the form:
+\begin{eqnarray}
+\rho = c_1 \cdot P_1 + c_2 \cdot P_2 +  c_3 \cdot P_3 
+\end{eqnarray}
+The list of vertices in the original shapes that produced $P_{1,2,3}$ are $A_{1,2,3}$ and $B_{1,2,3}$ (review Section \ref{Sec:closest_points}). Therefore:
+\begin{eqnarray}
+\rho_A =  c_1 \cdot A_1 + c_2 \cdot A_2 +  c_3 \cdot A_3  \nonumber\\
+\rho_B =  c_1 \cdot B_1 + c_2 \cdot B_2 +  c_3 \cdot B_3
+\end{eqnarray}
+Figure \ref{fig:EPA_sample} reports a planar example. The tridimensional case is analogous, considering to update a tridimensional convex hull (Figure \ref{fig:face_cone}).
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.85 \columnwidth}
+\import{./image/}{penetration_vector.pdf_tex} 
+	\caption{Penetration vector. }
+	\label{fig:penetration_vector}
+\end{figure}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.7 \columnwidth}
+\import{./image/}{facets_cone.pdf_tex} 
+	\caption{Example of $Plex$ update. All the blue facets are visible from $P^*_D$ and are those that will be replaced by the cone of new facets in the updated version of the $Plex$.  }
+	\label{fig:face_cone}
+\end{figure}
+
+\begin{algorithm}[H]
+ $Plex = \lbrace P_1, P_2, P_3, P_4 \rbrace$\;
+ $F_{clst}$ = find the closest facet to the origin in $Plex$\;
+ $D =$ outgoing normal of $F_{clst}$\;
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+ \If{$P^*_D \in Plex$}{
+ 	\Return $\rho$ = closest point to origin in $F_{clst}$\;
+ }
+ Update $Plex$ building a cone of new facets around $P^*_D$ (Figure \ref{fig:face_cone})\;
+ \While{TRUE}{
+ $F_{clst}$ = find the closest facet to the origin in $Plex$\;
+ $D =$ outgoing normal of $F_{clst}$\;
+ $P^*_D=Support\bigg(Plex , D\bigg)$\;
+ \If{$P^*_D \in Plex$}{
+ 	\Return $\rho$ = closest point to origin in $F_{clst}$\;
+ }
+ Update $Plex$ building a cone of new facets around $P^*_D$ (Figure \ref{fig:face_cone})\;
+ }
+\caption{EPA algorithm for penetration vector computation.
+\label{alg:EPA}}
+\end{algorithm}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.9 \columnwidth}
+\import{./image/}{EPA_sample.pdf_tex} 
+	\caption{Example of penetration vector computation. Red arrows indicate the outgoing normal of the facets. }
+	\label{fig:EPA_sample}
+\end{figure}
+
+\section{How to use the GjkEpa solver}
+
+The GjkEpa class implements the GJK and EPA algorithms.
+There are basically 2 ways to use such solver:
+\begin{itemize}
+\item perform s simple query
+\item perform a complex query
+\end{itemize}
+A simple query can be performed by calling GjkEpa::isCollisionPresent, to simply check if the two shapes are or not in collision, without computing the closest points or the penetration depth (avoiding to waste time).
+\\
+On the other hand, when such quantities are required, you need to perform a complex query by calling GjkEpa::doComplexQuery.
+In this last case, the GjkEpa solver will automatically perform the final steps of the GJK (Section \ref{Sec:closest_points}) or the EPA algorithm (Section \ref{Sec:penetration}) according to the fact that the shapes are or not in collision.
+\\
+Refer also to the documentation inside the header of the GjkEpa class.
+
+\begin{appendices}
+\section{Homogeneous matrix}
+\label{Sec:homog}
+
+Homogeneous matrix are adopted for describing the relative position of different frames. Essentially, an homogeneous matrix $M_{AB}$ contains an orientation matrix $R_{AB}$ (see Appendix \ref{Sec:rot_XYZ}) and a translation vector $T_{AB}$ describing, respectively, the relative orientation and position of a frame $(B)$ w.r.t. another $(A)$. When a point $V$ is defined in the frame $(B)$, its coordinates $V_{(B)}$ are known, i.e. the coordinates with respect to $(B)$. Generally speaking, the coordinates of $V$ w.r.t. to the frame $(A)$, i.e. $V_{(A)}$, are different (refer to Figure \ref{fig:frames}).
+To pass from $V_{(B)}$ to $V_{(A)}$ the homogeneous matrix is exploited, leading to the following expression:
+\begin{eqnarray}
+V_{(A)} = R_{AB} V_{(B)} + T_{AB}
+\end{eqnarray}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.8 \columnwidth}
+\import{./image/}{homog.pdf_tex} 
+	\caption{The same point has different coordinates in different frames. }
+	\label{fig:frames}
+\end{figure}
+ 
+\section{Orientation matrix} 
+\label{Sec:rot_XYZ}
+
+A rotation matrix $R_{AB}$ is a $3 \times 3$ matrix describing the orientation of a frame $(B)$ w.r.t to another one $(A)$. $R_{AB}$ is composed as follows:
+\begin{eqnarray}
+R_{AB} = \begin{bmatrix}
+X & Y & Z
+\end{bmatrix} = 
+ \begin{bmatrix}
+\begin{bmatrix} X_x\\ X_y \\ X_z \end{bmatrix} 
+&  
+\begin{bmatrix} Y_x\\ Y_y \\ Y_z \end{bmatrix} 
+& 
+\begin{bmatrix} Z_x\\ Z_y \\ Z_z \end{bmatrix} 
+\end{bmatrix}
+\end{eqnarray}
+$X,Y$ and $Z$ defines the direction of the axis of frame $(B)$ seen from frame $(A)$.
+Computing $R_{AB}$ can be difficult. For this reason an alternative adopted representation are angles $\gamma_x, \gamma_y, \gamma_z$. The idea is to obtain frame $(B)$ starting from frame $(A)$ by applying three subsequent rotations: the first one around the x axis, the second around the y axis of the obtained frame and the last around the resulting z axis, see Figure \ref{fig:XYZ_angles}.
+To pass from the rotation angles $\gamma_x, \gamma_y, \gamma_z$ to $R_{AB}$, the three matrices reported in Figure \ref{fig:XYZ_angles} are multiplied:
+\begin{eqnarray}
+R_{AB} = 
+\begin{bmatrix} 1 & 0 & 0\\ 0  & cos(\gamma_x) & -sin(\gamma_x) \\ 0 & sin(\gamma_x) & cos(\gamma_x) \end{bmatrix}
+\cdot  
+\begin{bmatrix} cos(\gamma_y) & 0 & sin(\gamma_y) \\  0 & 1 & 0\\  -sin(\gamma_y) & 0 & cos(\gamma_y) \end{bmatrix}
+\cdot 
+\begin{bmatrix} cos(\gamma_z) & -sin(\gamma_z) & 0\\  sin(\gamma_z) & cos(\gamma_z) & 0\\  0 & 0 & 1 \end{bmatrix}
+\end{eqnarray}
+
+\begin{figure}
+	\centering
+\def\svgwidth{0.7 \columnwidth}
+\import{./image/}{XYZ_angles.pdf_tex} 
+	\caption{Angles $\gamma_x, \gamma_y, \gamma_z$ are interpreted as subsequent rotations to apply for getting the orientation of frame $(B)$ (in blue), starting from frame $(A)$ (in red) }
+	\label{fig:XYZ_angles}
+\end{figure}
+
+\end{appendices}
+ 
+\end{document}

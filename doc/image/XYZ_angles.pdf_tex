@@ -1,0 +1,77 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'XYZ_angles.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{364.49199185bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.46330847)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{XYZ_angles.pdf}}%
+    \put(0.00558145,0.07956484){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{rotation around $x$:}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{XYZ_angles.pdf}}%
+    \put(0.04611315,0.28581496){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\gamma_x$}}}}%
+    \put(0,0.0088942){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\begin{bmatrix} 1 & 0 & 0\\ 0  & cos(\gamma_x) & -sin(\gamma_x) \\ 0 & sin(\gamma_x) & cos(\gamma_x) \end{bmatrix}$}}}}%
+    \put(0.01709527,0.1640328){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$x$}}}}%
+    \put(0.20317995,0.18084822){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$y$}}}}%
+    \put(0.12003799,0.35317559){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$z$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{XYZ_angles.pdf}}%
+    \put(0.33087439,0.07956488){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{rotation around $y$:}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{XYZ_angles.pdf}}%
+    \put(0.40689027,0.31761359){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\gamma_y$}}}}%
+    \put(0.32529289,0.00889419){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\begin{bmatrix} cos(\gamma_y) & 0 & sin(\gamma_y) \\  0 & 1 & 0\\  -sin(\gamma_y) & 0 & cos(\gamma_y) \end{bmatrix}$}}}}%
+    \put(0.34679751,0.17321879){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$x^{'}$}}}}%
+    \put(0.52222646,0.26682898){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$y^{'}$}}}}%
+    \put(0.3916848,0.37375219){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$z^{'}$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{XYZ_angles.pdf}}%
+    \put(0.66552077,0.07956484){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{rotation around $z$:}}}}%
+    \put(0.79339136,0.28311685){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\gamma_z$}}}}%
+    \put(0.65993925,0.00889419){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\begin{bmatrix} cos(\gamma_z) & -sin(\gamma_z) & 0\\  sin(\gamma_z) & cos(\gamma_z) & 0\\  0 & 0 & 1 \end{bmatrix}$}}}}%
+    \put(0.68548569,0.15888866){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$x^{''}$}}}}%
+    \put(0.87315727,0.21041275){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$y^{''}$}}}}%
+    \put(0.68738266,0.36456623){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$z^{''}$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{XYZ_angles.pdf}}%
+  \end{picture}%
+\endgroup%

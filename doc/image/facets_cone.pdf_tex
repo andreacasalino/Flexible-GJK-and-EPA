@@ -1,0 +1,63 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'facets_cone.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{828.15769887bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.344327)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{facets_cone.pdf}}%
+    \put(0.49175746,0.32001778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P^{*}_D$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{facets_cone.pdf}}%
+    \put(0.09984358,0.33171616){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{outer normals of the facets}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{facets_cone.pdf}}%
+    \put(-0,0.07105115){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{border of the cone}}}}%
+    \put(0.00036767,0.04086212){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{of new facets to build}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{facets_cone.pdf}}%
+    \put(0.26946525,0.0072623){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$Plex$}}}}%
+    \put(0.74291619,0.00345258){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$Plex$ updated}}}}%
+  \end{picture}%
+\endgroup%

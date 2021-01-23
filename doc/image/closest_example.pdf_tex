@@ -1,0 +1,66 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'closest_example.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{559.16881882bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.63852285)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{closest_example.pdf}}%
+    \put(0.21190242,0.27520943){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1=A_1-B_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{closest_example.pdf}}%
+    \put(0.09850014,0.61984555){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{closest $Plex$ in $\mathcal{A} \ominus \mathcal{B}$}}}}%
+    \put(0,0.59235024){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3=A_3-B_3$}}}}%
+    \put(0.32263111,0.43539689){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2=A_2-B_2$}}}}%
+    \put(0.14355065,0.46368188){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_{closest} = c_1 \cdot P_1 +c_2 \cdot P_2+c_3 \cdot P_3$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{closest_example.pdf}}%
+    \put(0.60030016,0.14343789){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$B_{closest} = c_1 \cdot B_1 +c_2 \cdot B_2+c_3 \cdot B_3$}}}}%
+    \put(0.70081023,0.30941617){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$A_{closest} = c_1 \cdot A_1 +c_2 \cdot A_2+c_3 \cdot A_3$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{closest_example.pdf}}%
+    \put(0.66177298,0.61156926){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{A}$}}}}%
+    \put(0.56361704,0.02044955){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{B}$}}}}%
+  \end{picture}%
+\endgroup%

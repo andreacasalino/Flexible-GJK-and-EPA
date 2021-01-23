@@ -1,0 +1,92 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'Mink_diff.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{534.20449287bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.86207531)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{Mink_diff.pdf}}%
+    \put(0.19396838,0.8113531){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$1$}}}}%
+    \put(0.05700419,0.66247767){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0.19780101,0.57623462){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0.24640769,0.70660201){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$0.5$}}}}%
+    \put(0.0415169,0.83327272){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-0.5$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{Mink_diff.pdf}}%
+    \put(0.64122887,0.8113531){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$1$}}}}%
+    \put(0.50426465,0.66247768){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0.6450615,0.57623462){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0.64894214,0.71562745){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$0.5$}}}}%
+    \put(0.79664506,0.71594204){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$1.5$}}}}%
+    \put(0.03617563,0.72782199){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{A}$}}}}%
+    \put(0.25054336,0.76893784){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{B}_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{Mink_diff.pdf}}%
+    \put(0.19396837,0.47893603){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$2$}}}}%
+    \put(0.197801,0.02018729){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-2$}}}}%
+    \put(0.05744878,0.01103528){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{A} \ominus \mathcal{B}_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{Mink_diff.pdf}}%
+    \put(0.24533637,0.37946827){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{Mink_diff.pdf}}%
+    \put(0.24533636,0.14179847){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{Mink_diff.pdf}}%
+    \put(0.64524019,0.47893607){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$2$}}}}%
+    \put(0.64907282,0.02018734){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-2$}}}}%
+    \put(0.42788261,0.01812633){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{A} \ominus \mathcal{B}_2$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{Mink_diff.pdf}}%
+    \put(0.6966082,0.37946831){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{Mink_diff.pdf}}%
+    \put(0.69660818,0.14179853){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{Mink_diff.pdf}}%
+    \put(0.58001125,0.2644098){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-0.5$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{Mink_diff.pdf}}%
+    \put(0.44029154,0.26451624){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1.5$}}}}%
+    \put(0.793161,0.75954614){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$\mathcal{B}_2$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{Mink_diff.pdf}}%
+    \put(0,0.26378753){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-1.5$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{Mink_diff.pdf}}%
+    \put(0.35008464,0.26508981){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$-2.5$}}}}%
+  \end{picture}%
+\endgroup%

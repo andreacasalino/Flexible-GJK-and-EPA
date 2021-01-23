@@ -1,0 +1,65 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'tetra_origin.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{395.28330709bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.92271595)%
+    \put(0.14547443,0.00820136){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{tetra_origin.pdf}}%
+    \put(0.42614966,0.63462536){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$0$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{tetra_origin.pdf}}%
+    \put(0.3826726,0.10526483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$n_1$}}}}%
+    \put(0.80822635,0.50235816){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_2$}}}}%
+    \put(0.12584962,0.66092422){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_3$}}}}%
+    \put(0.43010703,0.87641162){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$P_4$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{tetra_origin.pdf}}%
+    \put(0.70765553,0.67854269){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$n_2$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{tetra_origin.pdf}}%
+    \put(0,0.48593636){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$n_3$}}}}%
+  \end{picture}%
+\endgroup%
