@@ -20,4 +20,4 @@ You can use the script pyhton ./Samples/Plotter.py to visualize each result in a
 
  * `python Plotter.py $(name of the file to plot)`
  
- ![Sample](https://github.com/andreacasalino/Flexible-GJK-and-EPA/sample.png)
+ [Sample](https://github.com/andreacasalino/Flexible-GJK-and-EPA/sample.png)
