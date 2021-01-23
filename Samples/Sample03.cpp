@@ -30,7 +30,7 @@ void addRandomShape(std::list<ShapePtr>& poligons) {
 
 //see Sample_01 and Sample_02 before this one
 int main() {
-	size_t N_shapes = 5;
+	std::size_t N_shapes = 5;
 	list<ShapePtr> shapes;
 
 //build the solver to use for the subsequent queries
@@ -38,7 +38,7 @@ int main() {
 	SampleLogger result("Result_3.json");
 
 // sample N_shapes politopes
-	for (size_t k = 0; k < N_shapes; ++k) {
+	for (std::size_t k = 0; k < N_shapes; ++k) {
 		addRandomShape(shapes);
 		result.addShape(*shapes.back());
 	}

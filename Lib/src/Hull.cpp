@@ -118,7 +118,7 @@ namespace flx::hull {
 		std::list<Facet*> Visible_group;
 		Visible_group.push_back(&starting_facet_for_expansion);
 		auto itN = Visible_group.begin();
-		size_t kNeigh = 0, k;
+		std::size_t kNeigh = 0, k;
 		float distance;
 		while (kNeigh < Visible_group.size()) {
 			for (k = 0; k < 3; ++k) {

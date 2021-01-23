@@ -37,12 +37,12 @@ namespace flx {
 		};
 
 		enum ResultType { closestPoint, penetrationVector };
-		/** @brief Perform a complex query on the passed shape.
-		 *  The pair of coordinates returned in result has the following meaning:
-		 * 		- if the shapes are not in collision are the closest points in the pair
+		/** @brief Perform a complex query on the passed pair of shapes.
+		 *  The pair of coordinates returned as result has the following meaning:
+		 * 		- if the shapes are not in collision are the closest points
 		 * 		- if the shapes are in collision is the penetration vector
-		 *  @return the meaning to give to result
-		 *  @param the pair of shapes the query is about
+		 *  @return the meaning of result
+		 *  @param the pair of shapes involved in the query
 		 *  @param the result of the query
 		 */
 		ResultType doComplexQuery(const ShapePair& pair, CoordinatePair& result

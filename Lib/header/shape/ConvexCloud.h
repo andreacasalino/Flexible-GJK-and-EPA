@@ -13,6 +13,12 @@
 #include <memory>
 
 namespace flx::shape {
+   /** @brief A point cloud of 3d points.
+    * Container should be an iterable container, storing the 
+    * vertices of the cloud. Each element in the container
+    * should be an object having the following const methods: x(), y(), z()
+    * that returns the coordinate of the point.
+    */
     template<typename Container>
     class ConvexCloud : public ConvexShape {
     public:

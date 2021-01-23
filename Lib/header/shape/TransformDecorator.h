@@ -11,12 +11,14 @@
 #include <shape/ConvexDecorator.h>
 
 namespace flx::shape {
+    /** @brief An object representing a roto-traslated convex shape.
+     */
     class TransformDecorator : public ConvexDecorator {
     public:
         TransformDecorator(std::unique_ptr<ConvexShape> shape);
         TransformDecorator(std::unique_ptr<ConvexShape> shape, const Coordinate& position, const Coordinate& rotation_XYZ = {0.f,0.f,0.f});
 
-        // const Coordinate& getRotationXYZ() const;
+        // const Coordinate& getRotationXYZ() const; //todo
         void setRotationXYZ(const Coordinate& rotation_XYZ);
 
         inline const Coordinate& getTraslation() const { return this->traslation; };
@@ -24,6 +26,9 @@ namespace flx::shape {
 
         void getSupport(Coordinate& result, const Coordinate& direction) const override;
 
+       /** @brief Get the passed position, as seen from the frame describing the 
+        * roto-traslation of this object.
+        */
         inline void transform(Coordinate& point) const {
             float temp[3];
             temp[0] = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y + this->rotation[0][2] * point.z + this->traslation.x;

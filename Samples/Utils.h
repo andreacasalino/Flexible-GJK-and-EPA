@@ -17,7 +17,7 @@
 
 /**
  * @brief Just an example of coordinate representation that can be used 
- * to represent a shape
+ * to represent a point cloud
  **/
 class Vector {
 public:

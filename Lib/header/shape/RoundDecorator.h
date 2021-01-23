@@ -11,6 +11,8 @@
 #include <shape/ConvexDecorator.h>
 
 namespace flx::shape {
+    /** @brief An object representing the Minkowski sum of a convex shape and a sphere.
+     */
     class RoundDecorator : public ConvexDecorator {
     public:
         RoundDecorator(std::unique_ptr<ConvexShape> shape, const float& ray);

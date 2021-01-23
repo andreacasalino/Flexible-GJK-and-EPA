@@ -29,7 +29,7 @@ std::shared_ptr<std::list<Vector>> getPoligon(const std::size_t& N_edges) {
 	float delta_angle = 2.f * 3.14159f / static_cast<float>(N_edges);
 	float angle = 0.f;
 	float temp[2];
-	for (size_t k = 0; k < N_edges; k++) {
+	for (std::size_t k = 0; k < N_edges; k++) {
 		temp[0] = std::cosf(angle);
 		temp[1] = std::sinf(angle);
 		cloud->emplace_back(temp[0], temp[1],  0.2f);
