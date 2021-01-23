@@ -46,7 +46,8 @@ int main() {
 		result.doComplexQuery(solver, { *shapeA, *shapeB });
 	}
 
-// analyze the .json storing the results using the python script Plotter.py
+// analyze the .json storing the results using the python script Plotter.py, by running: 
+// python Plotter.py $(name of the file to plot)
 
 	return EXIT_SUCCESS;
 }

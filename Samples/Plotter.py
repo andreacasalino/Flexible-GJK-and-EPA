@@ -12,6 +12,7 @@ import json
 from scipy.spatial import ConvexHull
 import numpy as np
 from random import random
+import sys
 
 
 
@@ -78,4 +79,4 @@ def plot_Log(file):
 #drawed with the traslation that:
     # is the penetration vector in case of a collision
     # allows the objects to become close to each other in case of collision absence
-plot_Log('Sample_03_Log') #change the name of the input file according to which log you want to display
+plot_Log(sys.argv[1])
