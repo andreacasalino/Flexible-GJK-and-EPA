@@ -8,6 +8,7 @@
 #include <GjkEpa.h>
 #include <shape/ConvexCloud.h>
 #include <shape/TransformDecorator.h>
+#include <math.h>
 #include "Utils.h"
 using namespace std;
 
@@ -30,8 +31,8 @@ std::shared_ptr<std::list<Vector>> getPoligon(const std::size_t& N_edges) {
 	float angle = 0.f;
 	float temp[2];
 	for (std::size_t k = 0; k < N_edges; k++) {
-		temp[0] = std::cosf(angle);
-		temp[1] = std::sinf(angle);
+		temp[0] = cosf(angle);
+		temp[1] = sinf(angle);
 		cloud->emplace_back(temp[0], temp[1],  0.2f);
 		cloud->emplace_back(temp[0], temp[1], -0.2f);
 		angle += delta_angle;

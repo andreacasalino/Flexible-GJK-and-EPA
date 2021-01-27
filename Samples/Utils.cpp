@@ -135,11 +135,11 @@ std::list<Vector> SampleLogger::_getDescribingCloud(const flx::shape::RoundDecor
     for (std::size_t d = 0; d < dim; ++d) {
         for (beta = 0; beta < N_BETA; ++beta) {
             alfaInterval.reset();
-            Cbeta = std::cosf(betaInterval.eval());
-            Sbeta = std::sinf(betaInterval.eval());
+            Cbeta = cosf(betaInterval.eval());
+            Sbeta = sinf(betaInterval.eval());
             for (alfa = 0; alfa < N_ALFA; ++alfa) {
-                Calfa = std::cosf(alfaInterval.eval());
-                Salfa = std::sinf(alfaInterval.eval());
+                Calfa = cosf(alfaInterval.eval());
+                Salfa = sinf(alfaInterval.eval());
                 coor[0] = Calfa * Cbeta * shape.getRay() + it->x();
                 coor[1] = Calfa * Sbeta * shape.getRay() + it->y();
                 coor[2] = Salfa * shape.getRay() + it->z();
