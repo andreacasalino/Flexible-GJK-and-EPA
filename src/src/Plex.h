@@ -10,13 +10,14 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <list>
 #include <memory>
+
 #ifdef FLX_LOGGER_ENABLED
 #include "Logger.h"
 #endif
 
 namespace flx {
 constexpr float GEOMETRIC_TOLLERANCE2 =
-    GEOMETRIC_TOLLERANCE * GEOMETRIC_TOLLERANCE;
+    hull::GEOMETRIC_TOLLERANCE * hull::GEOMETRIC_TOLLERANCE;
 constexpr float GEOMETRIC_TOLLERANCE4 =
     GEOMETRIC_TOLLERANCE2 * GEOMETRIC_TOLLERANCE2;
 
@@ -42,9 +43,7 @@ public:
   inline const MinkowskiCoordinatePtr *getVertices() const {
     return &this->vertices[0];
   };
-  inline const std::uint8_t &getPlexDimension() const {
-    return this->plex_dim;
-  };
+  inline const uint8_t &getPlexDimension() const { return this->plex_dim; };
 
 private:
   void update4();
@@ -52,14 +51,14 @@ private:
   void update2();
 
   void setToVertex();
-  void setToSegment(const std::uint8_t &kind);
-  void setToFacet(const std::uint8_t &kind);
+  void setToSegment(const uint8_t &kind);
+  void setToFacet(const uint8_t &kind);
 
   // data
   const ShapePair &pair;
   GjkEpa &user;
   MinkowskiCoordinatePtr vertices[4];
-  std::uint8_t plex_dim = 1;
+  uint8_t plex_dim = 1;
   bool collision_present = false;
   // cache
   hull::Coordinate searchDirection;

@@ -166,7 +166,7 @@ void GjkEpa::computeOutsideNormal(hull::Coordinate &N,
   cross(N, Delta1, Delta2);
 
   diff(Delta1, Pother, P1);
-  if (dot(N, Delta1) > GEOMETRIC_TOLLERANCE)
+  if (dot(N, Delta1) > hull::GEOMETRIC_TOLLERANCE)
     invert(N);
   normalizeInPlace(N);
 }

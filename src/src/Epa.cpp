@@ -60,7 +60,7 @@ GjkEpa::Epa::Epa(GjkEpa::Plex &lastPlex, CoordinatePair &result
 #ifdef FLX_LOGGER_ENABLED
     iterations.add(this->print(Minkowski_diff, *closestToOrigin->first));
 #endif
-    if (temp < GEOMETRIC_TOLLERANCE)
+    if (temp < hull::GEOMETRIC_TOLLERANCE)
       break;
     Minkowski_diff.UpdateHull(newVertex.vertexDiff);
     originalVertices.emplace(
@@ -87,10 +87,10 @@ GjkEpa::Epa::Epa(GjkEpa::Plex &lastPlex, CoordinatePair &result
 std::array<GjkEpa::MinkowskiCoordinate, 4>
 GjkEpa::Epa::getInitialTethraedron(GjkEpa::Plex &lastPlex) {
   std::array<GjkEpa::MinkowskiCoordinate, 4> initialVertices;
-  std::uint8_t size = lastPlex.getPlexDimension();
+  uint8_t size = lastPlex.getPlexDimension();
   {
     const GjkEpa::Plex::MinkowskiCoordinatePtr *v = lastPlex.getVertices();
-    for (std::uint8_t k = 0; k < size; ++k)
+    for (uint8_t k = 0; k < size; ++k)
       initialVertices[k] = *v[1 + k].get();
   }
   while (size < 4) {
@@ -139,13 +139,13 @@ GjkEpa::Epa::getInitialTethraedron(GjkEpa::Plex &lastPlex) {
     } else {
       computeOutsideNormal(searchDirection, initialVertices[0].vertexDiff,
                            initialVertices[1].vertexDiff,
-                           initialVertices[2].vertexDiff, ORIGIN);
+                           initialVertices[2].vertexDiff, hull::ORIGIN);
       invert(searchDirection);
       lastPlex.getUser().getSupportMinkowskiDiff(
           lastPlex.getPair(), searchDirection, initialVertices[3]);
       hull::Coordinate Delta;
       diff(Delta, initialVertices[3].vertexDiff, initialVertices[0].vertexDiff);
-      if (dot(Delta, searchDirection) <= GEOMETRIC_TOLLERANCE) {
+      if (dot(Delta, searchDirection) <= hull::GEOMETRIC_TOLLERANCE) {
         invert(searchDirection);
         lastPlex.getUser().getSupportMinkowskiDiff(
             lastPlex.getPair(), searchDirection, initialVertices[3]);

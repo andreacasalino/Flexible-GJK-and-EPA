@@ -45,7 +45,7 @@ GjkEpa::Plex::Plex(GjkEpa &user, const ShapePair &pair
     this->user.getSupportMinkowskiDiff(this->pair, this->searchDirection,
                                        *this->vertices[0]);
     if (dot(this->vertices[0]->vertexDiff, this->searchDirection) <=
-        GEOMETRIC_TOLLERANCE) {
+        hull::GEOMETRIC_TOLLERANCE) {
 #ifdef FLX_LOGGER_ENABLED
       iterations.add(this->print());
       this->logger->add(iterations.str());
@@ -78,7 +78,7 @@ GjkEpa::Plex::Plex(GjkEpa &user, const ShapePair &pair
   }
 }
 
-static inline const std::uint8_t INCIDENCES[3][3] = {
+static inline const uint8_t INCIDENCES[3][3] = {
     {0, 1, 2}, {0, 1, 3}, {0, 2, 3}};
 void GjkEpa::Plex::update4() {
   // update visibility flags
@@ -87,7 +87,7 @@ void GjkEpa::Plex::update4() {
                        this->vertices[2]->vertexDiff,
                        this->vertices[3]->vertexDiff);
   if (dot(this->Normals[0], this->vertices[0]->vertexDiff) <=
-      GEOMETRIC_TOLLERANCE)
+      hull::GEOMETRIC_TOLLERANCE)
     this->Origin_is_visible[0] = true;
   else
     this->Origin_is_visible[0] = false;
@@ -97,7 +97,7 @@ void GjkEpa::Plex::update4() {
                        this->vertices[3]->vertexDiff,
                        this->vertices[2]->vertexDiff);
   if (dot(this->Normals[1], this->vertices[0]->vertexDiff) <=
-      GEOMETRIC_TOLLERANCE)
+      hull::GEOMETRIC_TOLLERANCE)
     this->Origin_is_visible[1] = true;
   else
     this->Origin_is_visible[1] = false;
@@ -107,7 +107,7 @@ void GjkEpa::Plex::update4() {
                        this->vertices[3]->vertexDiff,
                        this->vertices[1]->vertexDiff);
   if (dot(this->Normals[2], this->vertices[0]->vertexDiff) <=
-      GEOMETRIC_TOLLERANCE)
+      hull::GEOMETRIC_TOLLERANCE)
     this->Origin_is_visible[2] = true;
   else
     this->Origin_is_visible[2] = false;
@@ -121,7 +121,7 @@ void GjkEpa::Plex::update4() {
   ClosestElement regions[3];
   float distances[3];
   hull::Coordinate temp;
-  for (std::uint8_t k = 0; k < 3; ++k) {
+  for (uint8_t k = 0; k < 3; ++k) {
     if (this->Origin_is_visible[k]) {
       regions[k] = getClosestInTriangle(
           this->vertices[INCIDENCES[k][0]]->vertexDiff,
@@ -134,7 +134,7 @@ void GjkEpa::Plex::update4() {
     } else
       distances[k] = FLT_MAX;
   }
-  std::uint8_t closest = 0;
+  uint8_t closest = 0;
   if (distances[1] < distances[closest])
     closest = 1;
   if (distances[2] < distances[closest])
@@ -219,7 +219,7 @@ void GjkEpa::Plex::finishingLoop(CoordinatePair &closestPoints) {
 #endif
   hull::Coordinate delta;
   diff(delta, this->vertices[0]->vertexDiff, this->vertices[1]->vertexDiff);
-  if (dot(this->searchDirection, delta) > GEOMETRIC_TOLLERANCE) {
+  if (dot(this->searchDirection, delta) > hull::GEOMETRIC_TOLLERANCE) {
     do {
       ++this->plex_dim;
       switch (this->plex_dim) {
@@ -239,7 +239,7 @@ void GjkEpa::Plex::finishingLoop(CoordinatePair &closestPoints) {
       this->user.getSupportMinkowskiDiff(this->pair, this->searchDirection,
                                          *this->vertices[0]);
       diff(delta, this->vertices[0]->vertexDiff, this->vertices[1]->vertexDiff);
-      if (dot(this->searchDirection, delta) <= GEOMETRIC_TOLLERANCE) {
+      if (dot(this->searchDirection, delta) <= hull::GEOMETRIC_TOLLERANCE) {
         break;
       }
     } while (true);
@@ -279,9 +279,9 @@ void GjkEpa::Plex::setToVertex() {
   std::swap(this->vertices[0], this->vertices[1]);
 }
 
-void GjkEpa::Plex::setToSegment(const std::uint8_t &kind) {
-  Coordinate *A = &this->vertices[0]->vertexDiff;
-  Coordinate *B = nullptr;
+void GjkEpa::Plex::setToSegment(const uint8_t &kind) {
+  hull::Coordinate *A = &this->vertices[0]->vertexDiff;
+  hull::Coordinate *B = nullptr;
   switch (kind) {
   case 0:
     B = &this->vertices[1]->vertexDiff;
@@ -306,10 +306,10 @@ void GjkEpa::Plex::setToSegment(const std::uint8_t &kind) {
   this->plex_dim = 2;
 }
 
-void GjkEpa::Plex::setToFacet(const std::uint8_t &kind) {
-  Coordinate *A = &this->vertices[0]->vertexDiff;
-  Coordinate *B = nullptr;
-  Coordinate *C = nullptr;
+void GjkEpa::Plex::setToFacet(const uint8_t &kind) {
+  hull::Coordinate *A = &this->vertices[0]->vertexDiff;
+  hull::Coordinate *B = nullptr;
+  hull::Coordinate *C = nullptr;
   switch (kind) {
   case 0:
     B = &this->vertices[1]->vertexDiff;
@@ -331,7 +331,7 @@ void GjkEpa::Plex::setToFacet(const std::uint8_t &kind) {
     break;
   }
   if (3 == this->plex_dim) {
-    computeOutsideNormal(this->searchDirection, *A, *B, *C, ORIGIN);
+    computeOutsideNormal(this->searchDirection, *A, *B, *C, hull::ORIGIN);
     invert(this->searchDirection);
   } else
     this->searchDirection = this->Normals[kind];
@@ -348,7 +348,7 @@ std::string GjkEpa::Plex::print() const {
   add(ss, this->vertices[0]->vertexDiff);
   ss << ",\"plex\":[";
   add(ss, this->vertices[1]->vertexDiff);
-  for (std::uint8_t k = 1; k < this->plex_dim; ++k) {
+  for (uint8_t k = 1; k < this->plex_dim; ++k) {
     ss << ',';
     add(ss, this->vertices[k + 1]->vertexDiff);
   }
