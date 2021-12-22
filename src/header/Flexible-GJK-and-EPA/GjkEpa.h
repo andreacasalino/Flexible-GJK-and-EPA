@@ -38,8 +38,8 @@ public:
   );
 
   struct CoordinatePair {
-    Coordinate pointA;
-    Coordinate pointB;
+    hull::Coordinate pointA;
+    hull::Coordinate pointB;
   };
 
   enum ResultType { closestPoints, penetrationVector };
@@ -69,12 +69,12 @@ public:
 
 private:
   struct MinkowskiCoordinate {
-    Coordinate vertexA;
-    Coordinate vertexB;
-    Coordinate vertexDiff;
+    hull::Coordinate vertexA;
+    hull::Coordinate vertexB;
+    hull::Coordinate vertexDiff;
   };
   void getSupportMinkowskiDiff(const ShapePair &pair,
-                               const Coordinate &direction,
+                               const hull::Coordinate &direction,
                                MinkowskiCoordinate &result);
 
   class Plex;
@@ -82,20 +82,22 @@ private:
   class Epa;
 
   enum ClosestElement { vertex_A, edge_AB, edge_AC, face_ABC };
-  static ClosestElement getClosestInSegment(const Coordinate &A,
-                                            const Coordinate &B,
+  static ClosestElement getClosestInSegment(const hull::Coordinate &A,
+                                            const hull::Coordinate &B,
                                             float *miximg_coeff);
-  static ClosestElement getClosestInTriangle(const Coordinate &A,
-                                             const Coordinate &B,
-                                             const Coordinate &C,
+  static ClosestElement getClosestInTriangle(const hull::Coordinate &A,
+                                             const hull::Coordinate &B,
+                                             const hull::Coordinate &C,
                                              float *miximg_coeff);
 
-  static void computeOutsideNormal(Coordinate &N, const Coordinate &P1,
-                                   const Coordinate &P2, const Coordinate &P3,
-                                   const Coordinate &Pother);
+  static void computeOutsideNormal(hull::Coordinate &N,
+                                   const hull::Coordinate &P1,
+                                   const hull::Coordinate &P2,
+                                   const hull::Coordinate &P3,
+                                   const hull::Coordinate &Pother);
 
-  static inline void mix2(Coordinate &result, const Coordinate &A,
-                          const Coordinate &B, const float *coeff) {
+  static inline void mix2(hull::Coordinate &result, const hull::Coordinate &A,
+                          const hull::Coordinate &B, const float *coeff) {
     result = A;
     prod(result, coeff[0]);
     result.x += coeff[1] * B.x;
@@ -103,8 +105,8 @@ private:
     result.z += coeff[1] * B.z;
   };
 
-  static inline void mix3(Coordinate &result, const Coordinate &A,
-                          const Coordinate &B, const Coordinate &C,
+  static inline void mix3(hull::Coordinate &result, const hull::Coordinate &A,
+                          const hull::Coordinate &B, const hull::Coordinate &C,
                           const float *coeff) {
     mix2(result, A, B, coeff);
     result.x += coeff[2] * C.x;
@@ -113,6 +115,6 @@ private:
   };
 
   // cache to speed up computations
-  Coordinate searchDirectionTwin;
+  hull::Coordinate searchDirectionTwin;
 };
 } // namespace flx

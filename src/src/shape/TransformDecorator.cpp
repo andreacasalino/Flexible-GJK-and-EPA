@@ -35,15 +35,15 @@ TransformDecorator::TransformDecorator(std::unique_ptr<ConvexShape> shape)
 }
 
 TransformDecorator::TransformDecorator(std::unique_ptr<ConvexShape> shape,
-                                       const Coordinate &position,
-                                       const Coordinate &rotation_XYZ)
+                                       const hull::Coordinate &position,
+                                       const hull::Coordinate &rotation_XYZ)
     : TransformDecorator(std::move(shape)) {
   this->setRotationXYZ(rotation_XYZ);
   this->setTraslation(position);
 }
 
-void TransformDecorator::getSupport(Coordinate &result,
-                                    const Coordinate &direction) const {
+void TransformDecorator::getSupport(hull::Coordinate &result,
+                                    const hull::Coordinate &direction) const {
   this->transformedDirection.x = this->rotation[0][0] * direction.x +
                                  this->rotation[1][0] * direction.y +
                                  this->rotation[2][0] * direction.z;
@@ -57,7 +57,7 @@ void TransformDecorator::getSupport(Coordinate &result,
   this->transform(result);
 }
 
-void TransformDecorator::setRotationXYZ(const Coordinate &rotation_XYZ) {
+void TransformDecorator::setRotationXYZ(const hull::Coordinate &rotation_XYZ) {
   float C1 = cosf(rotation_XYZ.x), S1 = sinf(rotation_XYZ.x);
   float C2 = cosf(rotation_XYZ.y), S2 = sinf(rotation_XYZ.y);
   float C3 = cosf(rotation_XYZ.z), S3 = sinf(rotation_XYZ.z);

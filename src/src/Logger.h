@@ -24,11 +24,11 @@ private:
   std::stringstream stream;
 };
 
-inline void add(std::stringstream &stream, const Coordinate &c) {
+inline void add(std::stringstream &stream, const hull::Coordinate &c) {
   stream << '[' << c.x << ',' << c.y << ',' << c.z << ']';
 };
 
-inline std::string str(const Coordinate &c) {
+inline std::string str(const hull::Coordinate &c) {
   std::stringstream stream;
   stream << '[' << c.x << ',' << c.y << ',' << c.z << ']';
   return stream.str();

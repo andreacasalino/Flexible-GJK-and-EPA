@@ -16,24 +16,26 @@ class TransformDecorator : public ConvexDecorator {
 public:
   TransformDecorator(std::unique_ptr<ConvexShape> shape);
   TransformDecorator(std::unique_ptr<ConvexShape> shape,
-                     const Coordinate &position,
-                     const Coordinate &rotation_XYZ = {0.f, 0.f, 0.f});
+                     const hull::Coordinate &position,
+                     const hull::Coordinate &rotation_XYZ = {0.f, 0.f, 0.f});
 
-  // const Coordinate& getRotationXYZ() const; //todo
-  void setRotationXYZ(const Coordinate &rotation_XYZ);
+  // const hull::Coordinate& getRotationXYZ() const; //todo
+  void setRotationXYZ(const hull::Coordinate &rotation_XYZ);
 
-  inline const Coordinate &getTraslation() const { return this->traslation; };
-  inline void setTraslation(const Coordinate &newTraslation) {
+  inline const hull::Coordinate &getTraslation() const {
+    return this->traslation;
+  };
+  inline void setTraslation(const hull::Coordinate &newTraslation) {
     this->traslation = newTraslation;
   };
 
-  void getSupport(Coordinate &result,
-                  const Coordinate &direction) const override;
+  void getSupport(hull::Coordinate &result,
+                  const hull::Coordinate &direction) const override;
 
   /** @brief Get the passed position, as seen from the frame describing the
    * roto-traslation of this object.
    */
-  inline void transform(Coordinate &point) const {
+  inline void transform(hull::Coordinate &point) const {
     float temp[3];
     temp[0] = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y +
               this->rotation[0][2] * point.z + this->traslation.x;
@@ -48,7 +50,7 @@ public:
 
 private:
   float rotation[3][3]; //[rows][columns]
-  Coordinate traslation;
-  mutable Coordinate transformedDirection;
+  hull::Coordinate traslation;
+  mutable hull::Coordinate transformedDirection;
 };
 } // namespace flx::shape

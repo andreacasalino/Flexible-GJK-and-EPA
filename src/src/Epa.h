@@ -24,9 +24,9 @@ public:
 
 private:
   struct MinkowskiPair {
-    Coordinate vertexA;
-    Coordinate vertexB;
-    MinkowskiPair(const Coordinate &a, const Coordinate &b)
+    hull::Coordinate vertexA;
+    hull::Coordinate vertexB;
+    MinkowskiPair(const hull::Coordinate &a, const hull::Coordinate &b)
         : vertexA(a), vertexB(b){};
   };
 
@@ -41,7 +41,7 @@ private:
   // data
   mutable std::map<const hull::Facet *, double> facetDistances;
   // cache
-  Coordinate searchDirection;
+  hull::Coordinate searchDirection;
 
 #ifdef FLX_LOGGER_ENABLED
   std::string print(const hull::Hull &h, const hull::Facet &closest) const;

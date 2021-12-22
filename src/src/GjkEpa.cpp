@@ -14,7 +14,7 @@
 
 namespace flx {
 void GjkEpa::getSupportMinkowskiDiff(const ShapePair &pair,
-                                     const Coordinate &direction,
+                                     const hull::Coordinate &direction,
                                      MinkowskiCoordinate &result) {
   pair.shapeA.getSupport(result.vertexA, direction);
 
@@ -26,11 +26,11 @@ void GjkEpa::getSupportMinkowskiDiff(const ShapePair &pair,
   diff(result.vertexDiff, result.vertexA, result.vertexB);
 }
 
-GjkEpa::ClosestElement GjkEpa::getClosestInSegment(const Coordinate &A,
-                                                   const Coordinate &B,
+GjkEpa::ClosestElement GjkEpa::getClosestInSegment(const hull::Coordinate &A,
+                                                   const hull::Coordinate &B,
                                                    float *miximg_coeff) {
   miximg_coeff[2] = 0.f;
-  Coordinate B_A = B;
+  hull::Coordinate B_A = B;
   B_A.x -= A.x;
   B_A.y -= A.y;
   B_A.z -= A.z;
@@ -45,15 +45,15 @@ GjkEpa::ClosestElement GjkEpa::getClosestInSegment(const Coordinate &A,
   }
 };
 
-GjkEpa::ClosestElement GjkEpa::getClosestInTriangle(const Coordinate &A,
-                                                    const Coordinate &B,
-                                                    const Coordinate &C,
+GjkEpa::ClosestElement GjkEpa::getClosestInTriangle(const hull::Coordinate &A,
+                                                    const hull::Coordinate &B,
+                                                    const hull::Coordinate &C,
                                                     float *miximg_coeff) {
-  Coordinate B_A = B;
+  hull::Coordinate B_A = B;
   B_A.x -= A.x;
   B_A.y -= A.y;
   B_A.z -= A.z;
-  Coordinate C_A = C;
+  hull::Coordinate C_A = C;
   C_A.x -= A.x;
   C_A.y -= A.y;
   C_A.z -= A.z;
@@ -78,7 +78,7 @@ GjkEpa::ClosestElement GjkEpa::getClosestInTriangle(const Coordinate &A,
     return face_ABC;
   } else {
     auto closest_AB = getClosestInSegment(A, B, miximg_coeff);
-    Coordinate V_AB(A);
+    hull::Coordinate V_AB(A);
     prod(V_AB, miximg_coeff[0]);
     V_AB.x += miximg_coeff[1] * B.x;
     V_AB.y += miximg_coeff[1] * B.y;
@@ -87,7 +87,7 @@ GjkEpa::ClosestElement GjkEpa::getClosestInTriangle(const Coordinate &A,
 
     float coeff_AC[3];
     auto closest_AC = getClosestInSegment(A, C, &coeff_AC[0]);
-    Coordinate V_AC(A);
+    hull::Coordinate V_AC(A);
     prod(V_AC, coeff_AC[0]);
     V_AC.x += coeff_AC[1] * C.x;
     V_AC.y += coeff_AC[1] * C.y;
@@ -155,10 +155,12 @@ GjkEpa::ResultType GjkEpa::doComplexQuery(const ShapePair &pair,
   return ResultType::closestPoints;
 }
 
-void GjkEpa::computeOutsideNormal(Coordinate &N, const Coordinate &P1,
-                                  const Coordinate &P2, const Coordinate &P3,
-                                  const Coordinate &Pother) {
-  Coordinate Delta1, Delta2;
+void GjkEpa::computeOutsideNormal(hull::Coordinate &N,
+                                  const hull::Coordinate &P1,
+                                  const hull::Coordinate &P2,
+                                  const hull::Coordinate &P3,
+                                  const hull::Coordinate &Pother) {
+  hull::Coordinate Delta1, Delta2;
   diff(Delta1, P2, P1);
   diff(Delta2, P3, P1);
   cross(N, Delta1, Delta2);

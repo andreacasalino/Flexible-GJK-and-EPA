@@ -27,8 +27,8 @@ public:
       throw flx::Error("a cloud should contain at least one vertex");
   };
 
-  void getSupport(Coordinate &result,
-                  const Coordinate &direction) const override {
+  void getSupport(hull::Coordinate &result,
+                  const hull::Coordinate &direction) const override {
     float max_distance, att_distance;
     auto it = this->vertices->begin();
     const auto *extremal = &(*it);

@@ -62,9 +62,9 @@ private:
   std::uint8_t plex_dim = 1;
   bool collision_present = false;
   // cache
-  Coordinate searchDirection;
-  Coordinate Normals[3];     // ABC, ABE, ACE
-  bool Origin_is_visible[3]; // ABC, ABE, ACE
+  hull::Coordinate searchDirection;
+  hull::Coordinate Normals[3]; // ABC, ABE, ACE
+  bool Origin_is_visible[3];   // ABC, ABE, ACE
   float coeff[3];
 
 #ifdef FLX_LOGGER_ENABLED
