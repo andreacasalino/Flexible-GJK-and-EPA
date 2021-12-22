@@ -67,7 +67,7 @@ def plot_Log(file):
     plot_data(data, color, ax1)
     
     if(len(data['Politopes']) == 2):
-        ax1.set_xlabel(r"$\mathcal{A}$ and $\mathcal{B}$")        
+        ax1.set_title(r"$\mathcal{A}$ and $\mathcal{B}$")        
         
         Delta = [data['Lines'][0]['V'][0][0]- data['Lines'][0]['V'][1][0] , data['Lines'][0]['V'][0][1]- data['Lines'][0]['V'][1][1], data['Lines'][0]['V'][0][2]- data['Lines'][0]['V'][1][2]]
         for v in range(0 ,len(data['Politopes'][1]['V'])):
@@ -75,6 +75,6 @@ def plot_Log(file):
             data['Politopes'][1]['V'][v][1] = data['Politopes'][1]['V'][v][1] + Delta[1]
             data['Politopes'][1]['V'][v][2] = data['Politopes'][1]['V'][v][2] + Delta[2]
         plot_data(data, color, ax2, 0)
-        ax2.set_xlabel(r"$\mathcal{A}$ and $\mathcal{B}^{'}=\mathcal{B} + (\rho_A - \rho_B  )$")
+        ax2.set_title(r"$\mathcal{A}$ and $\mathcal{B}^{'}=\mathcal{B} + (\rho_A - \rho_B  )$")
         
     plt.show()
