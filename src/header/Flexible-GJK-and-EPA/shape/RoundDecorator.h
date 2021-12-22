@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <shape/ConvexDecorator.h>
+#include <Flexible-GJK-and-EPA/shape/ConvexDecorator.h>
 
 namespace flx::shape {
 /** @brief An object representing the Minkowski sum of a convex shape and a

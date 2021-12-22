@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <GjkEpa.h>
+#include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <list>
 #include <memory>
 #ifdef FLX_LOGGER_ENABLED

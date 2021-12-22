@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <memory>
-#include <shape/ConvexShape.h>
 
 namespace flx::shape {
 class ConvexDecorator : public ConvexShape {

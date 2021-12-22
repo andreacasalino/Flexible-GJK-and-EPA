@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Coordinate.h>
+#include <Hull/Coordinate.h>
 
 namespace flx::shape {
 /** @brief A general interface for describing a convex shape

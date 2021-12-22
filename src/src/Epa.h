@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Hull.h"
 #include "Plex.h"
+#include <Hull/Hull.h>
 #include <array>
 #include <map>
 

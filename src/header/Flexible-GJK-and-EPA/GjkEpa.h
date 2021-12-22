@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <shape/ConvexShape.h>
+#include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 /** @brief When enabling this compiler definition, every time that a query is
  * performed, a log file containing the iterations perormed by GjkEpa is
  * created. This has just the aim of debugging the solver when needed.
