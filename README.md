@@ -16,8 +16,6 @@ This library is stand-alone and completely **cross platform**. Use [CMake](https
  
 The relevant code is contained in ./src, while ./Samples contains samples showing how to use this library.
 In particular, after running the samples, some .json files will be produced storing the results.
-You can use the script pyhton ./Samples/Plotter.py to visualize each result in a **3d plot**, by running
-
- * `python Plotter.py $(name of the file to plot)`
+A specific python script can be run to visualize results as similarly done below:
  
  ![Sample](sample.png)
