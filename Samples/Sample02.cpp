@@ -9,6 +9,7 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <Flexible-GJK-and-EPA/shape/ConvexCloud.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
+#include <iostream>
 #include <math.h>
 using namespace std;
 
@@ -70,8 +71,9 @@ int main() {
     result.doComplexQuery(solver, {*shapeA, *shapeB});
   }
 
-  // analyze the .json storing the results using the python script Plotter.py,
-  // by running: python Plotter.py $(name of the file to plot)
+  // analyze the .json(s) storing the results using the python script
+  // Visualize02.py
+  std::cout << "Use Visualize02.py to see the results" << std::endl;
 
   return 0;
 }
