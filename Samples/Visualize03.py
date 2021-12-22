@@ -8,7 +8,4 @@
 
 from Plotter import *
 
-plot_Log("Result_1_a.json")
-plot_Log("Result_1_b.json")
-plot_Log("Result_1_c.json")
-plot_Log("Result_1_d.json")
+plot_Log("Result_3.json")

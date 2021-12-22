@@ -49,10 +49,11 @@ def plot_data(data, color, ax, plot_lines = 1):
 #drawed with the traslation that:
     # is the penetration vector in case of a collision
     # allows the objects to become close to each other in case of collision absence
-def plot_Log(file):
-    data = get_json_from_file(file)
+def plot_Log(file_name):
+    data = get_json_from_file(file_name)
 
     fig = plt.figure(figsize=plt.figaspect(0.5))
+    fig.suptitle(file_name, fontsize=14)
     ax1 = None
     if(len(data['Politopes']) == 2):
         ax1 = fig.add_subplot(1, 2, 1, projection='3d')

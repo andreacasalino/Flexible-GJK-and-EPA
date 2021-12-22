@@ -12,5 +12,5 @@ macro(MAKE_SAMPLE NAME SCRIPT)
 endmacro()
 
 MAKE_SAMPLE(Sample01 Visualize01)
-# MAKE_SAMPLE(Sample02 "")
-# MAKE_SAMPLE(Sample03 "")
+MAKE_SAMPLE(Sample02 Visualize02)
+MAKE_SAMPLE(Sample03 Visualize03)
