@@ -11,7 +11,7 @@ set(PROJECT_SHORTNAME GJK-EPA)
 
 MakeLibrary(${PROJECT_SHORTNAME} header)
 
-target_link_libraries(${PROJECT_SHORTNAME} PRIVATE
+target_link_libraries(${PROJECT_SHORTNAME} PUBLIC
 Hull
 )
 

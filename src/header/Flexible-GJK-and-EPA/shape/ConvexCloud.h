@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <Error.h>
+#include <Flexible-GJK-and-EPA/Error.h>
+#include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <memory>
-#include <shape/ConvexShape.h>
 
 namespace flx::shape {
 /** @brief A point cloud of 3d points.
