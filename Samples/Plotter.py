@@ -12,7 +12,6 @@ import json
 from scipy.spatial import ConvexHull
 import numpy as np
 from random import random
-import sys
 
 
 
@@ -44,39 +43,38 @@ def plot_data(data, color, ax, plot_lines = 1):
             ax.text(L_x[0] ,L_y[0] , L_z[0], r"$\rho_A$", color='black')
             ax.text(L_x[1] ,L_y[1] , L_z[1], r"$\rho_B$", color='black')
 
-def plot_Log(file):
-    
-    data = get_json_from_file(file)
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    
-    color = [[1,0,0], [0,0,1]]
-    if (len(data['Politopes']) > 2 ):
-        for k in range(0, len(data['Politopes'])):
-            color.append([random() ,random() , random()])    
-    
-    plot_data(data, color, ax)
-    
-    if(len(data['Politopes']) == 2):
-        plt.title(r"$\mathcal{A}$ and $\mathcal{B}$")        
-        
-        Delta = [data['Lines'][0]['V'][0][0]- data['Lines'][0]['V'][1][0] , data['Lines'][0]['V'][0][1]- data['Lines'][0]['V'][1][1], data['Lines'][0]['V'][0][2]- data['Lines'][0]['V'][1][2]]
-        for v in range(0 ,len(data['Politopes'][1]['V'])):
-            data['Politopes'][1]['V'][v][0] = data['Politopes'][1]['V'][v][0] + Delta[0]
-            data['Politopes'][1]['V'][v][1] = data['Politopes'][1]['V'][v][1] + Delta[1]
-            data['Politopes'][1]['V'][v][2] = data['Politopes'][1]['V'][v][2] + Delta[2]
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
-        plot_data(data, color, ax, 0)
-        plt.title(r"$\mathcal{A}$ and $\mathcal{B}^{'}=\mathcal{B} + (\rho_A - \rho_B  )$")
-        
-    plt.show()
-
-
 #First opened figure represents the politopes and the closest points (if they are not in collision) or the vertices determining
 #the penetration vector: one for every pair.
 #A second figure is opened only when a single pair of politopes is in the file. In this second figure, the second politope is 
 #drawed with the traslation that:
     # is the penetration vector in case of a collision
     # allows the objects to become close to each other in case of collision absence
-plot_Log(sys.argv[1])
+def plot_Log(file):
+    data = get_json_from_file(file)
+
+    fig = plt.figure(figsize=plt.figaspect(0.5))
+    ax1 = None
+    if(len(data['Politopes']) == 2):
+        ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+        ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+    else:
+        ax1 = fig.add_subplot(1, 1, 1, projection='3d')
+    
+    color = [[1,0,0], [0,0,1]]
+    if (len(data['Politopes']) > 2 ):
+        for k in range(0, len(data['Politopes'])):
+            color.append([random() ,random() , random()])        
+    plot_data(data, color, ax1)
+    
+    if(len(data['Politopes']) == 2):
+        ax1.set_xlabel(r"$\mathcal{A}$ and $\mathcal{B}$")        
+        
+        Delta = [data['Lines'][0]['V'][0][0]- data['Lines'][0]['V'][1][0] , data['Lines'][0]['V'][0][1]- data['Lines'][0]['V'][1][1], data['Lines'][0]['V'][0][2]- data['Lines'][0]['V'][1][2]]
+        for v in range(0 ,len(data['Politopes'][1]['V'])):
+            data['Politopes'][1]['V'][v][0] = data['Politopes'][1]['V'][v][0] + Delta[0]
+            data['Politopes'][1]['V'][v][1] = data['Politopes'][1]['V'][v][1] + Delta[1]
+            data['Politopes'][1]['V'][v][2] = data['Politopes'][1]['V'][v][2] + Delta[2]
+        plot_data(data, color, ax2, 0)
+        ax2.set_xlabel(r"$\mathcal{A}$ and $\mathcal{B}^{'}=\mathcal{B} + (\rho_A - \rho_B  )$")
+        
+    plt.show()
