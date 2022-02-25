@@ -14,16 +14,12 @@ namespace flx::shape {
  */
 class ConvexShape {
 public:
-  ConvexShape() = default;
-  ConvexShape(const ConvexShape &) = delete;
-  ConvexShape &operator=(const ConvexShape &) = delete;
-  ConvexShape(ConvexShape &&) = delete;
-  ConvexShape &operator=(ConvexShape &&) = delete;
+  virtual ~ConvexShape() = default;
 
   /** @param[out] the support point in the passed direction
    *  @param[out] the search direction
    */
-  virtual void getSupport(hull::Coordinate &result,
-                          const hull::Coordinate &direction) const = 0;
+  virtual hull::Coordinate
+  getSupport(const hull::Coordinate &direction) const = 0;
 };
 } // namespace flx::shape

@@ -17,6 +17,11 @@
 #endif
 
 namespace flx {
+struct CoordinatePair {
+  hull::Coordinate pointA;
+  hull::Coordinate pointB;
+};
+
 class GjkEpa {
 public:
   GjkEpa() = default;
@@ -36,11 +41,6 @@ public:
                           std::string logFile = ""
 #endif
   );
-
-  struct CoordinatePair {
-    hull::Coordinate pointA;
-    hull::Coordinate pointB;
-  };
 
   enum ResultType { closestPoints, penetrationVector };
   /** @brief Perform a complex query on the passed pair of shapes.
@@ -68,52 +68,6 @@ public:
   );
 
 private:
-  struct MinkowskiCoordinate {
-    hull::Coordinate vertexA;
-    hull::Coordinate vertexB;
-    hull::Coordinate vertexDiff;
-  };
-  void getSupportMinkowskiDiff(const ShapePair &pair,
-                               const hull::Coordinate &direction,
-                               MinkowskiCoordinate &result);
-
-  class Plex;
-
-  class Epa;
-
-  enum ClosestElement { vertex_A, edge_AB, edge_AC, face_ABC };
-  static ClosestElement getClosestInSegment(const hull::Coordinate &A,
-                                            const hull::Coordinate &B,
-                                            float *miximg_coeff);
-  static ClosestElement getClosestInTriangle(const hull::Coordinate &A,
-                                             const hull::Coordinate &B,
-                                             const hull::Coordinate &C,
-                                             float *miximg_coeff);
-
-  static void computeOutsideNormal(hull::Coordinate &N,
-                                   const hull::Coordinate &P1,
-                                   const hull::Coordinate &P2,
-                                   const hull::Coordinate &P3,
-                                   const hull::Coordinate &Pother);
-
-  static inline void mix2(hull::Coordinate &result, const hull::Coordinate &A,
-                          const hull::Coordinate &B, const float *coeff) {
-    result = A;
-    prod(result, coeff[0]);
-    result.x += coeff[1] * B.x;
-    result.y += coeff[1] * B.y;
-    result.z += coeff[1] * B.z;
-  };
-
-  static inline void mix3(hull::Coordinate &result, const hull::Coordinate &A,
-                          const hull::Coordinate &B, const hull::Coordinate &C,
-                          const float *coeff) {
-    mix2(result, A, B, coeff);
-    result.x += coeff[2] * C.x;
-    result.y += coeff[2] * C.y;
-    result.z += coeff[2] * C.z;
-  };
-
   // cache to speed up computations
   hull::Coordinate searchDirectionTwin;
 };
