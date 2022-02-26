@@ -19,7 +19,7 @@ public:
 
   inline const float &getRay() const { return this->ray; };
 
-  void getSupport(hull::Coordinate &result,
+  void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const override;
 
 private:

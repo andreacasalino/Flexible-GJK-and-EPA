@@ -9,9 +9,15 @@
 
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <Hull/Coordinate.h>
+#include <Hull/Definitions.h>
 #include <vector>
 
 namespace flx {
+constexpr float GEOMETRIC_TOLLERANCE2 =
+    hull::HULL_GEOMETRIC_TOLLERANCE * hull::HULL_GEOMETRIC_TOLLERANCE;
+constexpr float GEOMETRIC_TOLLERANCE4 =
+    GEOMETRIC_TOLLERANCE2 * GEOMETRIC_TOLLERANCE2;
+
 enum ClosestElement { vertex_A, edge_AB, edge_AC, face_ABC };
 
 using Coefficients = std::vector<float>;
@@ -40,6 +46,7 @@ inline hull::Coordinate mix2(const hull::Coordinate &A,
   result.x += coeff[1] * B.x;
   result.y += coeff[1] * B.y;
   result.z += coeff[1] * B.z;
+  return result;
 };
 
 inline hull::Coordinate mix3(const hull::Coordinate &A,
@@ -50,6 +57,7 @@ inline hull::Coordinate mix3(const hull::Coordinate &A,
   result.x += coeff[2] * C.x;
   result.y += coeff[2] * C.y;
   result.z += coeff[2] * C.z;
+  return result;
 };
 
 struct ShapePair {
@@ -58,12 +66,12 @@ struct ShapePair {
 };
 
 struct MinkowskiDiffCoordinate {
-  hull::Coordinate vertexA;
-  hull::Coordinate vertexB;
-  hull::Coordinate vertexDiff;
+  hull::Coordinate vertex_in_shape_a;
+  hull::Coordinate vertex_in_shape_b;
+  hull::Coordinate vertex_in_Minkowski_diff;
 };
 
-MinkowskiDiffCoordinate
-getSupportMinkowskiDiff(const ShapePair &pair,
-                        const hull::Coordinate &direction);
+void getSupportMinkowskiDiff(const ShapePair &pair,
+                             const hull::Coordinate &direction,
+                             MinkowskiDiffCoordinate &result);
 } // namespace flx

@@ -20,11 +20,11 @@ RoundDecorator::RoundDecorator(std::unique_ptr<ConvexShape> shape,
     throw flx::Error("found null shape when building RoundDecorator");
 }
 
-void RoundDecorator::getSupport(hull::Coordinate &result,
+void RoundDecorator::getSupport(hull::Coordinate &support,
                                 const hull::Coordinate &direction) const {
-  this->shape->getSupport(result, direction);
-  result.x += this->ray * direction.x;
-  result.y += this->ray * direction.y;
-  result.z += this->ray * direction.z;
+  this->shape->getSupport(support, direction);
+  support.x += this->ray * direction.x;
+  support.y += this->ray * direction.y;
+  support.z += this->ray * direction.z;
 }
 } // namespace flx::shape

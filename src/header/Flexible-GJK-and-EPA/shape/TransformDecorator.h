@@ -29,7 +29,7 @@ public:
     this->traslation = newTraslation;
   };
 
-  void getSupport(hull::Coordinate &result,
+  void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const override;
 
   /** @brief Get the passed position, as seen from the frame describing the
@@ -51,6 +51,5 @@ public:
 private:
   float rotation[3][3]; //[rows][columns]
   hull::Coordinate traslation;
-  mutable hull::Coordinate transformedDirection;
 };
 } // namespace flx::shape

@@ -44,16 +44,17 @@ TransformDecorator::TransformDecorator(std::unique_ptr<ConvexShape> shape,
 
 void TransformDecorator::getSupport(hull::Coordinate &result,
                                     const hull::Coordinate &direction) const {
-  this->transformedDirection.x = this->rotation[0][0] * direction.x +
-                                 this->rotation[1][0] * direction.y +
-                                 this->rotation[2][0] * direction.z;
-  this->transformedDirection.y = this->rotation[0][1] * direction.x +
-                                 this->rotation[1][1] * direction.y +
-                                 this->rotation[2][1] * direction.z;
-  this->transformedDirection.z = this->rotation[0][2] * direction.x +
-                                 this->rotation[1][2] * direction.y +
-                                 this->rotation[2][2] * direction.z;
-  this->shape->getSupport(result, this->transformedDirection);
+  hull::Coordinate transformedDirection;
+  transformedDirection.x = this->rotation[0][0] * direction.x +
+                           this->rotation[1][0] * direction.y +
+                           this->rotation[2][0] * direction.z;
+  transformedDirection.y = this->rotation[0][1] * direction.x +
+                           this->rotation[1][1] * direction.y +
+                           this->rotation[2][1] * direction.z;
+  transformedDirection.z = this->rotation[0][2] * direction.x +
+                           this->rotation[1][2] * direction.y +
+                           this->rotation[2][2] * direction.z;
+  this->shape->getSupport(result, transformedDirection);
   this->transform(result);
 }
 

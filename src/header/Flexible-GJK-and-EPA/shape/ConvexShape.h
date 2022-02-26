@@ -19,7 +19,7 @@ public:
   /** @param[out] the support point in the passed direction
    *  @param[out] the search direction
    */
-  virtual hull::Coordinate
-  getSupport(const hull::Coordinate &direction) const = 0;
+  virtual void getSupport(hull::Coordinate &support,
+                          const hull::Coordinate &direction) const = 0;
 };
 } // namespace flx::shape
