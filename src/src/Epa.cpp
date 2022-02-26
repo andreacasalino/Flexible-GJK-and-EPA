@@ -15,8 +15,88 @@
 
 namespace flx {
 namespace {
+MinkowskiDiffCoordinate find_vertex_trying_direction_and_opposite(
+    const ShapePair &pair, const MinkowskiDiffCoordinate &existing_vertex,
+    hull::Coordinate direction) {
+  hull::normalizeInPlace(direction);
+  MinkowskiDiffCoordinate result;
+  getSupportMinkowskiDiff(pair, direction, result);
+  hull::Coordinate delta;
+  hull::diff(delta, result.vertex_in_Minkowski_diff,
+             existing_vertex.vertex_in_Minkowski_diff);
+  if (hull::dot(direction, delta) <= hull::HULL_GEOMETRIC_TOLLERANCE) {
+    hull::invert(direction);
+    getSupportMinkowskiDiff(pair, direction, result);
+  }
+  return result;
+}
+
 std::vector<MinkowskiDiffCoordinate>
-initial_thetraedron(const ShapePair &pair, const Plex &initial_plex);
+initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
+  struct Visitor {
+    mutable std::vector<MinkowskiDiffCoordinate> result;
+
+    void operator()(const VertexCase &subject) const {
+      if (hull::squaredDistance(
+              subject.data->vertices[0]->vertex_in_Minkowski_diff,
+              subject.data->vertices[1]->vertex_in_Minkowski_diff) <=
+          GEOMETRIC_TOLLERANCE2) {
+        result =
+            std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0]};
+      } else {
+        result = std::vector<MinkowskiDiffCoordinate>{
+            *subject.data->vertices[0], *subject.data->vertices[1]};
+      }
+    }
+
+    void operator()(const SegmentCase &subject) const {
+      result = std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0],
+                                                    *subject.data->vertices[1],
+                                                    *subject.data->vertices[2]};
+    }
+
+    void operator()(const FacetCase &subject) const {
+      result = std::vector<MinkowskiDiffCoordinate>{
+          *subject.data->vertices[0], *subject.data->vertices[1],
+          *subject.data->vertices[2], *subject.data->vertices[3]};
+    }
+  } visitor;
+  std::visit(visitor, initial_plex);
+  std::vector<MinkowskiDiffCoordinate> result = std::move(visitor.result);
+
+  while (result.size() < 4) {
+    switch (result.size()) {
+    case 1:
+      result.push_back(find_vertex_trying_direction_and_opposite(
+          pair, result.front(), hull::Coordinate{1.f, 0, 0}));
+      break;
+    case 2: {
+      hull::Coordinate delta;
+      hull::diff(delta, result[1].vertex_in_Minkowski_diff,
+                 result[0].vertex_in_Minkowski_diff);
+      auto direction1 = hull::cross(delta, hull::Coordinate{1.f, 0, 0});
+      auto direction2 = hull::cross(delta, hull::Coordinate{0, 1.f, 0});
+      auto &direction = direction1;
+      if (hull::normSquared(direction2) > hull::normSquared(direction1)) {
+        direction = direction2;
+      }
+      result.push_back(find_vertex_trying_direction_and_opposite(
+          pair, result.front(), direction));
+    } break;
+    case 3:
+      hull::Coordinate delta_AB;
+      hull::diff(delta_AB, result[0].vertex_in_Minkowski_diff,
+                 result[1].vertex_in_Minkowski_diff);
+      hull::Coordinate delta_AC;
+      hull::diff(delta_AC, result[0].vertex_in_Minkowski_diff,
+                 result[2].vertex_in_Minkowski_diff);
+      result.push_back(find_vertex_trying_direction_and_opposite(
+          pair, result.front(), hull::cross(delta_AB, delta_AC)));
+      break;
+    }
+  }
+  return result;
+};
 
 class EpaHull : public hull::Observer {
 public:
