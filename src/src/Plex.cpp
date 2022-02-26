@@ -5,11 +5,13 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "GjkPlex.h"
+#include "Plex.h"
+
+#include <limits>
 
 namespace flx {
 namespace {
-VertexCase update_as_vertex(PlexData *data) {
+VertexCase set_to_vertex(const PlexDataPtr &data) {
   data->search_direction = data->vertices.front()->vertex_in_Minkowski_diff;
   hull::invert(data->search_direction);
   hull::normalizeInPlace(data->search_direction);
@@ -18,8 +20,8 @@ VertexCase update_as_vertex(PlexData *data) {
 }
 
 enum SegmentUpdateCase { AB, AC, AD };
-SegmentCase update_as_segment(PlexData *data,
-                              const SegmentUpdateCase segment_case) {
+SegmentCase set_to_segment(const PlexDataPtr &data,
+                           const SegmentUpdateCase segment_case) {
   hull::Coordinate *A = &data->vertices[0]->vertex_in_Minkowski_diff;
   hull::Coordinate *B = nullptr;
   switch (segment_case) {
@@ -47,8 +49,9 @@ SegmentCase update_as_segment(PlexData *data,
 }
 
 enum FacetUpdateCase { ABC, ABD, ACD };
-FacetCase update_as_facet(PlexData *data, const FacetUpdateCase facet_case,
-                          const hull::Coordinate *normals) {
+FacetCase set_to_facet(const PlexDataPtr &data,
+                       const FacetUpdateCase facet_case,
+                       const hull::Coordinate *outward_normals) {
   hull::Coordinate *A = &data->vertices[0]->vertex_in_Minkowski_diff;
   hull::Coordinate *B = nullptr;
   hull::Coordinate *C = nullptr;
@@ -59,23 +62,22 @@ FacetCase update_as_facet(PlexData *data, const FacetUpdateCase facet_case,
     std::swap(data->vertices[2], data->vertices[3]);
     std::swap(data->vertices[1], data->vertices[2]);
     std::swap(data->vertices[0], data->vertices[1]);
-    data->search_direction = normals[0];
+    data->search_direction = outward_normals[0];
     break;
   case FacetUpdateCase::ABD:
     B = &data->vertices[1]->vertex_in_Minkowski_diff;
     C = &data->vertices[3]->vertex_in_Minkowski_diff;
     std::swap(data->vertices[1], data->vertices[2]);
     std::swap(data->vertices[0], data->vertices[1]);
-    data->search_direction = normals[1];
+    data->search_direction = outward_normals[1];
     break;
   case FacetUpdateCase::ACD:
     B = &data->vertices[2]->vertex_in_Minkowski_diff;
     C = &data->vertices[3]->vertex_in_Minkowski_diff;
     std::swap(data->vertices[0], data->vertices[1]);
-    data->search_direction = normals[2];
+    data->search_direction = outward_normals[2];
     break;
   }
-  hull::invert(data->search_direction);
   return FacetCase{data};
 }
 
@@ -83,17 +85,21 @@ bool compute_facet_visibility(hull::Coordinate &first, hull::Coordinate &second,
                               hull::Coordinate &third, hull::Coordinate &other,
                               hull::Coordinate &normal) {
   normal = computeOutsideNormal(first, second, third, other);
-  if (hull::dot(normal, first) <= hull::GEOMETRIC_TOLLERANCE)
+  if (hull::dot(normal, first) <= hull::HULL_GEOMETRIC_TOLLERANCE)
     return true;
   return false;
 };
+
+constexpr float MAX_DISTANCE = std::numeric_limits<float>::max();
 } // namespace
 
-Plex update_plex(const Plex &subject) {
+namespace {
+static inline const uint8_t INCIDENCES[3][3] = {
+    {0, 1, 2}, {0, 1, 3}, {0, 2, 3}};
+} // namespace
+PlexUpdateResult update_plex(const Plex &subject) {
   struct Visitor {
-    mutable Plex result;
-
-    void operator()(const CollisionCase &) const { return; };
+    mutable PlexUpdateResult result;
 
     void operator()(const VertexCase &subject) const {
       auto &data = *subject.data;
@@ -104,22 +110,22 @@ Plex update_plex(const Plex &subject) {
         result = CollisionCase{};
         return;
       }
-      auto closest =
-          getClosestInSegment(data.vertices[0]->vertex_in_Minkowski_diff,
-                              data.vertices[1]->vertex_in_Minkowski_diff);
+      auto closest = getClosestToOriginInSegment(
+          data.vertices[0]->vertex_in_Minkowski_diff,
+          data.vertices[1]->vertex_in_Minkowski_diff);
       if (vertex_A == closest.region) {
-        result = update_as_vertex(subject.data);
+        result = set_to_vertex(subject.data);
         return;
       }
-      result = update_as_segment(subject.data, SegmentUpdateCase::AB);
+      result = set_to_segment(subject.data, SegmentUpdateCase::AB);
     };
 
     void operator()(const SegmentCase &subject) const {
       auto &data = *subject.data;
-      auto closest =
-          getClosestInTriangle(data.vertices[0]->vertex_in_Minkowski_diff,
-                               data.vertices[1]->vertex_in_Minkowski_diff,
-                               data.vertices[2]->vertex_in_Minkowski_diff);
+      auto closest = getClosestToOriginInTriangle(
+          data.vertices[0]->vertex_in_Minkowski_diff,
+          data.vertices[1]->vertex_in_Minkowski_diff,
+          data.vertices[2]->vertex_in_Minkowski_diff);
       hull::Coordinate temp = mix3(data.vertices[0]->vertex_in_Minkowski_diff,
                                    data.vertices[1]->vertex_in_Minkowski_diff,
                                    data.vertices[2]->vertex_in_Minkowski_diff,
@@ -130,241 +136,127 @@ Plex update_plex(const Plex &subject) {
       }
       // update plex
       switch (closest.region) {
-      case ClosestElement::face_ABC: {
+      case ClosestRegionToOrigin::face_ABC: {
         hull::Coordinate normal = computeOutsideNormal(
             data.vertices[0]->vertex_in_Minkowski_diff,
             data.vertices[1]->vertex_in_Minkowski_diff,
             data.vertices[2]->vertex_in_Minkowski_diff, hull::ORIGIN);
-        result = update_as_facet(subject.data, FacetUpdateCase::ABC, &normal);
+        hull::invert(normal);
+        result = set_to_facet(subject.data, FacetUpdateCase::ABC, &normal);
       } break;
-      case ClosestElement::vertex_A:
-        result = update_as_vertex(subject.data);
+      case ClosestRegionToOrigin::vertex_A:
+        result = set_to_vertex(subject.data);
         break;
       default:
-        if (ClosestElement::edge_AB == closest.region)
-          result = update_as_segment(subject.data, SegmentUpdateCase::AB);
+        if (ClosestRegionToOrigin::edge_AB == closest.region)
+          result = set_to_segment(subject.data, SegmentUpdateCase::AB);
         else
-          result = update_as_segment(subject.data, SegmentUpdateCase::AC);
+          result = set_to_segment(subject.data, SegmentUpdateCase::AC);
         break;
       }
     };
 
-    void operator()(const FacetCase &) const {
+    void operator()(const FacetCase &subject) const {
+      auto &data = *subject.data;
       std::array<hull::Coordinate, 3> normals;
+      bool is_origin_visible[3];
       // update visibility flags
-      bool visibility_ABC = compute_facet_visibility(
-          this->vertices[0]->vertexDiff, this->vertices[1]->vertexDiff,
-          this->vertices[2]->vertexDiff, this->vertices[3]->vertexDiff,
-          normals[0]);
-      bool visibility_ABD = compute_facet_visibility(
-          this->vertices[0]->vertexDiff, this->vertices[1]->vertexDiff,
-          this->vertices[3]->vertexDiff, this->vertices[2]->vertexDiff,
-          normals[1]);
-      bool visibility_ACD = compute_facet_visibility(
-          this->vertices[0]->vertexDiff, this->vertices[2]->vertexDiff,
-          this->vertices[3]->vertexDiff, this->vertices[1]->vertexDiff,
-          normals[2]);
+      is_origin_visible[0] = compute_facet_visibility(
+          data.vertices[0]->vertex_in_Minkowski_diff,
+          data.vertices[1]->vertex_in_Minkowski_diff,
+          data.vertices[2]->vertex_in_Minkowski_diff,
+          data.vertices[3]->vertex_in_Minkowski_diff, normals[0]);
+      is_origin_visible[1] = compute_facet_visibility(
+          data.vertices[0]->vertex_in_Minkowski_diff,
+          data.vertices[1]->vertex_in_Minkowski_diff,
+          data.vertices[3]->vertex_in_Minkowski_diff,
+          data.vertices[2]->vertex_in_Minkowski_diff, normals[1]);
+      is_origin_visible[2] = compute_facet_visibility(
+          data.vertices[0]->vertex_in_Minkowski_diff,
+          data.vertices[2]->vertex_in_Minkowski_diff,
+          data.vertices[3]->vertex_in_Minkowski_diff,
+          data.vertices[1]->vertex_in_Minkowski_diff, normals[2]);
 
       // check contains origin
-      if (!(visibility_ABC && visibility_ABD && visibility_ACD)) {
+      if (!(is_origin_visible[0] || is_origin_visible[1] ||
+            is_origin_visible[2])) {
         result = CollisionCase{};
         return;
       }
 
-      //   // update plex
-      //   ClosestElement regions[3];
-      //   float distances[3];
-      //   hull::Coordinate temp;
-      //   for (uint8_t k = 0; k < 3; ++k) {
-      //     if (this->Origin_is_visible[k]) {
-      //       regions[k] = getClosestInTriangle(
-      //           this->vertices[INCIDENCES[k][0]]->vertexDiff,
-      //           this->vertices[INCIDENCES[k][1]]->vertexDiff,
-      //           this->vertices[INCIDENCES[k][2]]->vertexDiff, this->coeff);
-      //       mix3(temp, this->vertices[INCIDENCES[k][0]]->vertexDiff,
-      //            this->vertices[INCIDENCES[k][1]]->vertexDiff,
-      //            this->vertices[INCIDENCES[k][2]]->vertexDiff, this->coeff);
-      //       distances[k] = normSquared(temp);
-      //     } else
-      //       distances[k] = FLT_MAX;
-      //   }
+      // update plex
+      ClosestRegionToOrigin regions[3];
+      float distances[3];
+      hull::Coordinate temp;
+      for (std::uint8_t k = 0; k < 3; ++k) {
+        if (is_origin_visible[k]) {
+          auto [region, coeff] = getClosestToOriginInTriangle(
+              data.vertices[INCIDENCES[k][0]]->vertex_in_Minkowski_diff,
+              data.vertices[INCIDENCES[k][1]]->vertex_in_Minkowski_diff,
+              data.vertices[INCIDENCES[k][2]]->vertex_in_Minkowski_diff);
+          distances[k] = normSquared(
+              mix3(data.vertices[INCIDENCES[k][0]]->vertex_in_Minkowski_diff,
+                   data.vertices[INCIDENCES[k][1]]->vertex_in_Minkowski_diff,
+                   data.vertices[INCIDENCES[k][2]]->vertex_in_Minkowski_diff,
+                   coeff));
+          regions[k] = region;
+        } else
+          distances[k] = MAX_DISTANCE;
+      }
 
-      //   uint8_t closest = 0;
-      //   if (distances[1] < distances[closest])
-      //     closest = 1;
-      //   if (distances[2] < distances[closest])
-      //     closest = 2;
+      std::uint8_t closest_facet = 0;
+      if (distances[1] < distances[closest_facet])
+        closest_facet = 1;
+      if (distances[2] < distances[closest_facet])
+        closest_facet = 2;
 
-      //   if (face_ABC == regions[closest])
-      //     this->setToFacet(closest);
-      //   else if (vertex_A == regions[closest])
-      //     this->setToVertex();
-      //   else {
-      //     switch (closest) {
-      //     case 0:
-      //       if (edge_AB == regions[0])
-      //         this->setToSegment(0);
-      //       else
-      //         this->setToSegment(1);
-      //       break;
-      //     case 1:
-      //       if (edge_AB == regions[1])
-      //         this->setToSegment(0);
-      //       else
-      //         this->setToSegment(2);
-      //       break;
-      //     default: // 2
-      //       if (edge_AB == regions[2])
-      //         this->setToSegment(1);
-      //       else
-      //         this->setToSegment(2);
-      //       break;
-      //     }
-      //   }
+      if (regions[closest_facet] == vertex_A) {
+        result = set_to_vertex(subject.data);
+        return;
+      }
+
+      if (regions[closest_facet] == face_ABC) {
+        switch (closest_facet) {
+        case 0:
+          result =
+              set_to_facet(subject.data, FacetUpdateCase::ABC, normals.data());
+          break;
+        case 1:
+          result =
+              set_to_facet(subject.data, FacetUpdateCase::ABD, normals.data());
+          break;
+        case 2:
+          result =
+              set_to_facet(subject.data, FacetUpdateCase::ACD, normals.data());
+          break;
+        }
+        return;
+      }
+
+      switch (closest_facet) {
+      case 0:
+        if (edge_AB == regions[0])
+          result = set_to_segment(subject.data, SegmentUpdateCase::AB);
+        else
+          result = set_to_segment(subject.data, SegmentUpdateCase::AC);
+        break;
+      case 1:
+        if (edge_AB == regions[1])
+          result = set_to_segment(subject.data, SegmentUpdateCase::AB);
+        else
+          result = set_to_segment(subject.data, SegmentUpdateCase::AD);
+        break;
+      case 2:
+        if (edge_AB == regions[2])
+          result = set_to_segment(subject.data, SegmentUpdateCase::AC);
+        else
+          result = set_to_segment(subject.data, SegmentUpdateCase::AD);
+        break;
+      }
     };
-  };
-
-  Visitor visitor;
+  } visitor;
   std::visit(visitor, subject);
   return visitor.result;
 }
 
 } // namespace flx
-
-// // GjkEpa::Plex::Plex(GjkEpa &user, const ShapePair &pair
-// // #ifdef FLX_LOGGER_ENABLED
-// //                    ,
-// //                    std::shared_ptr<Logger> log
-// // #endif
-// //                    )
-// //     : pair(pair), user(user)
-// // #ifdef FLX_LOGGER_ENABLED
-// //       ,
-// //       logger(log)
-// // #endif
-// // {
-// // #ifdef FLX_LOGGER_ENABLED
-// //   this->logger->add("\n\"GjkPrimal\":");
-// //   Array iterations;
-// // #endif
-// //   for (std::size_t k = 0; k < 4; ++k)
-// //     this->vertices[k] = std::make_unique<MinkowskiCoordinate>();
-// //   this->searchDirection = {1.f, 0.f, 0.f};
-// //   this->user.getSupportMinkowskiDiff(this->pair, this->searchDirection,
-// //                                      *this->vertices[1]);
-// //   if (normSquared(this->vertices[1]->vertexDiff) <= GEOMETRIC_TOLLERANCE2)
-// {
-// //     this->collision_present = true;
-// // #ifdef FLX_LOGGER_ENABLED
-// //     iterations.add(this->print());
-// //     this->logger->add(iterations.str());
-// // #endif
-// //     return;
-// //   }
-// //   this->searchDirection = this->vertices[1]->vertexDiff;
-// //   invert(this->searchDirection);
-// //   normalizeInPlace(this->searchDirection);
-// //   while (true) {
-// //     this->user.getSupportMinkowskiDiff(this->pair, this->searchDirection,
-// //                                        *this->vertices[0]);
-// //     if (dot(this->vertices[0]->vertexDiff, this->searchDirection) <=
-// //         hull::GEOMETRIC_TOLLERANCE) {
-// // #ifdef FLX_LOGGER_ENABLED
-// //       iterations.add(this->print());
-// //       this->logger->add(iterations.str());
-// // #endif
-// //       return;
-// //     }
-// //     ++this->plex_dim;
-// //     switch (this->plex_dim) {
-// //     case 4:
-// //       this->update4();
-// //       break;
-// //     case 3:
-// //       this->update3();
-// //       break;
-// //     default: // 2
-// //       this->update2();
-// //       break;
-// //     }
-// //     if (this->collision_present) {
-// //       --this->plex_dim;
-// // #ifdef FLX_LOGGER_ENABLED
-// //       iterations.add(this->print());
-// //       this->logger->add(iterations.str());
-// // #endif
-// //       return;
-// //     }
-// // #ifdef FLX_LOGGER_ENABLED
-// //     iterations.add(this->print());
-// // #endif
-// //   }
-// // }
-
-// // static inline const uint8_t INCIDENCES[3][3] = {
-// //     {0, 1, 2}, {0, 1, 3}, {0, 2, 3}};
-
-// // void GjkEpa::Plex::finishingLoop(CoordinatePair &closestPoints) {
-// // #ifdef FLX_LOGGER_ENABLED
-// //   this->logger->add(",\n\"GjkFinal\":");
-// //   Array iterations;
-// // #endif
-// //   hull::Coordinate delta;
-// //   diff(delta, this->vertices[0]->vertexDiff,
-// this->vertices[1]->vertexDiff);
-// //   if (dot(this->searchDirection, delta) > hull::GEOMETRIC_TOLLERANCE) {
-// //     do {
-// //       ++this->plex_dim;
-// //       switch (this->plex_dim) {
-// //       case 4:
-// //         this->update4();
-// //         break;
-// //       case 3:
-// //         this->update3();
-// //         break;
-// //       default: // 2
-// //         this->update2();
-// //         break;
-// //       }
-// // #ifdef FLX_LOGGER_ENABLED
-// //       iterations.add(this->print());
-// // #endif
-// //       this->user.getSupportMinkowskiDiff(this->pair,
-// this->searchDirection,
-// //                                          *this->vertices[0]);
-// //       diff(delta, this->vertices[0]->vertexDiff,
-// //       this->vertices[1]->vertexDiff); if (dot(this->searchDirection,
-// delta)
-// //       <= hull::GEOMETRIC_TOLLERANCE) {
-// //         break;
-// //       }
-// //     } while (true);
-// //   }
-// // #ifdef FLX_LOGGER_ENABLED
-// //   this->logger->add(iterations.str());
-// // #endif
-// //   // compute closest pair
-// //   if (1 == this->plex_dim) {
-// //     closestPoints.pointA = this->vertices[0]->vertexA;
-// //     closestPoints.pointB = this->vertices[0]->vertexB;
-// //     return;
-// //   }
-// //   if (2 == this->plex_dim) {
-// //     getClosestInSegment(this->vertices[1]->vertexDiff,
-// //                         this->vertices[2]->vertexDiff, this->coeff);
-// //     mix2(closestPoints.pointA, this->vertices[1]->vertexA,
-// //          this->vertices[2]->vertexA, this->coeff);
-// //     mix2(closestPoints.pointB, this->vertices[1]->vertexB,
-// //          this->vertices[2]->vertexB, this->coeff);
-// //     return;
-// //   }
-// //   getClosestInTriangle(this->vertices[1]->vertexDiff,
-// //                        this->vertices[2]->vertexDiff,
-// //                        this->vertices[3]->vertexDiff, this->coeff);
-// //   mix3(closestPoints.pointA, this->vertices[1]->vertexA,
-// //        this->vertices[2]->vertexA, this->vertices[3]->vertexA,
-// this->coeff);
-// //   mix3(closestPoints.pointB, this->vertices[1]->vertexB,
-// //        this->vertices[2]->vertexB, this->vertices[3]->vertexB,
-// this->coeff);
-// // }

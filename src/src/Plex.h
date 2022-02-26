@@ -38,15 +38,13 @@ struct FacetCase {
   PlexDataPtr data;
 };
 
-using PlexCase = std::variant<VertexCase, SegmentCase, FacetCase>;
+using Plex = std::variant<VertexCase, SegmentCase, FacetCase>;
 
-struct CollisionCase {
-  PlexCase last_case;
-};
+struct CollisionCase {};
 
-using Plex = std::variant<CollisionCase, PlexCase>;
+using PlexUpdateResult = std::variant<CollisionCase, Plex>;
 
 // the new vertex is supposed to have already been placed at the front of the
 // vertices
-Plex update_plex(const PlexCase &subject);
+PlexUpdateResult update_plex(const Plex &subject);
 } // namespace flx

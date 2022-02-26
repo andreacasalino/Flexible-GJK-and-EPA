@@ -18,20 +18,20 @@ constexpr float GEOMETRIC_TOLLERANCE2 =
 constexpr float GEOMETRIC_TOLLERANCE4 =
     GEOMETRIC_TOLLERANCE2 * GEOMETRIC_TOLLERANCE2;
 
-enum ClosestElement { vertex_A, edge_AB, edge_AC, face_ABC };
+enum ClosestRegionToOrigin { vertex_A, edge_AB, edge_AC, face_ABC };
 
 using Coefficients = std::vector<float>;
 
 struct ClosestResult {
-  ClosestElement region;
+  ClosestRegionToOrigin region;
   Coefficients coefficients;
 };
-ClosestResult getClosestInSegment(const hull::Coordinate &A,
-                                  const hull::Coordinate &B);
+ClosestResult getClosestToOriginInSegment(const hull::Coordinate &A,
+                                          const hull::Coordinate &B);
 
-ClosestResult getClosestInTriangle(const hull::Coordinate &A,
-                                   const hull::Coordinate &B,
-                                   const hull::Coordinate &C);
+ClosestResult getClosestToOriginInTriangle(const hull::Coordinate &A,
+                                           const hull::Coordinate &B,
+                                           const hull::Coordinate &C);
 
 hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,
                                       const hull::Coordinate &P2,

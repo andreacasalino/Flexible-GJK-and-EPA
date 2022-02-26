@@ -3,7 +3,7 @@
 namespace flx {
 ClosestResult getClosestInSegment(const hull::Coordinate &A,
                                   const hull::Coordinate &B) {
-  Coefficients miximg_coeff;
+  Coefficients miximg_coeff = Coefficients{0, 0};
   miximg_coeff[2] = 0.f;
   hull::Coordinate B_A = B;
   B_A.x -= A.x;
@@ -38,7 +38,7 @@ ClosestResult getClosestInTriangle(const hull::Coordinate &A,
   float c1 = -dot(A, B_A);
   float c2 = -dot(A, C_A);
 
-  Coefficients miximg_coeff;
+  Coefficients miximg_coeff = Coefficients{0, 0, 0};
   miximg_coeff[1] = (c1 * m22 - m12 * c2) / (m11 * m22 - m12 * m12);
   miximg_coeff[2] = (c2 - m12 * miximg_coeff[1]) / m22;
 
