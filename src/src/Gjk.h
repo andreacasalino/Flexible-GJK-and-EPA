@@ -11,8 +11,12 @@
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
 namespace flx {
-Plex initial_GJK_loop(const ShapePair &pair);
+struct InitialLoopResult {
+  bool collision_present;
+  Plex last_plex;
+};
+InitialLoopResult initial_GJK_loop(const ShapePair &pair);
 
 CoordinatePair finishing_GJK_loop(const ShapePair &pair,
-                                  const PlexCase &initial_plex);
+                                  const Plex &initial_plex);
 } // namespace flx

@@ -5,7 +5,7 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "GjkPlex.h"
+// #include "GjkPlex.h"
 
 namespace flx {
 // bool GjkEpa::isCollisionPresent(const ShapePair &pair

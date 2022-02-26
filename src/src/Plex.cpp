@@ -10,7 +10,6 @@
 #include <limits>
 
 namespace flx {
-namespace {
 VertexCase set_to_vertex(const PlexDataPtr &data) {
   data->search_direction = data->vertices.front()->vertex_in_Minkowski_diff;
   hull::invert(data->search_direction);
@@ -19,6 +18,7 @@ VertexCase set_to_vertex(const PlexDataPtr &data) {
   return VertexCase{data};
 }
 
+namespace {
 enum SegmentUpdateCase { AB, AC, AD };
 SegmentCase set_to_segment(const PlexDataPtr &data,
                            const SegmentUpdateCase segment_case) {

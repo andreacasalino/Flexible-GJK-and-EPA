@@ -8,58 +8,65 @@
 #include "Gjk.h"
 
 namespace flx {
-Plex initial_GJK_loop(const ShapePair &pair) {
+InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
   auto plex_data = std::make_shared<PlexData>();
   plex_data->search_direction = hull::Coordinate{1.f, 0, 0};
   getSupportMinkowskiDiff(pair, plex_data->search_direction,
                           *plex_data->vertices[0]);
   if (hull::normSquared(plex_data->vertices[0]->vertex_in_Minkowski_diff) <=
       GEOMETRIC_TOLLERANCE2) {
-    return CollisionCase{VertexCase{plex_data}};
+    *plex_data->vertices[0] = *plex_data->vertices[1];
+    return InitialLoopResult{true, VertexCase{plex_data}};
   }
-  plex_data->search_direction =
-      plex_data->vertices[0]->vertex_in_Minkowski_diff;
-  hull::invert(plex_data->search_direction);
-  std::swap(plex_data->vertices[0], plex_data->vertices[1]);
-  PlexCase plex = VertexCase{plex_data};
-  while (true) {
+
+  Plex plex = set_to_vertex(plex_data);
+  do {
     getSupportMinkowskiDiff(pair, plex_data->search_direction,
                             *plex_data->vertices[0]);
     if (hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
                   plex_data->search_direction) <=
         hull::HULL_GEOMETRIC_TOLLERANCE) {
-      return plex;
+      return InitialLoopResult{false, plex};
     }
-    auto updated_plex = update_plex(plex);
-    auto *maybe_collision = std::get_if<CollisionCase>(&updated_plex);
-    if (nullptr != maybe_collision) {
-      return *maybe_collision;
+    auto update_result = update_plex(plex);
+    if (nullptr != std::get_if<CollisionCase>(&update_result)) {
+      return InitialLoopResult{true, plex};
     }
-    plex = std::get<PlexCase>(updated_plex);
-  }
+    plex = std::get<Plex>(update_result);
+  } while (true);
 }
 
+namespace {
+PlexDataPtr extract_data(const Plex &plex) {
+  struct Visitor {
+    mutable PlexDataPtr result;
+
+    void operator()(const VertexCase &subject) const { result = subject.data; };
+
+    void operator()(const SegmentCase &subject) const {
+      result = subject.data;
+    };
+
+    void operator()(const FacetCase &subject) const { result = subject.data; };
+  } visitor;
+  std::visit(visitor, plex);
+  return visitor.result;
+}
+} // namespace
+
 CoordinatePair finishing_GJK_loop(const ShapePair &pair,
-                                  const PlexCase &initial_plex) {
-  PlexData &plex_data = ;
-  PlexCase plex = initial_plex;
+                                  const Plex &initial_plex) {
+  auto plex_data = extract_data(initial_plex);
+  auto plex = initial_plex;
   hull::Coordinate delta;
-  diff(delta, plex_data.vertices[0]->vertex_in_Minkowski_diff,
-       plex_data.vertices[1]->vertex_in_Minkowski_diff);
-  if (dot(plex_data.search_direction, delta) >
-      hull::HULL_GEOMETRIC_TOLLERANCE) {
-    do {
-      plex = std::get<PlexCase>(update_plex(plex));
-      getSupportMinkowskiDiff(pair, plex_data.search_direction,
-                              *plex_data.vertices[0]);
-      diff(delta, plex_data.vertices[0]->vertex_in_Minkowski_diff,
-           plex_data.vertices[1]->vertex_in_Minkowski_diff);
-      if (dot(plex_data.search_direction, delta) <=
-          hull::HULL_GEOMETRIC_TOLLERANCE) {
-        break;
-      }
-    } while (true);
-  }
+  do {
+    getSupportMinkowskiDiff(pair, plex_data->search_direction,
+                            *plex_data->vertices[0]);
+    plex = std::get<Plex>(update_plex(plex));
+    diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
+         plex_data->vertices[1]->vertex_in_Minkowski_diff);
+  } while (hull::HULL_GEOMETRIC_TOLLERANCE <
+           dot(plex_data->search_direction, delta));
 
   struct Visitor {
     mutable CoordinatePair closest_pair;
@@ -72,7 +79,7 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
     };
 
     void operator()(const SegmentCase &subject) const {
-      auto temp = getClosestInSegment(
+      auto temp = getClosestToOriginInSegment(
           subject.data->vertices[0]->vertex_in_Minkowski_diff,
           subject.data->vertices[1]->vertex_in_Minkowski_diff);
       closest_pair.point_in_shape_a =
@@ -84,7 +91,7 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
     };
 
     void operator()(const FacetCase &subject) const {
-      auto temp = getClosestInTriangle(
+      auto temp = getClosestToOriginInTriangle(
           subject.data->vertices[0]->vertex_in_Minkowski_diff,
           subject.data->vertices[1]->vertex_in_Minkowski_diff,
           subject.data->vertices[2]->vertex_in_Minkowski_diff);
