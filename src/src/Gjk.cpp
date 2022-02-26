@@ -42,9 +42,9 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   auto plex = initial_plex;
   hull::Coordinate delta;
   do {
+    plex = std::get<Plex>(update_plex(plex));
     getSupportMinkowskiDiff(pair, plex_data->search_direction,
                             *plex_data->vertices[0]);
-    plex = std::get<Plex>(update_plex(plex));
     diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
          plex_data->vertices[1]->vertex_in_Minkowski_diff);
   } while (hull::HULL_GEOMETRIC_TOLLERANCE <

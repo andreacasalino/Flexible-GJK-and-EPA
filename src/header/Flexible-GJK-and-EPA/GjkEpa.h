@@ -30,8 +30,8 @@ get_closest_points(const shape::ConvexShape &shape_a,
 
 // TODO spiegare
 std::optional<CoordinatePair>
-get_penetration_depth(const shape::ConvexShape &shape_a,
-                      const shape::ConvexShape &shape_b);
+get_penetration_info(const shape::ConvexShape &shape_a,
+                     const shape::ConvexShape &shape_b);
 
 /** @brief Perform a complex query on the passed pair of shapes.
  *  The pair of coordinates returned as result has the following meaning:
@@ -55,10 +55,10 @@ get_penetration_depth(const shape::ConvexShape &shape_a,
  * to implement multi-threading strategies
  */
 struct QueryResult {
-  bool closest_pair_or_penetration_depth;
+  bool is_closest_pair_or_penetration_info;
   CoordinatePair result;
 };
 QueryResult
-get_closest_points_or_penetration_depth(const shape::ConvexShape &shape_a,
-                                        const shape::ConvexShape &shape_b);
+get_closest_points_or_penetration_info(const shape::ConvexShape &shape_a,
+                                       const shape::ConvexShape &shape_b);
 } // namespace flx

@@ -28,19 +28,19 @@ get_closest_points(const shape::ConvexShape &shape_a,
 }
 
 std::optional<CoordinatePair>
-get_penetration_depth(const shape::ConvexShape &shape_a,
-                      const shape::ConvexShape &shape_b) {
+get_penetration_info(const shape::ConvexShape &shape_a,
+                     const shape::ConvexShape &shape_b) {
   ShapePair pair = ShapePair{shape_a, shape_b};
   auto result = initial_GJK_loop(pair);
-  if (!result.collision_present) {
-    return std::nullopt;
+  if (result.collision_present) {
+    return EPA(pair, result.last_plex);
   }
-  return EPA(pair, result.last_plex);
+  return std::nullopt;
 }
 
 QueryResult
-get_closest_points_or_penetration_depth(const shape::ConvexShape &shape_a,
-                                        const shape::ConvexShape &shape_b) {
+get_closest_points_or_penetration_info(const shape::ConvexShape &shape_a,
+                                       const shape::ConvexShape &shape_b) {
   ShapePair pair = ShapePair{shape_a, shape_b};
   auto result = initial_GJK_loop(pair);
   if (result.collision_present) {
