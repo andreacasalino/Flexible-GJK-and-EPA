@@ -259,4 +259,20 @@ PlexUpdateResult update_plex(const Plex &subject) {
   return visitor.result;
 }
 
+PlexDataPtr extract_data(const Plex &plex) {
+  struct Visitor {
+    mutable PlexDataPtr result;
+
+    void operator()(const VertexCase &subject) const { result = subject.data; };
+
+    void operator()(const SegmentCase &subject) const {
+      result = subject.data;
+    };
+
+    void operator()(const FacetCase &subject) const { result = subject.data; };
+  } visitor;
+  std::visit(visitor, plex);
+  return visitor.result;
+}
+
 } // namespace flx

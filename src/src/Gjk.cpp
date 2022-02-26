@@ -36,24 +36,6 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
   } while (true);
 }
 
-namespace {
-PlexDataPtr extract_data(const Plex &plex) {
-  struct Visitor {
-    mutable PlexDataPtr result;
-
-    void operator()(const VertexCase &subject) const { result = subject.data; };
-
-    void operator()(const SegmentCase &subject) const {
-      result = subject.data;
-    };
-
-    void operator()(const FacetCase &subject) const { result = subject.data; };
-  } visitor;
-  std::visit(visitor, plex);
-  return visitor.result;
-}
-} // namespace
-
 CoordinatePair finishing_GJK_loop(const ShapePair &pair,
                                   const Plex &initial_plex) {
   auto plex_data = extract_data(initial_plex);

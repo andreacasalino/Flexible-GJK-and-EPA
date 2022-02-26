@@ -5,56 +5,48 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-// #include "GjkPlex.h"
+#include <Flexible-GJK-and-EPA/GjkEpa.h>
+
+#include "Gjk.h"
 
 namespace flx {
-// bool GjkEpa::isCollisionPresent(const ShapePair &pair
-// #ifdef FLX_LOGGER_ENABLED
-//                                 ,
-//                                 std::string logFile
-// #endif
-// ) {
-// #ifdef FLX_LOGGER_ENABLED
-//   std::shared_ptr<Logger> logger = std::make_shared<Logger>(logFile);
-// #endif
-//   Plex plex(*this, pair
-// #ifdef FLX_LOGGER_ENABLED
-//             ,
-//             logger
-// #endif
-//   );
-//   return plex.isCollisionPresent();
-// }
+bool is_collision_present(const shape::ConvexShape &shape_a,
+                          const shape::ConvexShape &shape_b) {
+  return initial_GJK_loop(ShapePair{shape_a, shape_b}).collision_present;
+}
 
-// GjkEpa::ResultType GjkEpa::doComplexQuery(const ShapePair &pair,
-//                                           CoordinatePair &result
-// #ifdef FLX_LOGGER_ENABLED
-//                                           ,
-//                                           std::string logFile
-// #endif
-// ) {
-// #ifdef FLX_LOGGER_ENABLED
-//   std::shared_ptr<Logger> logger = std::make_shared<Logger>(logFile);
-// #endif
-//   Plex plex(*this, pair
-// #ifdef FLX_LOGGER_ENABLED
-//             ,
-//             logger
-// #endif
-//   );
-//   if (plex.isCollisionPresent()) {
-//     // EPA
-//     Epa(plex, result
-// #ifdef FLX_LOGGER_ENABLED
-//         ,
-//         logger
-// #endif
-//     );
-//     return ResultType::penetrationVector;
-//   }
-//   // second phase of GJK
-//   plex.finishingLoop(result);
-//   return ResultType::closestPoints;
-// }
+std::optional<CoordinatePair>
+get_closest_points(const shape::ConvexShape &shape_a,
+                   const shape::ConvexShape &shape_b) {
+  ShapePair pair = ShapePair{shape_a, shape_b};
+  auto result = initial_GJK_loop(pair);
+  if (result.collision_present) {
+    return std::nullopt;
+  }
+  return finishing_GJK_loop(pair, result.last_plex);
+}
 
+std::optional<CoordinatePair>
+get_penetration_depth(const shape::ConvexShape &shape_a,
+                      const shape::ConvexShape &shape_b) {
+  ShapePair pair = ShapePair{shape_a, shape_b};
+  auto result = initial_GJK_loop(pair);
+  if (!result.collision_present) {
+    return std::nullopt;
+  }
+  return;
+}
+
+QueryResult
+get_closest_points_or_penetration_depth(const shape::ConvexShape &shape_a,
+                                        const shape::ConvexShape &shape_b) {
+  ShapePair pair = ShapePair{shape_a, shape_b};
+  auto result = initial_GJK_loop(pair);
+  if (result.collision_present) {
+    return QueryResult{
+        false,
+    };
+  }
+  return QueryResult{true, finishing_GJK_loop(pair, result.last_plex)};
+}
 } // namespace flx

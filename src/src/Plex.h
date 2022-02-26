@@ -40,6 +40,8 @@ struct FacetCase {
 
 using Plex = std::variant<VertexCase, SegmentCase, FacetCase>;
 
+PlexDataPtr extract_data(const Plex &plex);
+
 struct CollisionCase {};
 
 using PlexUpdateResult = std::variant<CollisionCase, Plex>;
