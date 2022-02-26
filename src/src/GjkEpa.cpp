@@ -7,6 +7,7 @@
 
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 
+#include "Epa.h"
 #include "Gjk.h"
 
 namespace flx {
@@ -34,7 +35,7 @@ get_penetration_depth(const shape::ConvexShape &shape_a,
   if (!result.collision_present) {
     return std::nullopt;
   }
-  return;
+  return EPA(pair, result.last_plex);
 }
 
 QueryResult
@@ -43,9 +44,7 @@ get_closest_points_or_penetration_depth(const shape::ConvexShape &shape_a,
   ShapePair pair = ShapePair{shape_a, shape_b};
   auto result = initial_GJK_loop(pair);
   if (result.collision_present) {
-    return QueryResult{
-        false,
-    };
+    return QueryResult{false, EPA(pair, result.last_plex)};
   }
   return QueryResult{true, finishing_GJK_loop(pair, result.last_plex)};
 }
