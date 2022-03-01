@@ -6,6 +6,38 @@
  **/
 
 #include "Utils.h"
+
+namespace {
+std::vector<hull::Coordinate>
+get_describing_cloud(const flx::shape::ConvexShape &shape);
+
+std::vector<hull::Coordinate> get_sphere_cloud(const float ray);
+
+void to_json(nlohmann::json &json, const flx::shape::ConvexShape &shape);
+
+const nlohmann::json &get_shape_json(
+    std::map<const flx::shape::ConvexShape *, nlohmann::json> &container,
+    const flx::shape::ConvexShape &shape) {
+  auto container_it = container.find(&shape);
+  if (container_it == container.end()) {
+    to_json(container[&shape], shape);
+    return container[&shape];
+  }
+  return container_it->second;
+}
+} // namespace
+
+void ResultLogger::logResult(const flx::shape::ConvexShape &shape_a,
+                             const flx::shape::ConvexShape &shape_b,
+                             const std::string &file_name) {
+  const auto &shape_a_json =
+      get_shape_json(already_encountered_shapes, shape_a);
+  const auto &shape_b_json =
+      get_shape_json(already_encountered_shapes, shape_b);
+  // do something else
+}
+
+/*
 #include <Flexible-GJK-and-EPA/Error.h>
 #include <fstream>
 #include <iostream>
@@ -191,3 +223,4 @@ void SampleLogger::doComplexQuery(flx::GjkEpa &solver,
             << result.pointB.z << ">" << std::endl;
   std::cout << std::endl;
 }
+*/
