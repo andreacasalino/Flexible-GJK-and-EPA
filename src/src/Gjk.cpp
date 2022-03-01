@@ -6,6 +6,7 @@
  **/
 
 #include "Gjk.h"
+#include <Flexible-GJK-and-EPA/Error.h>
 
 namespace flx {
 InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
@@ -41,14 +42,22 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   auto plex_data = extract_data(initial_plex);
   auto plex = initial_plex;
   hull::Coordinate delta;
-  do {
-    plex = std::get<Plex>(update_plex(plex));
+  diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
+       plex_data->vertices[1]->vertex_in_Minkowski_diff);
+  while (dot(plex_data->search_direction, delta) <
+         hull::HULL_GEOMETRIC_TOLLERANCE) {
+    auto plex_updated = update_plex(plex);
+    auto *plex_updated_ptr = std::get_if<Plex>(&plex_updated);
+    if (nullptr == plex_updated_ptr) {
+      throw Error{
+          "Trying to call finishing_GJK_loop on a plex that contains origin"};
+    }
+    plex = *plex_updated_ptr;
     getSupportMinkowskiDiff(pair, plex_data->search_direction,
                             *plex_data->vertices[0]);
     diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
          plex_data->vertices[1]->vertex_in_Minkowski_diff);
-  } while (hull::HULL_GEOMETRIC_TOLLERANCE <
-           dot(plex_data->search_direction, delta));
+  }
 
   struct Visitor {
     mutable CoordinatePair closest_pair;

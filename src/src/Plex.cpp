@@ -85,9 +85,7 @@ bool compute_facet_visibility(hull::Coordinate &first, hull::Coordinate &second,
                               hull::Coordinate &third, hull::Coordinate &other,
                               hull::Coordinate &normal) {
   normal = computeOutsideNormal(first, second, third, other);
-  if (hull::dot(normal, first) <= hull::HULL_GEOMETRIC_TOLLERANCE)
-    return true;
-  return false;
+  return hull::dot(normal, first) <= hull::HULL_GEOMETRIC_TOLLERANCE;
 };
 
 constexpr float MAX_DISTANCE = std::numeric_limits<float>::max();
@@ -147,11 +145,11 @@ PlexUpdateResult update_plex(const Plex &subject) {
       case ClosestRegionToOrigin::vertex_A:
         result = set_to_vertex(subject.data);
         break;
-      default:
-        if (ClosestRegionToOrigin::edge_AB == closest.region)
-          result = set_to_segment(subject.data, SegmentUpdateCase::AB);
-        else
-          result = set_to_segment(subject.data, SegmentUpdateCase::AC);
+      case ClosestRegionToOrigin::edge_AB:
+        result = set_to_segment(subject.data, SegmentUpdateCase::AB);
+        break;
+      case ClosestRegionToOrigin::edge_AC:
+        result = set_to_segment(subject.data, SegmentUpdateCase::AC);
         break;
       }
     };
@@ -235,19 +233,19 @@ PlexUpdateResult update_plex(const Plex &subject) {
 
       switch (closest_facet) {
       case 0:
-        if (edge_AB == regions[0])
+        if (edge_AB == regions[closest_facet])
           result = set_to_segment(subject.data, SegmentUpdateCase::AB);
         else
           result = set_to_segment(subject.data, SegmentUpdateCase::AC);
         break;
       case 1:
-        if (edge_AB == regions[1])
+        if (edge_AB == regions[closest_facet])
           result = set_to_segment(subject.data, SegmentUpdateCase::AB);
         else
           result = set_to_segment(subject.data, SegmentUpdateCase::AD);
         break;
       case 2:
-        if (edge_AB == regions[2])
+        if (edge_AB == regions[closest_facet])
           result = set_to_segment(subject.data, SegmentUpdateCase::AC);
         else
           result = set_to_segment(subject.data, SegmentUpdateCase::AD);
