@@ -19,7 +19,7 @@ TestCloud make_prism_cloud(const std::vector<Point2D> &polygon,
                            const float height) {
   std::vector<hull::Coordinate> points;
   points.reserve(polygon.size() * 2);
-  for (const auto &point : points) {
+  for (const auto &point : polygon) {
     points.push_back(hull::Coordinate{point.x, point.y, height});
     points.push_back(hull::Coordinate{point.x, point.y, -height});
   }
