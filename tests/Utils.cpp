@@ -1,6 +1,7 @@
 #include "Utils.h"
 
 #include <math.h>
+#include <random>
 
 namespace flx {
 namespace shape {
@@ -11,9 +12,10 @@ float get_support(const PointsIterator &point,
 
 hull::Coordinate convert(const PointsIterator &point) { return *point; };
 
-TestCloud::TestCloud(const Points &points)
-    : PointCloud<PointsIterator>(points->begin(), points->end(), get_support,
-                                 convert){};
+TestCloud::TestCloud(Points &&buffer)
+    : PointsStore(std::move(buffer)), PointCloud<PointsIterator>(
+                                          points.begin(), points.end(),
+                                          get_support, convert) {}
 
 TestCloud make_prism_cloud(const std::vector<Point2D> &polygon,
                            const float height) {
@@ -23,8 +25,26 @@ TestCloud make_prism_cloud(const std::vector<Point2D> &polygon,
     points.push_back(hull::Coordinate{point.x, point.y, height});
     points.push_back(hull::Coordinate{point.x, point.y, -height});
   }
-  return std::make_shared<const std::vector<hull::Coordinate>>(
-      std::move(points));
+  return points;
+}
+
+std::unique_ptr<ConvexShape>
+make_prism_cloud_ptr(const std::vector<Point2D> &polygon, const float height) {
+  return std::make_unique<TestCloud>(make_prism_cloud(polygon, height));
+}
+
+float sample_coordinate() {
+  return 2.f * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1.f;
+}
+
+TestCloud make_random_cloud(const std::size_t points) {
+  std::vector<hull::Coordinate> buffer;
+  buffer.reserve(points);
+  for (std::size_t k = 0; k < points; ++k) {
+    buffer.push_back(hull::Coordinate{sample_coordinate(), sample_coordinate(),
+                                      sample_coordinate()});
+  }
+  return buffer;
 }
 } // namespace shape
 

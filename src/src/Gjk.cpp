@@ -44,7 +44,7 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   hull::Coordinate delta;
   diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
        plex_data->vertices[1]->vertex_in_Minkowski_diff);
-  while (dot(plex_data->search_direction, delta) <
+  while (dot(plex_data->search_direction, delta) >
          hull::HULL_GEOMETRIC_TOLLERANCE) {
     auto plex_updated = update_plex(plex);
     auto *plex_updated_ptr = std::get_if<Plex>(&plex_updated);

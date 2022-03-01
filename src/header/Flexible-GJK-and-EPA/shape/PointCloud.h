@@ -27,9 +27,9 @@ public:
 
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const final {
-    PointCollectionIt it = begin;
+    auto it = begin;
     float max_support_value = support_predicate(it, direction), support_value;
-    PointCollectionIt max_support_point = it;
+    auto max_support_point = it;
     ++it;
     for (it; it != end; ++it) {
       support_value = support_predicate(it, direction);
@@ -42,8 +42,8 @@ public:
   };
 
 private:
-  const PointCollectionIt begin;
-  const PointCollectionIt end;
+  PointCollectionIt begin;
+  PointCollectionIt end;
 
   const std::function<float(const PointCollectionIt &,
                             const hull::Coordinate &)>
