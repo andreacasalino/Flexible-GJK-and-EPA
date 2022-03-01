@@ -11,10 +11,9 @@
 #include <functional>
 
 namespace flx::shape {
-template <typename PointCollectionIt, typename SupportPredicate,
-          typename ToCoordinatePredicate>
-class PointCloud : public ConvexShape {
+template <typename PointCollectionIt> class PointCloud : public ConvexShape {
 public:
+  template <typename SupportPredicate, typename ToCoordinatePredicate>
   PointCloud(const PointCollectionIt &begin, const PointCollectionIt &end,
              SupportPredicate &&support_pred,
              ToCoordinatePredicate &&convert_pred)
@@ -26,15 +25,15 @@ public:
     auto it = begin;
     float max_support_value = support_predicate(it, direction), support_value;
     PointCollectionIt max_support_point = it;
-    ++it;
-    while (it; it != end; ++it) {
-      support_value = support_predicate(it, direction);
-      if (support_value > max_support_value) {
-        max_support_value = support_value;
-        max_support_point = it;
-      }
-    }
-    return convert_predicate(it);
+    // ++it;
+    // while (it; it != end; ++it) {
+    //   support_value = support_predicate(it, direction);
+    //   if (support_value > max_support_value) {
+    //     max_support_value = support_value;
+    //     max_support_point = it;
+    //   }
+    // }
+    support = convert_predicate(it);
   };
 
 private:

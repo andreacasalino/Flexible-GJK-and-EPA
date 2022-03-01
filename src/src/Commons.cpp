@@ -1,8 +1,8 @@
 #include "Commons.h"
 
 namespace flx {
-ClosestResult getClosestInSegment(const hull::Coordinate &A,
-                                  const hull::Coordinate &B) {
+ClosestResult getClosestToOriginInSegment(const hull::Coordinate &A,
+                                          const hull::Coordinate &B) {
   Coefficients miximg_coeff = Coefficients{0, 0};
   miximg_coeff[2] = 0.f;
   hull::Coordinate B_A = B;
@@ -19,9 +19,9 @@ ClosestResult getClosestInSegment(const hull::Coordinate &A,
   return ClosestResult{edge_AB, std::move(miximg_coeff)};
 }
 
-ClosestResult getClosestInTriangle(const hull::Coordinate &A,
-                                   const hull::Coordinate &B,
-                                   const hull::Coordinate &C) {
+ClosestResult getClosestToOriginInTriangle(const hull::Coordinate &A,
+                                           const hull::Coordinate &B,
+                                           const hull::Coordinate &C) {
   hull::Coordinate B_A = B;
   B_A.x -= A.x;
   B_A.y -= A.y;
@@ -51,7 +51,7 @@ ClosestResult getClosestInTriangle(const hull::Coordinate &A,
     miximg_coeff[0] = 1.f - miximg_coeff[1] - miximg_coeff[2];
     return ClosestResult{face_ABC, std::move(miximg_coeff)};
   }
-  auto [closest_AB, miximg_coeff_AB] = getClosestInSegment(A, B);
+  auto [closest_AB, miximg_coeff_AB] = getClosestToOriginInSegment(A, B);
   hull::Coordinate V_AB(A);
   prod(V_AB, miximg_coeff_AB[0]);
   V_AB.x += miximg_coeff_AB[1] * B.x;
@@ -59,7 +59,7 @@ ClosestResult getClosestInTriangle(const hull::Coordinate &A,
   V_AB.z += miximg_coeff_AB[1] * B.z;
   float d_AB = dot(V_AB, V_AB);
 
-  auto [closest_AC, miximg_coeff_AC] = getClosestInSegment(A, C);
+  auto [closest_AC, miximg_coeff_AC] = getClosestToOriginInSegment(A, C);
   hull::Coordinate V_AC(A);
   prod(V_AC, miximg_coeff_AC[0]);
   V_AC.x += miximg_coeff_AC[1] * C.x;

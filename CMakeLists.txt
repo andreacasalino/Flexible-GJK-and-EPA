@@ -23,3 +23,8 @@ if(BUILD_GJK_EPA_SAMPLES)
     add_subdirectory(samples)
 endif()
 
+option(BUILD_GJK_EPA_TESTS "" OFF)
+if(BUILD_GJK_EPA_TESTS)
+    project(Flexible-GJK-and-EPA-Tests)
+    add_subdirectory(tests)
+endif()
