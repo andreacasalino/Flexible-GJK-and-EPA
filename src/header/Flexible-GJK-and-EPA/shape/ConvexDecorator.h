@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <Flexible-GJK-and-EPA/Error.h>
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <memory>
 
@@ -15,10 +16,18 @@ class ConvexDecorator : public ConvexShape {
 public:
   inline const ConvexShape &getShape() const { return *this->shape; };
 
+  ConvexDecorator(ConvexDecorator &&o);
+  ConvexDecorator &operator=(ConvexDecorator &&o);
+
 protected:
   ConvexDecorator(std::unique_ptr<ConvexShape> shape)
-      : shape(std::move(shape)){};
+      : shape(std::move(shape)) {
+    if (nullptr == this->shape) {
+      throw Error{"null shape found when building a shape decorator"};
+    }
+  };
 
+private:
   std::unique_ptr<ConvexShape> shape;
 };
 } // namespace flx::shape

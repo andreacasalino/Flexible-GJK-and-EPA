@@ -16,6 +16,7 @@ namespace flx::shape {
 class RoundDecorator : public ConvexDecorator {
 public:
   RoundDecorator(std::unique_ptr<ConvexShape> shape, const float &ray);
+  RoundDecorator(ConvexDecorator &&decorator_o, const float &ray);
 
   inline const float &getRay() const { return this->ray; };
 

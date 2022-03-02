@@ -8,48 +8,55 @@
 #pragma once
 
 #include <Flexible-GJK-and-EPA/shape/ConvexDecorator.h>
+#include <array>
 
 namespace flx::shape {
-/** @brief An object representing a roto-traslated convex shape.
- */
-class TransformDecorator : public ConvexDecorator {
+using RotationXYZ = std::array<float, 3>;
+
+class Transformation {
 public:
-  TransformDecorator(std::unique_ptr<ConvexShape> shape);
-  TransformDecorator(std::unique_ptr<ConvexShape> shape,
-                     const hull::Coordinate &position,
-                     const hull::Coordinate &rotation_XYZ = {0.f, 0.f, 0.f});
+  Transformation();
 
-  // const hull::Coordinate& getRotationXYZ() const; //todo
-  void setRotationXYZ(const hull::Coordinate &rotation_XYZ);
+  Transformation(const hull::Coordinate &traslation);
+  Transformation(const RotationXYZ &rotation_XYZ);
 
-  inline const hull::Coordinate &getTraslation() const {
-    return this->traslation;
-  };
-  inline void setTraslation(const hull::Coordinate &newTraslation) {
-    this->traslation = newTraslation;
-  };
+  Transformation(const hull::Coordinate &traslation,
+                 const RotationXYZ &rotation_XYZ);
 
-  void getSupport(hull::Coordinate &support,
-                  const hull::Coordinate &direction) const override;
+  void setTraslation(const hull::Coordinate &new_traslation);
+  void setRotationXYZ(const RotationXYZ &new_rotation_XYZ);
 
   /** @brief Get the passed position, as seen from the frame describing the
    * roto-traslation of this object.
    */
-  inline void transform(hull::Coordinate &point) const {
-    float temp[3];
-    temp[0] = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y +
-              this->rotation[0][2] * point.z + this->traslation.x;
-    temp[1] = this->rotation[1][0] * point.x + this->rotation[1][1] * point.y +
-              this->rotation[1][2] * point.z + this->traslation.y;
-    temp[2] = this->rotation[2][0] * point.x + this->rotation[2][1] * point.y +
-              this->rotation[2][2] * point.z + this->traslation.z;
-    point.x = temp[0];
-    point.y = temp[1];
-    point.z = temp[2];
-  };
+  void transform(hull::Coordinate &point) const;
+
+  using Rotation = std::array<std::array<float, 3>, 3>;
+
+  const Rotation &getRotation() const { return rotation; };
+  const hull::Coordinate &getTraslation() const { return traslation; };
 
 private:
-  float rotation[3][3]; //[rows][columns]
+  Rotation rotation; //[rows][columns]
   hull::Coordinate traslation;
+};
+
+/** @brief An object representing a roto-traslated convex shape.
+ */
+class TransformDecorator : public ConvexDecorator {
+public:
+  TransformDecorator(std::unique_ptr<ConvexShape> shape,
+                     const Transformation &transformation);
+  TransformDecorator(ConvexDecorator &&decorator_o,
+                     const Transformation &transformation);
+
+  const Transformation &getTransformation() const { return transformation; };
+  Transformation &getTransformation() { return transformation; };
+
+  void getSupport(hull::Coordinate &support,
+                  const hull::Coordinate &direction) const override;
+
+private:
+  Transformation transformation;
 };
 } // namespace flx::shape
