@@ -29,9 +29,11 @@ private:
   float data[3];
 };
 
-hull::Coordinate to_coordinate(const Vector3d &subject);
+hull::Coordinate
+to_coordinate(const std::vector<Vector3d>::const_iterator &subject);
 
-float dot_product(const Vector3d &subject, const hull::Coordinate &direction);
+float dot_product(const std::vector<Vector3d>::const_iterator &subject,
+                  const hull::Coordinate &direction);
 
 std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
@@ -39,7 +41,7 @@ std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
 class Vector3dStorer {
 public:
-  Vector3dStorer(std::vector<Vector3d> &&buffer) : points(std::move(buffer)){};
+  Vector3dStorer(const std::vector<Vector3d> &buffer) : points(buffer){};
 
   const std::vector<Vector3d> &getPoints() const { return points; }
 
@@ -51,8 +53,8 @@ class Vector3dCloud
     : public Vector3dStorer,
       public flx::shape::PointCloud<std::vector<Vector3d>::const_iterator> {
 public:
-  Vector3dCloud(std::vector<Vector3d> &&buffer)
-      : Vector3dStorer(std::move(buffer)),
+  Vector3dCloud(const std::vector<Vector3d> &buffer)
+      : Vector3dStorer(buffer),
         flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>(
             points.begin(), points.end(), dot_product, to_coordinate){};
 };
@@ -61,22 +63,74 @@ public:
 #include <map>
 #include <nlohmann/json.hpp>
 
-// You can dig into the sources to understand this class
-// if you are really interested. However, this is not strictly
-// required to understand how to use the functionalities
-// in GjkEpa.h.
+namespace logger {
+// You can dig into the sources to understand the functionalities
+// stored in this namespace if you really are interested in.
+// However, this is not strictly required to understand how to use
+// the functions in GjkEpa.h.
 //
 // In essence, this class is simply generating json files
 // in order to later display the results in cool python plots.
-class ResultLogger {
-public:
-  ResultLogger() = default;
 
-  void logResult(const flx::shape::ConvexShape &shape_a,
-                 const flx::shape::ConvexShape &shape_b,
-                 const flx::QueryResult &result, const std::string &file_name);
+class CloudsMemoizer {
+public:
+  CloudsMemoizer() = default;
+
+  std::vector<Vector3d> &getCloudVertices(const flx::shape::ConvexShape &shape);
 
 private:
-  std::map<const flx::shape::ConvexShape *, nlohmann::json>
-      already_encountered_shapes;
+  std::map<const flx::shape::ConvexShape *, std::vector<Vector3d>> clouds;
 };
+
+using CloudMemoizerPtr = std::shared_ptr<CloudsMemoizer>;
+
+class SubPlot {
+  friend class Figure;
+
+public:
+  void addShape(const flx::shape::ConvexShape &shape);
+
+  void addLine(const hull::Coordinate &a, const hull::Coordinate &b);
+
+  void toJson(nlohmann::json &recipient) const;
+
+private:
+  SubPlot(const CloudMemoizerPtr &collection, const std::string &title)
+      : title(title), collection(collection){};
+
+  const std::string title;
+  CloudMemoizerPtr collection;
+  std::vector<nlohmann::json> shapes;
+  std::vector<nlohmann::json> lines;
+};
+
+class Figure {
+  friend class Manager;
+
+public:
+  SubPlot &addSubPlot(const std::string &title);
+
+  void log(const std::string &file_name) const;
+
+private:
+  Figure(const CloudMemoizerPtr &collection) : collection(collection){};
+
+  CloudMemoizerPtr collection;
+  std::vector<SubPlot> sub_plots;
+};
+
+class Manager {
+public:
+  Manager() = default;
+
+  Figure makeFigure() const;
+
+  void logSingleQuery(const flx::shape::ConvexShape &shape_a,
+                      const flx::shape::ConvexShape &shape_b,
+                      const flx::QueryResult &result,
+                      const std::string &file_name);
+
+private:
+  CloudMemoizerPtr collection;
+};
+} // namespace logger

@@ -16,8 +16,11 @@ class ConvexDecorator : public ConvexShape {
 public:
   inline const ConvexShape &getShape() const { return *this->shape; };
 
-  ConvexDecorator(ConvexDecorator &&o);
-  ConvexDecorator &operator=(ConvexDecorator &&o);
+  ConvexDecorator(ConvexDecorator &&o) : ConvexDecorator(std::move(o.shape)){};
+  ConvexDecorator &operator=(ConvexDecorator &&o) {
+    shape = std::move(o.shape);
+    return *this;
+  };
 
 protected:
   ConvexDecorator(std::unique_ptr<ConvexShape> shape)
