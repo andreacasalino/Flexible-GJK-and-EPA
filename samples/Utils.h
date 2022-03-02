@@ -47,12 +47,13 @@ protected:
   const std::vector<Vector3d> points;
 };
 
-class Vector3dCloud : public Vector3dStorer,
-                      public PointCloud<std::vector<Vector3d>::const_iterator> {
+class Vector3dCloud
+    : public Vector3dStorer,
+      public flx::shape::PointCloud<std::vector<Vector3d>::const_iterator> {
 public:
   Vector3dCloud(std::vector<Vector3d> &&buffer)
       : Vector3dStorer(std::move(buffer)),
-        PointCloud<std::vector<Vector3d>::const_iterator>(
+        flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>(
             points.begin(), points.end(), dot_product, to_coordinate){};
 };
 

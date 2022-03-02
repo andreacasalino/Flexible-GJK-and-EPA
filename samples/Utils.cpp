@@ -99,7 +99,13 @@ get_describing_cloud(const flx::shape::ConvexShape &shape) {
   return {};
 }
 
-void to_json(nlohmann::json &json, const flx::shape::ConvexShape &shape);
+void to_json(nlohmann::json &json, const Vector3d &point) {
+  json = std::vector<float>{point.x(), point.y(), point.z()};
+}
+
+void to_json(nlohmann::json &json, const flx::shape::ConvexShape &shape) {
+  json["V"] = get_describing_cloud(shape);
+};
 
 const nlohmann::json &get_shape_json(
     std::map<const flx::shape::ConvexShape *, nlohmann::json> &container,
