@@ -35,6 +35,27 @@ float dot_product(const Vector3d &subject, const hull::Coordinate &direction);
 
 std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
+#include <Flexible-GJK-and-EPA/shape/PointCloud.h>
+
+class Vector3dStorer {
+public:
+  Vector3dStorer(std::vector<Vector3d> &&buffer) : points(std::move(buffer)){};
+
+  const std::vector<Vector3d> &getPoints() const { return points; }
+
+protected:
+  const std::vector<Vector3d> points;
+};
+
+class Vector3dCloud : public Vector3dStorer,
+                      public PointCloud<std::vector<Vector3d>::const_iterator> {
+public:
+  Vector3dCloud(std::vector<Vector3d> &&buffer)
+      : Vector3dStorer(std::move(buffer)),
+        PointCloud<std::vector<Vector3d>::const_iterator>(
+            points.begin(), points.end(), dot_product, to_coordinate){};
+};
+
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -45,68 +66,16 @@ std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 // in GjkEpa.h.
 //
 // In essence, this class is simply generating json files
-// in order to generate cool python plots later.
+// in order to later display the results in cool python plots.
 class ResultLogger {
 public:
   ResultLogger() = default;
 
   void logResult(const flx::shape::ConvexShape &shape_a,
                  const flx::shape::ConvexShape &shape_b,
-                 const std::string &file_name);
+                 const flx::QueryResult &result, const std::string &file_name);
 
 private:
   std::map<const flx::shape::ConvexShape *, nlohmann::json>
       already_encountered_shapes;
 };
-
-// class SampleLogger {
-// public:
-//   SampleLogger(const std::string &fileName);
-//   ~SampleLogger();
-
-//   inline void addShape(const flx::shape::ConvexShape &shape) {
-//     this->shapes.add(getDescribingCloud(shape));
-//   };
-
-//   inline void addQueryResult(const flx::GjkEpa::CoordinatePair &result) {
-//     this->results.add(
-//         {Vector(result.pointA.x, result.pointA.y, result.pointA.z),
-//          Vector(result.pointB.x, result.pointB.y, result.pointB.z)});
-//   };
-
-//   void doComplexQuery(flx::GjkEpa &solver, const flx::GjkEpa::ShapePair
-//   &pair);
-
-// private:
-//   static std::list<Vector>
-//   getDescribingCloud(const flx::shape::ConvexShape &shape);
-//   inline static std::list<Vector>
-//   _getDescribingCloud(const flx::shape::ConvexCloud<std::list<Vector>>
-//   &shape) {
-//     return shape.getPoints();
-//   };
-//   static std::list<Vector>
-//   _getDescribingCloud(const flx::shape::TransformDecorator &shape);
-//   static std::list<Vector>
-//   _getDescribingCloud(const flx::shape::RoundDecorator &shape);
-
-//   class VerticesArray {
-//   public:
-//     VerticesArray(const std::string &name);
-
-//     void add(const std::list<Vector> &element);
-
-//     std::string str();
-
-//   private:
-//     bool isFirstElement = true;
-//     std::stringstream stream;
-//   };
-//   mutable VerticesArray shapes;
-//   mutable VerticesArray results;
-
-//   std::string logFile;
-// #ifdef FLX_LOGGER_ENABLED
-//   static std::size_t logCounter;
-// #endif
-// };

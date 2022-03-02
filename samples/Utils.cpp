@@ -6,12 +6,98 @@
  **/
 
 #include "Utils.h"
+#include <Flexible-GJK-and-EPA/shape/RoundDecorator.h>
+#include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
+#include <math.h>
 
 namespace {
-std::vector<hull::Coordinate>
-get_describing_cloud(const flx::shape::ConvexShape &shape);
+class Interval {
+public:
+  Interval(const float &min, const float &max, const std::size_t &nPoints)
+      : delta((max - min) / static_cast<float>(nPoints - 1)), min(min) {
+    this->reset();
+  };
 
-std::vector<hull::Coordinate> get_sphere_cloud(const float ray);
+  inline void reset() { this->value = this->min; };
+
+  inline Interval &operator++() {
+    this->value += this->delta;
+    return *this;
+  };
+
+  inline const float &eval() const { return this->value; };
+
+private:
+  float value;
+  const float delta;
+  const float min;
+};
+constexpr float PI = 3.14159f;
+constexpr std::uint8_t N_ALFA = 5;
+constexpr std::uint8_t N_BETA = 10;
+std::vector<Vector3d> get_sphere_cloud(const float ray) {
+  std::vector<Vector3d> result;
+  float Calfa, Salfa, Cbeta, Sbeta;
+  Interval alfaInterval(-0.5f * PI, 0.5f * PI, N_ALFA);
+  Interval betaInterval(0.f, 2.f * PI, N_BETA);
+  for (std::uint8_t beta = 0; beta < N_BETA; ++beta) {
+    Cbeta = cosf(betaInterval.eval());
+    Sbeta = sinf(betaInterval.eval());
+    alfaInterval.reset();
+    for (std::uint8_t alfa = 0; alfa < N_ALFA; ++alfa) {
+      Calfa = cosf(alfaInterval.eval());
+      Salfa = sinf(alfaInterval.eval());
+      result.emplace_back(Calfa * Cbeta * ray, Calfa * Sbeta * ray,
+                          Salfa * ray);
+      ++betaInterval;
+    }
+    ++alfaInterval;
+  }
+  return result;
+};
+
+std::vector<Vector3d>
+get_describing_cloud(const flx::shape::ConvexShape &shape) {
+  {
+    const auto *as_cloud = dynamic_cast<const Vector3dCloud *>(&shape);
+    if (nullptr != as_cloud) {
+      return as_cloud->getPoints();
+    }
+  }
+  {
+    const auto *as_transformer =
+        dynamic_cast<const flx::shape::TransformDecorator *>(&shape);
+    if (nullptr != as_transformer) {
+      auto result = get_describing_cloud(as_transformer->getShape());
+      hull::Coordinate temp;
+      for (auto &point : result) {
+        temp.x = point.x();
+        temp.y = point.y();
+        temp.z = point.z();
+        as_transformer->getTransformation().transform(temp);
+        point = Vector3d{temp.x, temp.y, temp.z};
+      }
+      return result;
+    }
+  }
+  {
+    const auto *as_rounded =
+        dynamic_cast<const flx::shape::RoundDecorator *>(&shape);
+    if (nullptr != as_rounded) {
+      std::vector<Vector3d> result;
+      auto sphere = get_sphere_cloud(as_rounded->getRay());
+      for (const auto &point : get_describing_cloud(as_rounded->getShape())) {
+        for (const auto &point_sphere : sphere) {
+          result.emplace_back(point.x() + point_sphere.x(),
+                              point.y() + point_sphere.y(),
+                              point.z() + point_sphere.z());
+        }
+      }
+      return result;
+    }
+  }
+  return {};
+}
 
 void to_json(nlohmann::json &json, const flx::shape::ConvexShape &shape);
 
@@ -20,8 +106,9 @@ const nlohmann::json &get_shape_json(
     const flx::shape::ConvexShape &shape) {
   auto container_it = container.find(&shape);
   if (container_it == container.end()) {
-    to_json(container[&shape], shape);
-    return container[&shape];
+    auto &result = container[&shape];
+    to_json(result, shape);
+    return result;
   }
   return container_it->second;
 }
@@ -29,6 +116,7 @@ const nlohmann::json &get_shape_json(
 
 void ResultLogger::logResult(const flx::shape::ConvexShape &shape_a,
                              const flx::shape::ConvexShape &shape_b,
+                             const flx::QueryResult &result,
                              const std::string &file_name) {
   const auto &shape_a_json =
       get_shape_json(already_encountered_shapes, shape_a);
