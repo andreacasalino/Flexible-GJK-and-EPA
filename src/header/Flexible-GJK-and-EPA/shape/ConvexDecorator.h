@@ -18,6 +18,9 @@ public:
 
   ConvexDecorator(ConvexDecorator &&o) : ConvexDecorator(std::move(o.shape)){};
   ConvexDecorator &operator=(ConvexDecorator &&o) {
+    if (nullptr == o.shape) {
+      throw Error{"null shape found when move copying a shape decorator"};
+    }
     shape = std::move(o.shape);
     return *this;
   };
