@@ -92,16 +92,15 @@ hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,
   return N;
 }
 
-// void getSupportMinkowskiDiff(const ShapePair &pair,
-//                              const hull::Coordinate &direction,
-//                              MinkowskiDiffCoordinate &result) {
-//   pair.shape_a.getSupport(result.vertex_in_shape_a, direction);
+void MinkowskiDifference::getSupport(MinkowskiDiffCoordinate &result,
+                                     const hull::Coordinate &direction) const {
+  pair.shape_a.getSupport(result.vertex_in_shape_a, direction);
 
-//   auto direction_twin = direction;
-//   hull::invert(direction_twin);
-//   pair.shape_b.getSupport(result.vertex_in_shape_b, direction_twin);
+  auto direction_twin = direction;
+  hull::invert(direction_twin);
+  pair.shape_b.getSupport(result.vertex_in_shape_b, direction_twin);
 
-//   hull::diff(result.vertex_in_Minkowski_diff, result.vertex_in_shape_a,
-//              result.vertex_in_shape_b);
-// }
+  hull::diff(result.vertex_in_Minkowski_diff, result.vertex_in_shape_a,
+             result.vertex_in_shape_b);
+}
 } // namespace flx

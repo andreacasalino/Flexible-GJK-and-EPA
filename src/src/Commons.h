@@ -75,8 +75,8 @@ class MinkowskiDifference {
 public:
   MinkowskiDifference(const ShapePair &pair) : pair(pair){};
 
-  void getSupport(const hull::Coordinate &direction,
-                  MinkowskiDiffCoordinate &result) const;
+  void getSupport(MinkowskiDiffCoordinate &result,
+                  const hull::Coordinate &direction) const;
 
 private:
   const ShapePair &pair;
