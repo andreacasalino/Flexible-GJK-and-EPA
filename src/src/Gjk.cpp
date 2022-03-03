@@ -10,10 +10,10 @@
 
 namespace flx {
 InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
+  MinkowskiDifference mink_diff(pair);
   auto plex_data = std::make_shared<PlexData>();
   plex_data->search_direction = hull::Coordinate{1.f, 0, 0};
-  getSupportMinkowskiDiff(pair, plex_data->search_direction,
-                          *plex_data->vertices[0]);
+  mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
   if (hull::normSquared(plex_data->vertices[0]->vertex_in_Minkowski_diff) <=
       GEOMETRIC_TOLLERANCE2) {
     *plex_data->vertices[0] = *plex_data->vertices[1];
@@ -22,8 +22,7 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
 
   Plex plex = set_to_vertex(plex_data);
   do {
-    getSupportMinkowskiDiff(pair, plex_data->search_direction,
-                            *plex_data->vertices[0]);
+    mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
     if (hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
                   plex_data->search_direction) <=
         hull::HULL_GEOMETRIC_TOLLERANCE) {
@@ -44,6 +43,7 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   hull::Coordinate delta;
   diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
        plex_data->vertices[1]->vertex_in_Minkowski_diff);
+  MinkowskiDifference mink_diff(pair);
   while (dot(plex_data->search_direction, delta) >
          hull::HULL_GEOMETRIC_TOLLERANCE) {
     auto plex_updated = update_plex(plex);
@@ -53,8 +53,7 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
           "Trying to call finishing_GJK_loop on a plex that contains origin"};
     }
     plex = *plex_updated_ptr;
-    getSupportMinkowskiDiff(pair, plex_data->search_direction,
-                            *plex_data->vertices[0]);
+    mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
     diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
          plex_data->vertices[1]->vertex_in_Minkowski_diff);
   }

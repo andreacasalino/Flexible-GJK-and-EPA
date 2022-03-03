@@ -15,7 +15,21 @@ target_link_libraries(${PROJECT_SHORTNAME} PUBLIC
 Hull
 )
 
-if(LOGGER_OPT)
-target_compile_definitions(${PROJECT_NAME} PUBLIC FLX_LOGGER_ENABLED)
-endif()
+if(GJK_EPA_DIAGNOSTIC)
+  message(STATUS "fetching nlohmann json for diagnostics")
+  include(FetchContent)
+  FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        7194245a314d142a5560f6906a87f7c67ebbcf2e
+  )
+  FetchContent_MakeAvailable(nlohmann_json)
 
+  target_compile_definitions(${PROJECT_NAME} PUBLIC 
+    GJK_EPA_DIAGNOSTIC
+  )
+
+  target_link_libraries(${PROJECT_NAME} PRIVATE 
+    nlohmann_json::nlohmann_json
+  )
+endif()

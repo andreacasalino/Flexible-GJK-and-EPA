@@ -10,7 +10,11 @@ set(TEST_NAME Tests)
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
-add_executable(${TEST_NAME} ${SOURCES})
+add_executable(${TEST_NAME} 
+    ${SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../samples/Utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../samples/Utils.cpp
+)
 
 target_link_libraries(${TEST_NAME} PUBLIC
     Catch2::Catch2

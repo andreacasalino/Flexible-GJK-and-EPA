@@ -16,17 +16,18 @@
 namespace flx {
 namespace {
 MinkowskiDiffCoordinate find_vertex_trying_direction_and_opposite(
-    const ShapePair &pair, const MinkowskiDiffCoordinate &existing_vertex,
+    const MinkowskiDifference &mink_diff,
+    const MinkowskiDiffCoordinate &existing_vertex,
     hull::Coordinate direction) {
   hull::normalizeInPlace(direction);
   MinkowskiDiffCoordinate result;
-  getSupportMinkowskiDiff(pair, direction, result);
+  mink_diff.getSupport(result, direction);
   hull::Coordinate delta;
   hull::diff(delta, result.vertex_in_Minkowski_diff,
              existing_vertex.vertex_in_Minkowski_diff);
   if (hull::dot(direction, delta) <= hull::HULL_GEOMETRIC_TOLLERANCE) {
     hull::invert(direction);
-    getSupportMinkowskiDiff(pair, direction, result);
+    mink_diff.getSupport(result, direction);
   }
   return result;
 }
@@ -64,11 +65,13 @@ initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
   std::visit(visitor, initial_plex);
   std::vector<MinkowskiDiffCoordinate> result = std::move(visitor.result);
 
+  MinkowskiDifference mink_diff(pair);
+
   while (result.size() < 4) {
     switch (result.size()) {
     case 1:
       result.push_back(find_vertex_trying_direction_and_opposite(
-          pair, result.front(), hull::Coordinate{1.f, 0, 0}));
+          mink_diff, result.front(), hull::Coordinate{1.f, 0, 0}));
       break;
     case 2: {
       hull::Coordinate delta;
@@ -81,7 +84,7 @@ initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
         direction = direction2;
       }
       result.push_back(find_vertex_trying_direction_and_opposite(
-          pair, result.front(), direction));
+          mink_diff, result.front(), direction));
     } break;
     case 3:
       hull::Coordinate delta_AB;
@@ -91,7 +94,7 @@ initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
       hull::diff(delta_AC, result[0].vertex_in_Minkowski_diff,
                  result[2].vertex_in_Minkowski_diff);
       result.push_back(find_vertex_trying_direction_and_opposite(
-          pair, result.front(), hull::cross(delta_AB, delta_AC)));
+          mink_diff, result.front(), hull::cross(delta_AB, delta_AC)));
       break;
     }
   }
@@ -100,7 +103,7 @@ initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
 
 class EpaHull : public hull::Observer {
 public:
-  EpaHull(const ShapePair &pair, const Plex &initial_plex) : pair(pair) {
+  EpaHull(const ShapePair &pair, const Plex &initial_plex) : mink_diff(pair) {
     this->vertices = initial_thetraedron(pair, initial_plex);
     this->hull = std::make_unique<hull::Hull>(
         vertices[0].vertex_in_Minkowski_diff,
@@ -111,8 +114,7 @@ public:
 
   bool update() {
     const hull::Facet &closest_facet = *distances_facets_map.begin()->second;
-    getSupportMinkowskiDiff(pair, closest_facet.normal,
-                            vertices.emplace_back());
+    mink_diff.getSupport(vertices.emplace_back(), closest_facet.normal);
     hull::Coordinate improvement;
     hull::diff(improvement, vertices.back().vertex_in_Minkowski_diff,
                vertices[closest_facet.vertexA].vertex_in_Minkowski_diff);
@@ -166,7 +168,7 @@ protected:
     return hull::normSquared(mix3(A, B, C, closest_info.coefficients));
   }
 
-  ShapePair pair;
+  MinkowskiDifference mink_diff;
   std::unique_ptr<hull::Hull> hull;
   std::vector<MinkowskiDiffCoordinate> vertices;
   std::multimap<float, const hull::Facet *> distances_facets_map;
