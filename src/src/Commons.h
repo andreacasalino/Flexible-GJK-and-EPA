@@ -71,7 +71,14 @@ struct MinkowskiDiffCoordinate {
   hull::Coordinate vertex_in_Minkowski_diff;
 };
 
-void getSupportMinkowskiDiff(const ShapePair &pair,
-                             const hull::Coordinate &direction,
-                             MinkowskiDiffCoordinate &result);
+class MinkowskiDifference {
+public:
+  MinkowskiDifference(const ShapePair &pair) : pair(pair){};
+
+  void getSupport(const hull::Coordinate &direction,
+                  MinkowskiDiffCoordinate &result) const;
+
+private:
+  const ShapePair &pair;
+};
 } // namespace flx
