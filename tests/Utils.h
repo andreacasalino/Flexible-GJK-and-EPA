@@ -20,6 +20,8 @@ class PointsStore {
 public:
   PointsStore(Points &&buffer) : points(std::move(buffer)){};
 
+  const Points &getPoints() const { return points; };
+
 protected:
   const Points points;
 };
