@@ -19,8 +19,9 @@ macro(MAKE_SAMPLE NAME SCRIPT)
         nlohmann_json::nlohmann_json
     )
 
-    COPY_SCRIPT(${NAME} Plotter)
-    COPY_SCRIPT(${NAME} ${SCRIPT})	
+    # COPY_SCRIPT(${NAME} Plotter)
+    # COPY_SCRIPT(${NAME} ${SCRIPT})
+    COPY_SCRIPT(${NAME} Visualize)	
 endmacro()
 
 MAKE_SAMPLE(Sample01 Visualize01)

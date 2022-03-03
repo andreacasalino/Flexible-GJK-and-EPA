@@ -43,6 +43,16 @@ float dot_product(const std::vector<Vector3d>::const_iterator &subject,
 
 namespace logger {
 
+class CloudsMemoizer {
+public:
+  CloudsMemoizer() = default;
+
+  std::vector<Vector3d> &getCloudVertices(const flx::shape::ConvexShape &shape);
+
+private:
+  std::map<const flx::shape::ConvexShape *, std::vector<Vector3d>> clouds;
+};
+
 namespace {
 class Interval {
 public:
@@ -149,13 +159,25 @@ void to_json(nlohmann::json &recipient, const std::vector<Vector3d> &points) {
 } // namespace
 
 void SubPlot::toJson(nlohmann::json &recipient) const {
+  recipient["title"] = this->title;
   recipient["Politopes"] = this->shapes;
   recipient["Lines"] = this->lines;
 }
 
 void SubPlot::addShape(const flx::shape::ConvexShape &shape) {
-  to_json(shapes.emplace_back()["Vertices"],
-          collection->getCloudVertices(shape));
+  auto &new_politope = shapes.emplace_back();
+  to_json(new_politope["Vertices"], collection->getCloudVertices(shape));
+  std::vector<float> color;
+  if (1 == shapes.size()) {
+    color = {1, 0, 0};
+  } else if (2 == shapes.size()) {
+    color = {0, 0, 1};
+  } else {
+    for (std::size_t k = 0; k < 3; ++k) {
+      color[k] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    }
+  }
+  new_politope["Color"] = color;
 }
 
 void SubPlot::addLine(const hull::Coordinate &a, const hull::Coordinate &b) {
@@ -226,4 +248,6 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
   }
   fig.log(file_name);
 }
+
+Manager::Manager() { collection = std::make_shared<CloudsMemoizer>(); }
 } // namespace logger

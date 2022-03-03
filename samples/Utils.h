@@ -72,15 +72,7 @@ namespace logger {
 // In essence, this class is simply generating json files
 // in order to later display the results in cool python plots.
 
-class CloudsMemoizer {
-public:
-  CloudsMemoizer() = default;
-
-  std::vector<Vector3d> &getCloudVertices(const flx::shape::ConvexShape &shape);
-
-private:
-  std::map<const flx::shape::ConvexShape *, std::vector<Vector3d>> clouds;
-};
+class CloudsMemoizer;
 
 using CloudMemoizerPtr = std::shared_ptr<CloudsMemoizer>;
 
@@ -121,7 +113,7 @@ private:
 
 class Manager {
 public:
-  Manager() = default;
+  Manager();
 
   Figure makeFigure() const;
 
