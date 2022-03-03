@@ -8,6 +8,7 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
+#include "Logger.h"
 #include "Utils.h"
 #include <iostream>
 using namespace std;

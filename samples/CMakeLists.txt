@@ -13,7 +13,10 @@ macro(COPY_SCRIPT TARGET SCRIPT)
 endmacro()
 
 macro(MAKE_SAMPLE NAME SCRIPT)
-    add_executable(${NAME} ${NAME}.cpp Utils.h Utils.cpp)
+    add_executable(${NAME} ${NAME}.cpp 
+        Utils.h Utils.cpp
+        Logger.h Logger.cpp
+    )
     target_link_libraries(${NAME} PUBLIC 
         GJK-EPA
         nlohmann_json::nlohmann_json

@@ -19,12 +19,12 @@ std::vector<float> get_angles(const std::size_t size) {
   return angles;
 }
 
-std::vector<hull::Coordinate> get_polygon(const std::size_t size) {
-  std::vector<hull::Coordinate> vertices;
-  vertices.reserve(size);
+std::vector<Vector3d> get_polygon(const std::size_t size) {
+  std::vector<Vector3d> vertices;
+  vertices.reserve(size * 2);
   for (const auto &angle : get_angles(size)) {
-    vertices.push_back(hull::Coordinate{cosf(angle), sinf(angle), 0.25f});
-    vertices.push_back(hull::Coordinate{cosf(angle), sinf(angle), -0.25f});
+    vertices.emplace_back(cosf(angle), sinf(angle), 0.25f);
+    vertices.emplace_back(cosf(angle), sinf(angle), -0.25f);
   }
   return vertices;
 }
@@ -32,22 +32,22 @@ std::vector<hull::Coordinate> get_polygon(const std::size_t size) {
 TEST_CASE("Polygon", "[support]") {
   auto polygon_size = GENERATE(3, 5, 9);
 
-  flx::shape::TestCloud polygon(get_polygon(polygon_size));
+  Vector3dCloud polygon(get_polygon(polygon_size));
 
   for (const auto &angle : get_angles(polygon_size)) {
     const float angle_cos = cosf(angle);
     const float angle_sin = sinf(angle);
     hull::Coordinate support;
     polygon.getSupport(support, hull::Coordinate{angle_cos, angle_sin, 0});
-    CHECK(flx::almost_equal(angle_cos, support.x));
-    CHECK(flx::almost_equal(angle_sin, support.y));
+    CHECK(almost_equal(angle_cos, support.x));
+    CHECK(almost_equal(angle_sin, support.y));
   }
 }
 
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 TEST_CASE("Transform decorator", "[support]") {
   const std::size_t polygon_size = 5;
-  flx::shape::TestCloud polygon(get_polygon(polygon_size));
+  Vector3dCloud polygon(get_polygon(polygon_size));
 
   SECTION("Traslations") {
     auto traslation = GENERATE(
@@ -57,7 +57,7 @@ TEST_CASE("Transform decorator", "[support]") {
 
     auto polygon_points = polygon.getPoints();
     flx::shape::TransformDecorator polygon_translated(
-        std::make_unique<flx::shape::TestCloud>(std::move(polygon_points)),
+        std::make_unique<Vector3dCloud>(std::move(polygon_points)),
         flx::shape::Transformation{traslation});
 
     for (const auto &angle : get_angles(polygon_size)) {
@@ -70,10 +70,10 @@ TEST_CASE("Transform decorator", "[support]") {
       hull::Coordinate polygon_traslated_support;
       polygon_translated.getSupport(polygon_support, direction);
 
-      CHECK(flx::almost_equal(polygon_traslated_support.x,
-                              polygon_support.x + traslation.x));
-      CHECK(flx::almost_equal(polygon_traslated_support.y,
-                              polygon_support.y + traslation.y));
+      CHECK(almost_equal(polygon_traslated_support.x,
+                         polygon_support.x + traslation.x));
+      CHECK(almost_equal(polygon_traslated_support.y,
+                         polygon_support.y + traslation.y));
     }
   }
 
@@ -90,12 +90,12 @@ TEST_CASE("Transform decorator", "[support]") {
 TEST_CASE("Round decorator", "[support]") {
   auto polygon_size = GENERATE(3, 5, 9);
 
-  flx::shape::TestCloud polygon(get_polygon(polygon_size));
+  Vector3dCloud polygon(get_polygon(polygon_size));
 
   const float ray = 1.5f;
   auto polygon_points = polygon.getPoints();
   flx::shape::RoundDecorator polygon_inflated(
-      std::make_unique<flx::shape::TestCloud>(std::move(polygon_points)), ray);
+      std::make_unique<Vector3dCloud>(std::move(polygon_points)), ray);
 
   for (const auto &angle : get_angles(polygon_size)) {
     hull::Coordinate direction = hull::Coordinate{cosf(angle), sinf(angle), 0};
@@ -105,9 +105,7 @@ TEST_CASE("Round decorator", "[support]") {
 
     hull::Coordinate polygon_inflated_support;
     polygon_inflated.getSupport(polygon_support, direction);
-    CHECK(
-        flx::almost_equal(polygon_inflated_support.x, polygon_support.x + ray));
-    CHECK(
-        flx::almost_equal(polygon_inflated_support.y, polygon_support.y + ray));
+    CHECK(almost_equal(polygon_inflated_support.x, polygon_support.x + ray));
+    CHECK(almost_equal(polygon_inflated_support.y, polygon_support.y + ray));
   }
 }
