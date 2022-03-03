@@ -5,75 +5,75 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "Utils.h"
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
-#include <Flexible-GJK-and-EPA/shape/ConvexCloud.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
+
+#include "Utils.h"
 #include <iostream>
-#include <math.h>
 using namespace std;
 
-hull::Coordinate getRandomCorodinate(const float &min_val,
-                                     const float &max_val) {
+flx::shape::Transformation getRandomTransformation(const float &min_val,
+                                                   const float &max_val) {
   auto randUnif = [](const float &min_val, const float &max_val) {
     float delta = max_val - min_val;
     return min_val +
            delta * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
   };
 
-  return {randUnif(min_val, max_val), randUnif(min_val, max_val),
-          randUnif(min_val, max_val)};
+  return flx::shape::Transformation{
+      hull::Coordinate{randUnif(min_val, max_val), randUnif(min_val, max_val),
+                       randUnif(min_val, max_val)},
+      flx::shape::RotationXYZ{randUnif(0.f, 0.5f * 3.14159f),
+                              randUnif(0.f, 0.5f * 3.14159f),
+                              randUnif(0.f, 0.5f * 3.14159f)}};
 }
 
-std::shared_ptr<std::list<Vector>> getPoligon(const std::size_t &N_edges) {
-  std::shared_ptr<std::list<Vector>> cloud =
-      std::make_shared<std::list<Vector>>();
+Vector3dCloud getPoligon(const std::size_t N_edges) {
+  std::vector<Vector3d> cloud;
   float delta_angle = 2.f * 3.14159f / static_cast<float>(N_edges);
   float angle = 0.f;
   float temp[2];
   for (std::size_t k = 0; k < N_edges; k++) {
     temp[0] = cosf(angle);
     temp[1] = sinf(angle);
-    cloud->emplace_back(temp[0], temp[1], 0.2f);
-    cloud->emplace_back(temp[0], temp[1], -0.2f);
+    cloud.emplace_back(temp[0], temp[1], 0.2f);
+    cloud.emplace_back(temp[0], temp[1], -0.2f);
     angle += delta_angle;
   }
   return cloud;
 }
 
 int main() {
-  // build the solver to use for the subsequent queries
-  flx::GjkEpa solver;
+  logger::Manager logger;
 
   // build two poligons with a specified number of vertices
-  std::unique_ptr<flx::shape::ConvexShape> shapeA =
-      std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(getPoligon(6));
-  std::unique_ptr<flx::shape::ConvexShape> shapeB =
-      std::make_unique<flx::shape::ConvexCloud<list<Vector>>>(getPoligon(3));
+  std::unique_ptr<Vector3dCloud> shapeA =
+      std::make_unique<Vector3dCloud>(getPoligon(6));
+  std::unique_ptr<Vector3dCloud> shapeB =
+      std::make_unique<Vector3dCloud>(getPoligon(3));
 
-  // get the penetration distance and the closest points
   {
-    SampleLogger result("Result_2_a.json");
-    result.doComplexQuery(solver, {*shapeA, *shapeB});
+    auto query_result =
+        flx::get_closest_points_or_penetration_info(*shapeA, *shapeB);
+    // log results
+    logger.logSingleQuery(*shapeA, *shapeB, query_result, "Result_2_a.json");
   }
 
   // get two random rototraslations for both the shapes
-  shapeA = std::make_unique<flx::shape::TransformDecorator>(
-      std::move(shapeA), getRandomCorodinate(2.f, 3.5f),
-      getRandomCorodinate(0.f, 0.5f * 3.14159f));
-  shapeB = std::make_unique<flx::shape::TransformDecorator>(
-      std::move(shapeB), getRandomCorodinate(-3.5f, -2.f),
-      getRandomCorodinate(-0.5f * 3.14159f, 0.f));
+  flx::shape::TransformDecorator shapeA_translated(
+      std::move(shapeA),
+      flx::shape::Transformation{getRandomTransformation(2.f, 3.5f)});
+  flx::shape::TransformDecorator shapeB_translated(
+      std::move(shapeB),
+      flx::shape::Transformation{getRandomTransformation(-3.5f, -2.f)});
 
   // get the closest points
   {
-    SampleLogger result("Result_2_b.json");
-    result.doComplexQuery(solver, {*shapeA, *shapeB});
+    auto query_result =
+        flx::get_closest_points_or_penetration_info(*shapeA, *shapeB);
+    // log results
+    logger.logSingleQuery(*shapeA, *shapeB, query_result, "Result_2_b.json");
   }
 
-  // analyze the .json(s) storing the results using the python script
-  // Visualize02.py
-  std::cout << "Use Visualize02.py to see the results" << std::endl;
-
-  return 0;
+  return EXIT_SUCCESS;
 }

@@ -29,50 +29,48 @@ int main() {
       logger.logSingleQuery(shapeA, *shapeB, query_result, "Result_1_a.json");
     }
 
-    // {
-    //   // translate one of the shape away: no collision is expected now
-    //   flx::shape::TransformDecorator shapeB_translated(
-    //       std::move(shapeB),
-    //       flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
+    {
+      // translate one of the shape away: no collision is expected now
+      flx::shape::TransformDecorator shapeB_translated(
+          std::move(shapeB),
+          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
 
-    //   auto query_result = flx::get_closest_points_or_penetration_info(
-    //       shapeA, shapeB_translated);
-    //   // log results
-    //   logger.logSingleQuery(shapeA, shapeB_translated, query_result,
-    //                         "Result_1_b.json");
-    // }
+      auto query_result = flx::get_closest_points_or_penetration_info(
+          shapeA, shapeB_translated);
+      // log results
+      logger.logSingleQuery(shapeA, shapeB_translated, query_result,
+                            "Result_1_b.json");
+    }
   }
 
-  // // repeat above steps with bigger point clouds
-  // {
-  //   // get random shapes with few points, centred around the origin: a
-  //   collision
-  //   // detection is expected
-  //   Vector3dCloud shapeA(make_random_cloud(500));
-  //   std::unique_ptr<Vector3dCloud> shapeB =
-  //       std::make_unique<Vector3dCloud>(make_random_cloud(500));
+  // repeat above steps with bigger point clouds
+  {
+    // get random shapes with few points, centred around the origin: a collision
+    // detection is expected
+    Vector3dCloud shapeA(make_random_cloud(500));
+    std::unique_ptr<Vector3dCloud> shapeB =
+        std::make_unique<Vector3dCloud>(make_random_cloud(500));
 
-  //   {
-  //     auto query_result =
-  //         flx::get_closest_points_or_penetration_info(shapeA, *shapeB);
-  //     // log results
-  //     logger.logSingleQuery(shapeA, *shapeB, query_result,
-  //     "Result_1_c.json");
-  //   }
+    {
+      auto query_result =
+          flx::get_closest_points_or_penetration_info(shapeA, *shapeB);
+      // log results
+      logger.logSingleQuery(shapeA, *shapeB, query_result, "Result_1_c.json");
+    }
 
-  //   {
-  //     // translate one of the shape away: no collision is expected now
-  //     flx::shape::TransformDecorator shapeB_translated(
-  //         std::move(shapeB),
-  //         flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
+    {
+      // translate one of the shape away: no collision is expected now
+      flx::shape::TransformDecorator shapeB_translated(
+          std::move(shapeB),
+          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
 
-  //     auto query_result = flx::get_closest_points_or_penetration_info(
-  //         shapeA, shapeB_translated);
-  //     // log results
-  //     logger.logSingleQuery(shapeA, shapeB_translated, query_result,
-  //                           "Result_1_d.json");
-  //   }
-  // }
+      auto query_result = flx::get_closest_points_or_penetration_info(
+          shapeA, shapeB_translated);
+      // log results
+      logger.logSingleQuery(shapeA, shapeB_translated, query_result,
+                            "Result_1_d.json");
+    }
+  }
 
   return EXIT_SUCCESS;
 }
