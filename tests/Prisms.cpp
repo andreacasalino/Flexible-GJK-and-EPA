@@ -4,6 +4,28 @@
 #include "Utils.h"
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 
+// #include <iostream>
+// TEST_CASE("Debug", "[debug]") {
+//   std::vector<Point2D> polygon_a = {
+//       {-1.f, -2.f}, {1.f, -2.f}, {1.f, 3.f}, {-1.f, 3.f}};
+//   std::vector<Point2D> polygon_b = {
+//       {-1.f, 2.f}, {1.f, 2.f}, {1.f, 5.f}, {-1.f, 5.f}};
+
+//   auto query = flx::get_closest_points_or_penetration_info(
+//       make_prism_cloud(polygon_a, 1), make_prism_cloud(polygon_b, 1));
+//   if (query.is_closest_pair_or_penetration_info) {
+//     std::cout << "closest pair" << std::endl;
+//   } else {
+//     std::cout << "penetration info" << std::endl;
+//   }
+//   std::cout << query.result.point_in_shape_a.x << ' '
+//             << query.result.point_in_shape_a.y << ' '
+//             << query.result.point_in_shape_a.z << std::endl;
+//   std::cout << query.result.point_in_shape_b.x << ' '
+//             << query.result.point_in_shape_b.y << ' '
+//             << query.result.point_in_shape_b.z << std::endl;
+// }
+
 TEST_CASE("Triangles, vertex-vertex proximity", "[prisms]") {
   std::vector<Point2D> polygon_a = {{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}};
 

@@ -34,7 +34,7 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair
     mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
     if (hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
                   plex_data->search_direction) <=
-        hull::HULL_GEOMETRIC_TOLLERANCE) {
+        -hull::HULL_GEOMETRIC_TOLLERANCE) {
       return InitialLoopResult{false, plex};
     }
     auto update_result = update_plex(plex
