@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Commons.h"
+#include "Diagnostic.h"
 
 #include <array>
 #include <memory>
@@ -48,7 +49,12 @@ using PlexUpdateResult = std::variant<CollisionCase, Plex>;
 
 // the new vertex is supposed to have already been placed at the front of the
 // vertices
-PlexUpdateResult update_plex(const Plex &subject);
+PlexUpdateResult update_plex(const Plex &subject
+#ifdef GJK_EPA_DIAGNOSTIC
+                             ,
+                             nlohmann::json &log
+#endif
+);
 
 VertexCase set_to_vertex(const PlexDataPtr &data);
 } // namespace flx

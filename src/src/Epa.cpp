@@ -136,6 +136,10 @@ public:
     return result;
   };
 
+#ifdef GJK_EPA_DIAGNOSTIC
+  void toJson(nlohmann::json &recipient) const;
+#endif
+
 protected:
   void hullChanges(Notification &&notification) final {
     for (const auto *added : notification.added) {
@@ -173,11 +177,39 @@ protected:
   std::vector<MinkowskiDiffCoordinate> vertices;
   std::multimap<float, const hull::Facet *> distances_facets_map;
 };
+
+#ifdef GJK_EPA_DIAGNOSTIC
+void EpaHull::toJson(nlohmann::json &recipient) const {
+  auto &facets = recipient["facets"];
+  facets = nlohmann::json::array();
+  for (const auto &facet : hull->getFacets()) {
+    auto &facet_json = facets.emplace_back();
+    diagnostic::to_json(facet_json["A"], hull->getVertices()[facet->vertexA]);
+    diagnostic::to_json(facet_json["B"], hull->getVertices()[facet->vertexB]);
+    diagnostic::to_json(facet_json["C"], hull->getVertices()[facet->vertexC]);
+  }
+}
+#endif
 } // namespace
 
-CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex) {
+CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex
+#ifdef GJK_EPA_DIAGNOSTIC
+                   ,
+                   nlohmann::json &log
+#endif
+) {
+#ifdef GJK_EPA_DIAGNOSTIC
+  auto &epa_log = log["EPA"];
+  epa_log = nlohmann::json::array();
+#endif
   EpaHull epa_hull(pair, initial_plex);
+#ifdef GJK_EPA_DIAGNOSTIC
+  epa_hull.toJson(epa_log.emplace_back());
+#endif
   while (epa_hull.update()) {
+#ifdef GJK_EPA_DIAGNOSTIC
+    epa_hull.toJson(epa_log.emplace_back());
+#endif
   }
   auto closest_facet = epa_hull.getClosestFacetToOrigin();
   auto closest_info =

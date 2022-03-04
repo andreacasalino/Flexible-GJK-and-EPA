@@ -94,23 +94,84 @@ constexpr float MAX_DISTANCE = std::numeric_limits<float>::max();
 namespace {
 static inline const uint8_t INCIDENCES[3][3] = {
     {0, 1, 2}, {0, 1, 3}, {0, 2, 3}};
+
+#ifdef GJK_EPA_DIAGNOSTIC
+void to_json(nlohmann::json &recipient, const ClosestRegionToOrigin &region) {
+  switch (region) {
+  case vertex_A:
+    recipient = "vertex_A";
+    break;
+  case edge_AB:
+    recipient = "edge_AB";
+    break;
+  case edge_AC:
+    recipient = "edge_AC";
+    break;
+  case face_ABC:
+    recipient = "face_ABC";
+    break;
+  }
+}
+
+void to_json(nlohmann::json &recipient, const PlexData &data,
+             const std::size_t size) {
+  diagnostic::to_json(recipient["direction"], data.search_direction);
+  auto &plex = recipient["plex"];
+  plex = nlohmann::json::array();
+  for (std::size_t k = 0; k < size; ++k) {
+    diagnostic::to_json(plex.emplace_back(),
+                        data.vertices[k]->vertex_in_Minkowski_diff);
+  }
+}
+
+void tp_json_closest(nlohmann::json &recipient, const Coefficients &coeff,
+                     const MinkowskiCoordinates &coordinates) {
+  hull::Coordinate closest;
+  if (2 == coeff.size()) {
+    closest = mix2(coordinates[0]->vertex_in_Minkowski_diff,
+                   coordinates[1]->vertex_in_Minkowski_diff, coeff);
+  } else {
+    closest = mix3(coordinates[0]->vertex_in_Minkowski_diff,
+                   coordinates[1]->vertex_in_Minkowski_diff,
+                   coordinates[2]->vertex_in_Minkowski_diff, coeff);
+  }
+  to_json(recipient, closest);
+}
+#endif
 } // namespace
-PlexUpdateResult update_plex(const Plex &subject) {
+PlexUpdateResult update_plex(const Plex &subject
+#ifdef GJK_EPA_DIAGNOSTIC
+                             ,
+                             nlohmann::json &log
+#endif
+) {
   struct Visitor {
+    nlohmann::json &log;
     mutable PlexUpdateResult result;
 
     void operator()(const VertexCase &subject) const {
       auto &data = *subject.data;
+#ifdef GJK_EPA_DIAGNOSTIC
+      to_json(log, data, 2);
+#endif
       hull::Coordinate temp;
       hull::cross(temp, data.vertices[0]->vertex_in_Minkowski_diff,
                   data.vertices[1]->vertex_in_Minkowski_diff);
       if (normSquared(temp) <= GEOMETRIC_TOLLERANCE4) {
+#ifdef GJK_EPA_DIAGNOSTIC
+        log["collision"] = true;
+#endif
         result = CollisionCase{};
         return;
       }
       auto closest = getClosestToOriginInSegment(
           data.vertices[0]->vertex_in_Minkowski_diff,
           data.vertices[1]->vertex_in_Minkowski_diff);
+#ifdef GJK_EPA_DIAGNOSTIC
+      tp_json_closest(log["closest"]["point"], closest.coefficients,
+                      data.vertices);
+      to_json(log["closest"]["region"], closest.region);
+#endif
       if (vertex_A == closest.region) {
         result = set_to_vertex(subject.data);
         return;
@@ -120,6 +181,9 @@ PlexUpdateResult update_plex(const Plex &subject) {
 
     void operator()(const SegmentCase &subject) const {
       auto &data = *subject.data;
+#ifdef GJK_EPA_DIAGNOSTIC
+      to_json(log, data, 3);
+#endif
       auto closest = getClosestToOriginInTriangle(
           data.vertices[0]->vertex_in_Minkowski_diff,
           data.vertices[1]->vertex_in_Minkowski_diff,
@@ -128,7 +192,14 @@ PlexUpdateResult update_plex(const Plex &subject) {
                                    data.vertices[1]->vertex_in_Minkowski_diff,
                                    data.vertices[2]->vertex_in_Minkowski_diff,
                                    closest.coefficients);
+#ifdef GJK_EPA_DIAGNOSTIC
+      diagnostic::to_json(log["closest"]["point"], temp);
+      to_json(log["closest"]["region"], closest.region);
+#endif
       if (normSquared(temp) <= GEOMETRIC_TOLLERANCE2) {
+#ifdef GJK_EPA_DIAGNOSTIC
+        log["collision"] = true;
+#endif
         result = CollisionCase{};
         return;
       }
@@ -156,8 +227,11 @@ PlexUpdateResult update_plex(const Plex &subject) {
 
     void operator()(const FacetCase &subject) const {
       auto &data = *subject.data;
+#ifdef GJK_EPA_DIAGNOSTIC
+      to_json(log, data, 4);
+#endif
       std::array<hull::Coordinate, 3> normals;
-      bool is_origin_visible[3];
+      std::array<bool, 3> is_origin_visible;
       // update visibility flags
       is_origin_visible[0] = compute_facet_visibility(
           data.vertices[0]->vertex_in_Minkowski_diff,
@@ -174,10 +248,22 @@ PlexUpdateResult update_plex(const Plex &subject) {
           data.vertices[2]->vertex_in_Minkowski_diff,
           data.vertices[3]->vertex_in_Minkowski_diff,
           data.vertices[1]->vertex_in_Minkowski_diff, normals[2]);
+#ifdef GJK_EPA_DIAGNOSTIC
+      auto &log_facets = log["facets"];
+      auto &log_normals = log_facets["normals"];
+      log_normals = nlohmann::json::array();
+      for (const auto &normal : normals) {
+        diagnostic::to_json(log_normals.emplace_back(), normal);
+      }
+      log_facets["visibility"] = is_origin_visible;
+#endif
 
       // check contains origin
       if (!(is_origin_visible[0] || is_origin_visible[1] ||
             is_origin_visible[2])) {
+#ifdef GJK_EPA_DIAGNOSTIC
+        log["collision"] = true;
+#endif
         result = CollisionCase{};
         return;
       }
@@ -186,7 +272,14 @@ PlexUpdateResult update_plex(const Plex &subject) {
       ClosestRegionToOrigin regions[3];
       float distances[3];
       hull::Coordinate temp;
+#ifdef GJK_EPA_DIAGNOSTIC
+      auto &log_facets_closest = log_facets["closest"];
+      log_facets_closest = nlohmann::json::array();
+#endif
       for (std::uint8_t k = 0; k < 3; ++k) {
+#ifdef GJK_EPA_DIAGNOSTIC
+        auto &closest_info = log_facets_closest.emplace_back();
+#endif
         if (is_origin_visible[k]) {
           auto [region, coeff] = getClosestToOriginInTriangle(
               data.vertices[INCIDENCES[k][0]]->vertex_in_Minkowski_diff,
@@ -198,8 +291,16 @@ PlexUpdateResult update_plex(const Plex &subject) {
                    data.vertices[INCIDENCES[k][2]]->vertex_in_Minkowski_diff,
                    coeff));
           regions[k] = region;
-        } else
+#ifdef GJK_EPA_DIAGNOSTIC
+          diagnostic::to_json(closest_info["point"], temp);
+          tp_json_closest(closest_info["region"], coeff, data.vertices);
+#endif
+        } else {
           distances[k] = MAX_DISTANCE;
+#ifdef GJK_EPA_DIAGNOSTIC
+          closest_info = nullptr;
+#endif
+        }
       }
 
       std::uint8_t closest_facet = 0;
@@ -252,7 +353,7 @@ PlexUpdateResult update_plex(const Plex &subject) {
         break;
       }
     };
-  } visitor;
+  } visitor{log};
   std::visit(visitor, subject);
   return visitor.result;
 }
