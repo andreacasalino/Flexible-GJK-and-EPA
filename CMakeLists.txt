@@ -14,7 +14,7 @@ include(GroupSources)
 include(AutoCollect)
 include(MakeLibrary)
 
-option(GJK_EPA_DIAGNOSTIC "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
+option(GJK_EPA_DIAGNOSTIC "Diagnostic log enabled (ON) or disabled (OFF)" ON)
 add_subdirectory(src)
 
 option(BUILD_GJK_EPA_SAMPLES "Build the samples showing how to use the package" ON)

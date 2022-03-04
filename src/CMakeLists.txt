@@ -25,11 +25,11 @@ if(GJK_EPA_DIAGNOSTIC)
   )
   FetchContent_MakeAvailable(nlohmann_json)
 
-  target_compile_definitions(${PROJECT_NAME} PUBLIC 
+  target_compile_definitions(${PROJECT_SHORTNAME} PUBLIC 
     GJK_EPA_DIAGNOSTIC
   )
 
-  target_link_libraries(${PROJECT_NAME} PRIVATE 
+  target_link_libraries(${PROJECT_SHORTNAME} PRIVATE 
     nlohmann_json::nlohmann_json
   )
 endif()
