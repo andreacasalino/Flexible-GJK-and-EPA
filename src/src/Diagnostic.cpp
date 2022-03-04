@@ -13,7 +13,7 @@ static std::size_t print_counter = 0;
 static const std::string DIAGNOSTIC_FOLDER = "./GJK-EPA-diagnostic";
 } // namespace
 
-void Diagnostic::print() const {
+Diagnostic::~Diagnostic() {
   std::scoped_lock locker(print_mtx);
   if (0 == print_counter) {
     std::filesystem::remove_all(DIAGNOSTIC_FOLDER);

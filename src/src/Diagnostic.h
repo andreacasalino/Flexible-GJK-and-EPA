@@ -8,8 +8,7 @@ namespace flx::diagnostic {
 class Diagnostic {
 public:
   Diagnostic() = default;
-
-  void print() const;
+  ~Diagnostic();
 
   nlohmann::json &getLog() { return log; }
 
