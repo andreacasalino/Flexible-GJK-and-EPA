@@ -53,6 +53,7 @@ int main() {
   std::unique_ptr<Vector3dCloud> shapeB =
       std::make_unique<Vector3dCloud>(getPoligon(3));
 
+  // a collsion is expected: get penetration depth
   {
     auto query_result =
         flx::get_closest_points_or_penetration_info(*shapeA, *shapeB);

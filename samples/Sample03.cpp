@@ -15,8 +15,7 @@ using namespace std;
 
 using ShapePtr = std::unique_ptr<flx::shape::ConvexShape>;
 
-// Add to the list of politopes a random poligon, with a random position and
-// orientation
+// Get a random poligon, shifted with a random position and orientation
 ShapePtr makeRandomShape() {
   auto randUnif = [](const float &min_val, const float &max_val) {
     float delta = max_val - min_val;
@@ -43,7 +42,7 @@ int main() {
   std::size_t N_shapes = 5;
   vector<ShapePtr> shapes;
   shapes.reserve(N_shapes);
-  // sample N_shapes politopes
+  // get some random shapes in space
   for (std::size_t k = 0; k < N_shapes; ++k) {
     shapes.emplace_back(makeRandomShape());
   }
