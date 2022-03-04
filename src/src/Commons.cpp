@@ -4,11 +4,8 @@ namespace flx {
 ClosestResult getClosestToOriginInSegment(const hull::Coordinate &A,
                                           const hull::Coordinate &B) {
   Coefficients miximg_coeff = Coefficients{0, 0};
-  miximg_coeff[2] = 0.f;
-  hull::Coordinate B_A = B;
-  B_A.x -= A.x;
-  B_A.y -= A.y;
-  B_A.z -= A.z;
+  hull::Coordinate B_A;
+  hull::diff(B_A, B, A);
   miximg_coeff[1] = -dot(B_A, A) / dot(B_A, B_A);
   if (miximg_coeff[1] <= 0.f) {
     miximg_coeff[0] = 1.f;
@@ -22,14 +19,10 @@ ClosestResult getClosestToOriginInSegment(const hull::Coordinate &A,
 ClosestResult getClosestToOriginInTriangle(const hull::Coordinate &A,
                                            const hull::Coordinate &B,
                                            const hull::Coordinate &C) {
-  hull::Coordinate B_A = B;
-  B_A.x -= A.x;
-  B_A.y -= A.y;
-  B_A.z -= A.z;
-  hull::Coordinate C_A = C;
-  C_A.x -= A.x;
-  C_A.y -= A.y;
-  C_A.z -= A.z;
+  hull::Coordinate B_A;
+  hull::diff(B_A, B, A);
+  hull::Coordinate C_A;
+  hull::diff(C_A, C, A);
 
   float m11 = dot(B_A, B_A);
   float m22 = dot(C_A, C_A);
@@ -68,11 +61,13 @@ ClosestResult getClosestToOriginInTriangle(const hull::Coordinate &A,
   float d_AC = dot(V_AC, V_AC);
 
   if (d_AB < d_AC)
-    return ClosestResult{closest_AB, std::move(miximg_coeff_AB)};
+    return ClosestResult{
+        closest_AB, Coefficients{miximg_coeff_AB[0], miximg_coeff_AB[1], 0}};
 
   if (closest_AC == edge_AB)
     closest_AC = edge_AC;
-  return ClosestResult{closest_AC, std::move(miximg_coeff_AC)};
+  return ClosestResult{closest_AC,
+                       Coefficients{miximg_coeff_AC[0], 0, miximg_coeff_AC[1]}};
 }
 
 hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,

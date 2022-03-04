@@ -53,12 +53,14 @@ Transformation::Rotation get_rotation_matrix(const RotationXYZ &rotation_XYZ) {
 } // namespace
 
 void Transformation::transform(hull::Coordinate &point) const {
-  point.x = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y +
-            this->rotation[0][2] * point.z + this->traslation.x;
-  point.y = this->rotation[1][0] * point.x + this->rotation[1][1] * point.y +
-            this->rotation[1][2] * point.z + this->traslation.y;
-  point.z = this->rotation[2][0] * point.x + this->rotation[2][1] * point.y +
-            this->rotation[2][2] * point.z + this->traslation.z;
+  hull::Coordinate result;
+  result.x = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y +
+             this->rotation[0][2] * point.z + this->traslation.x;
+  result.y = this->rotation[1][0] * point.x + this->rotation[1][1] * point.y +
+             this->rotation[1][2] * point.z + this->traslation.y;
+  result.z = this->rotation[2][0] * point.x + this->rotation[2][1] * point.y +
+             this->rotation[2][2] * point.z + this->traslation.z;
+  point = result;
 };
 
 Transformation::Transformation()
