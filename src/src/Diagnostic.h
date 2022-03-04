@@ -1,19 +1,17 @@
 #ifdef GJK_EPA_DIAGNOSTIC
 #pragma once
 
+#include <Hull/Coordinate.h>
 #include <nlohmann/json.hpp>
 
 namespace flx::diagnostic {
 class Diagnostic {
 public:
-  Diagnostic();
+  Diagnostic() = default;
 
   void print() const;
 
-  nlohmann::json &add_to_initial_GJK_loop();
-  nlohmann::json &add_to_finishing_GJK_loop();
-
-  nlohmann::json &add_EPA_loop();
+  nlohmann::json &getLog() { return log; }
 
 private:
   nlohmann::json log;

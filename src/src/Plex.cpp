@@ -135,7 +135,7 @@ void tp_json_closest(nlohmann::json &recipient, const Coefficients &coeff,
                    coordinates[1]->vertex_in_Minkowski_diff,
                    coordinates[2]->vertex_in_Minkowski_diff, coeff);
   }
-  to_json(recipient, closest);
+  diagnostic::to_json(recipient, closest);
 }
 #endif
 } // namespace

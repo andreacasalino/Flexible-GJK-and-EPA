@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "Diagnostic.h"
 #include "Plex.h"
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
@@ -15,8 +16,18 @@ struct InitialLoopResult {
   bool collision_present;
   Plex last_plex;
 };
-InitialLoopResult initial_GJK_loop(const ShapePair &pair);
+InitialLoopResult initial_GJK_loop(const ShapePair &pair
+#ifdef GJK_EPA_DIAGNOSTIC
+                                   ,
+                                   nlohmann::json &log
+#endif
+);
 
 CoordinatePair finishing_GJK_loop(const ShapePair &pair,
-                                  const Plex &initial_plex);
+                                  const Plex &initial_plex
+#ifdef GJK_EPA_DIAGNOSTIC
+                                  ,
+                                  nlohmann::json &log
+#endif
+);
 } // namespace flx

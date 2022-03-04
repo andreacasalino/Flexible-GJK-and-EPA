@@ -9,7 +9,16 @@
 #include <Flexible-GJK-and-EPA/Error.h>
 
 namespace flx {
-InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
+InitialLoopResult initial_GJK_loop(const ShapePair &pair
+#ifdef GJK_EPA_DIAGNOSTIC
+                                   ,
+                                   nlohmann::json &log
+#endif
+) {
+#ifdef GJK_EPA_DIAGNOSTIC
+  auto &gjk_initial_log = log["GJK_initial"];
+  gjk_initial_log = nlohmann::json::array();
+#endif
   MinkowskiDifference mink_diff(pair);
   auto plex_data = std::make_shared<PlexData>();
   plex_data->search_direction = hull::Coordinate{1.f, 0, 0};
@@ -28,7 +37,12 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
         hull::HULL_GEOMETRIC_TOLLERANCE) {
       return InitialLoopResult{false, plex};
     }
-    auto update_result = update_plex(plex);
+    auto update_result = update_plex(plex
+#ifdef GJK_EPA_DIAGNOSTIC
+                                     ,
+                                     gjk_initial_log.emplace_back()
+#endif
+    );
     if (nullptr != std::get_if<CollisionCase>(&update_result)) {
       return InitialLoopResult{true, plex};
     }
@@ -37,7 +51,16 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair) {
 }
 
 CoordinatePair finishing_GJK_loop(const ShapePair &pair,
-                                  const Plex &initial_plex) {
+                                  const Plex &initial_plex
+#ifdef GJK_EPA_DIAGNOSTIC
+                                  ,
+                                  nlohmann::json &log
+#endif
+) {
+#ifdef GJK_EPA_DIAGNOSTIC
+  auto &gjk_ending_log = log["GJK_ending"];
+  gjk_ending_log = nlohmann::json::array();
+#endif
   auto plex_data = extract_data(initial_plex);
   auto plex = initial_plex;
   hull::Coordinate delta;
@@ -46,7 +69,12 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   MinkowskiDifference mink_diff(pair);
   while (dot(plex_data->search_direction, delta) >
          hull::HULL_GEOMETRIC_TOLLERANCE) {
-    auto plex_updated = update_plex(plex);
+    auto plex_updated = update_plex(plex
+#ifdef GJK_EPA_DIAGNOSTIC
+                                    ,
+                                    gjk_ending_log.emplace_back()
+#endif
+    );
     auto *plex_updated_ptr = std::get_if<Plex>(&plex_updated);
     if (nullptr == plex_updated_ptr) {
       throw Error{
