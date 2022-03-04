@@ -146,7 +146,9 @@ PlexUpdateResult update_plex(const Plex &subject
 #endif
 ) {
   struct Visitor {
+#ifdef GJK_EPA_DIAGNOSTIC
     nlohmann::json &log;
+#endif
     mutable PlexUpdateResult result;
 
     void operator()(const VertexCase &subject) const {
@@ -353,7 +355,15 @@ PlexUpdateResult update_plex(const Plex &subject
         break;
       }
     };
-  } visitor{log};
+  }
+#ifdef GJK_EPA_DIAGNOSTIC
+  visitor {
+    log
+  }
+#else
+  visitor
+#endif
+  ;
   std::visit(visitor, subject);
   return visitor.result;
 }
