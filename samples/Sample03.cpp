@@ -39,7 +39,7 @@ ShapePtr makeRandomShape() {
 int main() {
   logger::Manager logger;
 
-  std::size_t N_shapes = 5;
+  std::size_t N_shapes = 2; // 5;
   vector<ShapePtr> shapes;
   shapes.reserve(N_shapes);
   // get some random shapes in space

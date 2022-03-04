@@ -91,36 +91,36 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
 
     void operator()(const VertexCase &subject) const {
       closest_pair.point_in_shape_a =
-          subject.data->vertices[0]->vertex_in_shape_a;
+          subject.data->vertices[1]->vertex_in_shape_a;
       closest_pair.point_in_shape_b =
-          subject.data->vertices[0]->vertex_in_shape_b;
+          subject.data->vertices[1]->vertex_in_shape_b;
     };
 
     void operator()(const SegmentCase &subject) const {
       auto temp = getClosestToOriginInSegment(
-          subject.data->vertices[0]->vertex_in_Minkowski_diff,
-          subject.data->vertices[1]->vertex_in_Minkowski_diff);
+          subject.data->vertices[1]->vertex_in_Minkowski_diff,
+          subject.data->vertices[2]->vertex_in_Minkowski_diff);
       closest_pair.point_in_shape_a =
-          mix2(subject.data->vertices[0]->vertex_in_shape_a,
-               subject.data->vertices[1]->vertex_in_shape_a, temp.coefficients);
+          mix2(subject.data->vertices[1]->vertex_in_shape_a,
+               subject.data->vertices[2]->vertex_in_shape_a, temp.coefficients);
       closest_pair.point_in_shape_b =
-          mix2(subject.data->vertices[0]->vertex_in_shape_b,
-               subject.data->vertices[1]->vertex_in_shape_b, temp.coefficients);
+          mix2(subject.data->vertices[1]->vertex_in_shape_b,
+               subject.data->vertices[2]->vertex_in_shape_b, temp.coefficients);
     };
 
     void operator()(const FacetCase &subject) const {
       auto temp = getClosestToOriginInTriangle(
-          subject.data->vertices[0]->vertex_in_Minkowski_diff,
           subject.data->vertices[1]->vertex_in_Minkowski_diff,
-          subject.data->vertices[2]->vertex_in_Minkowski_diff);
+          subject.data->vertices[2]->vertex_in_Minkowski_diff,
+          subject.data->vertices[3]->vertex_in_Minkowski_diff);
       closest_pair.point_in_shape_a =
-          mix3(subject.data->vertices[0]->vertex_in_shape_a,
-               subject.data->vertices[1]->vertex_in_shape_a,
-               subject.data->vertices[2]->vertex_in_shape_a, temp.coefficients);
+          mix3(subject.data->vertices[1]->vertex_in_shape_a,
+               subject.data->vertices[2]->vertex_in_shape_a,
+               subject.data->vertices[3]->vertex_in_shape_a, temp.coefficients);
       closest_pair.point_in_shape_b =
-          mix3(subject.data->vertices[0]->vertex_in_shape_b,
-               subject.data->vertices[1]->vertex_in_shape_b,
-               subject.data->vertices[2]->vertex_in_shape_b, temp.coefficients);
+          mix3(subject.data->vertices[1]->vertex_in_shape_b,
+               subject.data->vertices[2]->vertex_in_shape_b,
+               subject.data->vertices[3]->vertex_in_shape_b, temp.coefficients);
     };
   } visitor;
   std::visit(visitor, plex);
