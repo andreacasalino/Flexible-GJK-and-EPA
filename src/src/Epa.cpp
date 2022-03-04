@@ -180,14 +180,19 @@ protected:
 
 #ifdef GJK_EPA_DIAGNOSTIC
 void EpaHull::toJson(nlohmann::json &recipient) const {
+  auto facet_to_json = [&hull = this->hull](nlohmann::json &recipient,
+                                            const hull::Facet &facet) {
+    diagnostic::to_json(recipient["A"], hull->getVertices()[facet.vertexA]);
+    diagnostic::to_json(recipient["B"], hull->getVertices()[facet.vertexB]);
+    diagnostic::to_json(recipient["C"], hull->getVertices()[facet.vertexC]);
+  };
+
   auto &facets = recipient["facets"];
   facets = nlohmann::json::array();
   for (const auto &facet : hull->getFacets()) {
-    auto &facet_json = facets.emplace_back();
-    diagnostic::to_json(facet_json["A"], hull->getVertices()[facet->vertexA]);
-    diagnostic::to_json(facet_json["B"], hull->getVertices()[facet->vertexB]);
-    diagnostic::to_json(facet_json["C"], hull->getVertices()[facet->vertexC]);
+    facet_to_json(facets.emplace_back(), *facet);
   }
+  facet_to_json(recipient["closest"], *distances_facets_map.begin()->second);
 }
 #endif
 } // namespace
