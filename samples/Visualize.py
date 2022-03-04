@@ -23,13 +23,64 @@ def get_json_from_file(name):
 def plot_facet(x, y, z, ax, col, alp):
     ax.add_collection3d(Poly3DCollection([list(zip(x,y,z))], edgecolor='black', facecolors=col, alpha=alp, linewidth=0.2))
 
+class AxisLimitsAware:
+    def __init__(self):
+        self.limits = [0,0]
+    
+    def update(self, new_value_in_plot):
+        if(new_value_in_plot < self.limits[0]):
+            self.limits[0] = new_value_in_plot
+        if(new_value_in_plot > self.limits[1]):
+            self.limits[1] = new_value_in_plot
+
+    def min(self):
+        return self.limits[0]
+    def max(self):
+        return self.limits[1]
+
+class PlotLimitsAware:
+    def __init__(self):
+        self.x_limits = AxisLimitsAware()
+        self.y_limits = AxisLimitsAware()
+        self.z_limits = AxisLimitsAware()
+
+    def update(self, new_point):
+        self.x_limits.update(new_point[0])
+        self.y_limits.update(new_point[1])
+        self.z_limits.update(new_point[2])
+
+    def resize(self, ax):
+        min = self.x_limits.min()
+        if(self.y_limits.min() < min):
+            min = self.y_limits.min()
+        if(self.z_limits.min() < min):
+            min = self.z_limits.min()
+
+        max = self.x_limits.max()
+        if(self.y_limits.max() > max):
+            max = self.y_limits.max()
+        if(self.z_limits.max() > max):
+            max = self.z_limits.max()
+
+        incr = 0.15 * (max - min)
+        min = min - incr
+        max = max + incr
+
+        ax.set_xlim3d(min, max)
+        ax.set_ylim3d(min, max)
+        ax.set_zlim3d(min, max)        
+
 def plot_vertices_cloud(Vertices, color, ax):  
+    limits = PlotLimitsAware()
+    for point in Vertices:
+        limits.update(point)
     Vertices_array = np.array(Vertices)
     hull = ConvexHull(Vertices_array)
     for s in hull.simplices:
         s = np.append(s, s[0])  # Here we cycle back to the first coordinate
         plot_facet(Vertices_array[s, 0], Vertices_array[s, 1], Vertices_array[s, 2], ax, color, 0.4)
         ax.plot(Vertices_array[s, 0], Vertices_array[s, 1], Vertices_array[s, 2] , '.', color=color, markersize=1)
+    limits.resize(ax)
     
 def plot_line(Vertices, ax):
     L_x =[Vertices[0][0], Vertices[1][0]]

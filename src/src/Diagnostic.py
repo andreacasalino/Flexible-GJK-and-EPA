@@ -59,6 +59,10 @@ class PlotLimitsAware:
         if(self.z_limits.max() > max):
             max = self.z_limits.max()
 
+        incr = 0.15 * (max - min)
+        min = min - incr
+        max = max + incr
+
         ax.set_xlim3d(min, max)
         ax.set_ylim3d(min, max)
         ax.set_zlim3d(min, max)        
