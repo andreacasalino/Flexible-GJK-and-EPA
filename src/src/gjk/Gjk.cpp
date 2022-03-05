@@ -6,7 +6,6 @@
  **/
 
 #include "Gjk.h"
-#include "../Commons.h"
 #include <Flexible-GJK-and-EPA/Error.h>
 
 namespace flx::gjk {

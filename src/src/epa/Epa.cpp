@@ -6,7 +6,6 @@
  **/
 
 #include "Epa.h"
-#include "../gjk/Plex.h"
 #include "EpaHull.h"
 
 namespace flx::epa {

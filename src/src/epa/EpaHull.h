@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../Commons.h"
 #include "../Diagnostic.h"
 #include "../gjk/Plex.h"
 #include <Hull/Hull.h>

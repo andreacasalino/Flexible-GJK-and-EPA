@@ -11,7 +11,6 @@
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 
 #include <optional>
-#include <variant>
 
 namespace flx {
 /** @brief Returns true if the passed set of shapes is in collision,
