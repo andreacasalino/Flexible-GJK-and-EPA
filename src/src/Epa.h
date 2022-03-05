@@ -15,7 +15,7 @@ namespace flx {
 CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                    ,
-                   nlohmann::json &log
+                   diagnostic::Diagnostic &log
 #endif
 );
 } // namespace flx

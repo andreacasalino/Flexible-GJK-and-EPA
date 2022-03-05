@@ -159,7 +159,7 @@ PlexUpdateResult update_plex(const Plex &subject
       hull::Coordinate temp;
       hull::cross(temp, data.vertices[0]->vertex_in_Minkowski_diff,
                   data.vertices[1]->vertex_in_Minkowski_diff);
-      if (normSquared(temp) <= GEOMETRIC_TOLLERANCE4) {
+      if (normSquared(temp) <= GEOMETRIC_TOLLERANCE_SQUARED_SQUARED) {
 #ifdef GJK_EPA_DIAGNOSTIC
         log["collision"] = true;
 #endif
@@ -198,7 +198,7 @@ PlexUpdateResult update_plex(const Plex &subject
       diagnostic::to_json(log["closest"]["point"], temp);
       to_json(log["closest"]["region"], closest.region);
 #endif
-      if (normSquared(temp) <= GEOMETRIC_TOLLERANCE2) {
+      if (normSquared(temp) <= GEOMETRIC_TOLLERANCE_SQUARED) {
 #ifdef GJK_EPA_DIAGNOSTIC
         log["collision"] = true;
 #endif

@@ -12,6 +12,9 @@
 #include <functional>
 
 namespace flx::shape {
+/**
+ * @brief Wrapper around any kind of vertices collection.
+ */
 template <typename PointCollectionIt> class PointCloud : public ConvexShape {
 public:
   template <typename SupportPredicate, typename ToCoordinatePredicate>

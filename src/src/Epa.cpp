@@ -41,7 +41,7 @@ initial_thetraedron(const ShapePair &pair, const Plex &initial_plex) {
       if (hull::squaredDistance(
               subject.data->vertices[0]->vertex_in_Minkowski_diff,
               subject.data->vertices[1]->vertex_in_Minkowski_diff) <=
-          GEOMETRIC_TOLLERANCE2) {
+          GEOMETRIC_TOLLERANCE_SQUARED) {
         result =
             std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0]};
       } else {
@@ -137,7 +137,7 @@ public:
   };
 
 #ifdef GJK_EPA_DIAGNOSTIC
-  void toJson(nlohmann::json &recipient) const;
+  nlohmann::json toJson() const;
 #endif
 
 protected:
@@ -179,7 +179,8 @@ protected:
 };
 
 #ifdef GJK_EPA_DIAGNOSTIC
-void EpaHull::toJson(nlohmann::json &recipient) const {
+nlohmann::json EpaHull::toJson() const {
+  nlohmann::json recipient;
   auto facet_to_json = [&hull = this->hull](nlohmann::json &recipient,
                                             const hull::Facet &facet) {
     diagnostic::to_json(recipient["A"], hull->getVertices()[facet.vertexA]);
@@ -193,6 +194,7 @@ void EpaHull::toJson(nlohmann::json &recipient) const {
     facet_to_json(facets.emplace_back(), *facet);
   }
   facet_to_json(recipient["closest"], *distances_facets_map.begin()->second);
+  return recipient;
 }
 #endif
 } // namespace
@@ -200,20 +202,16 @@ void EpaHull::toJson(nlohmann::json &recipient) const {
 CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                    ,
-                   nlohmann::json &log
+                   diagnostic::Diagnostic &log
 #endif
 ) {
-#ifdef GJK_EPA_DIAGNOSTIC
-  auto &epa_log = log["EPA"];
-  epa_log = nlohmann::json::array();
-#endif
   EpaHull epa_hull(pair, initial_plex);
 #ifdef GJK_EPA_DIAGNOSTIC
-  epa_hull.toJson(epa_log.emplace_back());
+  log.addEpaIter(epa_hull.toJson());
 #endif
   while (epa_hull.update()) {
 #ifdef GJK_EPA_DIAGNOSTIC
-    epa_hull.toJson(epa_log.emplace_back());
+    log.addEpaIter(epa_hull.toJson());
 #endif
   }
   auto closest_facet = epa_hull.getClosestFacetToOrigin();

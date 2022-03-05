@@ -21,9 +21,9 @@ bool is_collision_present(const shape::ConvexShape &shape_a,
              ShapePair { shape_a, shape_b }
 #ifdef GJK_EPA_DIAGNOSTIC
              ,
-             log.getLog()
+             log
 #endif
-                 )
+             )
       .collision_present;
 }
 
@@ -37,7 +37,7 @@ get_closest_points(const shape::ConvexShape &shape_a,
   auto result = initial_GJK_loop(pair
 #ifdef GJK_EPA_DIAGNOSTIC
                                  ,
-                                 log.getLog()
+                                 log
 #endif
   );
   if (result.collision_present) {
@@ -46,7 +46,7 @@ get_closest_points(const shape::ConvexShape &shape_a,
   return finishing_GJK_loop(pair, result.last_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                             ,
-                            log.getLog()
+                            log
 #endif
   );
 }
@@ -61,14 +61,14 @@ get_penetration_info(const shape::ConvexShape &shape_a,
   auto result = initial_GJK_loop(pair
 #ifdef GJK_EPA_DIAGNOSTIC
                                  ,
-                                 log.getLog()
+                                 log
 #endif
   );
   if (result.collision_present) {
     return EPA(pair, result.last_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                ,
-               log.getLog()
+               log
 #endif
     );
   }
@@ -85,22 +85,22 @@ get_closest_points_or_penetration_info(const shape::ConvexShape &shape_a,
   auto result = initial_GJK_loop(pair
 #ifdef GJK_EPA_DIAGNOSTIC
                                  ,
-                                 log.getLog()
+                                 log
 #endif
   );
   if (result.collision_present) {
     return QueryResult{false, EPA(pair, result.last_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                                   ,
-                                  log.getLog()
+                                  log
 #endif
-                                      )};
+                                  )};
   }
   return QueryResult{true, finishing_GJK_loop(pair, result.last_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                                               ,
-                                              log.getLog()
+                                              log
 #endif
-                                                  )};
+                                              )};
 }
 } // namespace flx
