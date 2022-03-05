@@ -6,19 +6,41 @@
  **/
 
 #include "Gjk.h"
+#include "../Commons.h"
 #include <Flexible-GJK-and-EPA/Error.h>
 
-namespace flx {
+namespace flx::gjk {
+namespace {
+class SupportFinder {
+public:
+  SupportFinder(const ShapePair &pair, const PlexDataPtr &plex_data)
+      : mink_diff(pair), plex_data(plex_data) {}
+
+  void findSupport() {
+    mink_diff.getSupport(*plex_data->vertices[0],
+                         plex_data->search_direction.get());
+  };
+
+  hull::Coordinate getImprovment() const {
+    return delta(plex_data->vertices[0]->vertex_in_Minkowski_diff,
+                 plex_data->vertices[1]->vertex_in_Minkowski_diff);
+  }
+
+private:
+  MinkowskiDifference mink_diff;
+  PlexDataPtr plex_data;
+};
+} // namespace
+
 InitialLoopResult initial_GJK_loop(const ShapePair &pair
 #ifdef GJK_EPA_DIAGNOSTIC
                                    ,
                                    diagnostic::Diagnostic &log
 #endif
 ) {
-  MinkowskiDifference mink_diff(pair);
   auto plex_data = std::make_shared<PlexData>();
-  plex_data->search_direction = hull::Coordinate{1.f, 0, 0};
-  mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
+  SupportFinder support_finder(pair, plex_data);
+  support_finder.findSupport();
   if (hull::normSquared(plex_data->vertices[0]->vertex_in_Minkowski_diff) <=
       GEOMETRIC_TOLLERANCE_SQUARED) {
     *plex_data->vertices[0] = *plex_data->vertices[1];
@@ -27,28 +49,28 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair
 
   Plex plex = set_to_vertex(plex_data);
   do {
-    mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
+    support_finder.findSupport();
     if (hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
-                  plex_data->search_direction) <=
+                  plex_data->search_direction.get()) <=
         -hull::HULL_GEOMETRIC_TOLLERANCE) {
       return InitialLoopResult{false, plex};
     }
 #ifdef GJK_EPA_DIAGNOSTIC
     nlohmann::json gjk_iter_json;
 #endif
-    auto update_result = update_plex(plex
+    auto updated_result = update_plex(plex
 #ifdef GJK_EPA_DIAGNOSTIC
-                                     ,
-                                     gjk_iter_json
+                                      ,
+                                      gjk_iter_json
 #endif
     );
 #ifdef GJK_EPA_DIAGNOSTIC
     log.addGjkInitialIter(std::move(gjk_iter_json));
 #endif
-    if (nullptr != std::get_if<CollisionCase>(&update_result)) {
+    if (nullptr != std::get_if<CollisionCase>(&updated_result)) {
       return InitialLoopResult{true, plex};
     }
-    plex = std::get<Plex>(update_result);
+    plex = std::get<Plex>(updated_result);
   } while (true);
 }
 
@@ -60,12 +82,10 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
 #endif
 ) {
   auto plex_data = extract_data(initial_plex);
+  SupportFinder support_finder(pair, plex_data);
   auto plex = initial_plex;
-  hull::Coordinate delta;
-  diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
-       plex_data->vertices[1]->vertex_in_Minkowski_diff);
-  MinkowskiDifference mink_diff(pair);
-  while (dot(plex_data->search_direction, delta) >
+  hull::Coordinate delta = support_finder.getImprovment();
+  while (dot(plex_data->search_direction.get(), delta) >
          hull::HULL_GEOMETRIC_TOLLERANCE) {
 #ifdef GJK_EPA_DIAGNOSTIC
     nlohmann::json gjk_iter_json;
@@ -85,9 +105,8 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
           "Trying to call finishing_GJK_loop on a plex that contains origin"};
     }
     plex = *plex_updated_ptr;
-    mink_diff.getSupport(*plex_data->vertices[0], plex_data->search_direction);
-    diff(delta, plex_data->vertices[0]->vertex_in_Minkowski_diff,
-         plex_data->vertices[1]->vertex_in_Minkowski_diff);
+    support_finder.findSupport();
+    delta = support_finder.getImprovment();
   }
 
   struct Visitor {
@@ -130,4 +149,4 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   std::visit(visitor, plex);
   return visitor.closest_pair;
 }
-} // namespace flx
+} // namespace flx::gjk

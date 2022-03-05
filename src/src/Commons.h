@@ -10,7 +10,7 @@
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <Hull/Coordinate.h>
 #include <Hull/Definitions.h>
-#include <vector>
+#include <array>
 
 namespace flx {
 constexpr float GEOMETRIC_TOLLERANCE_SQUARED =
@@ -18,47 +18,35 @@ constexpr float GEOMETRIC_TOLLERANCE_SQUARED =
 constexpr float GEOMETRIC_TOLLERANCE_SQUARED_SQUARED =
     GEOMETRIC_TOLLERANCE_SQUARED * GEOMETRIC_TOLLERANCE_SQUARED;
 
+// returns (first-second)
+hull::Coordinate delta(const hull::Coordinate &first,
+                       const hull::Coordinate &second);
+
 enum ClosestRegionToOrigin { vertex_A, edge_AB, edge_AC, face_ABC };
 
-using Coefficients = std::vector<float>;
-
-struct ClosestResult {
+template <std::size_t N> struct ClosestResult {
   ClosestRegionToOrigin region;
-  Coefficients coefficients;
+  std::array<float, N> coefficients;
 };
-ClosestResult getClosestToOriginInSegment(const hull::Coordinate &A,
-                                          const hull::Coordinate &B);
 
-ClosestResult getClosestToOriginInTriangle(const hull::Coordinate &A,
-                                           const hull::Coordinate &B,
-                                           const hull::Coordinate &C);
+ClosestResult<2> getClosestToOriginInSegment(const hull::Coordinate &A,
+                                             const hull::Coordinate &B);
+
+ClosestResult<3> getClosestToOriginInTriangle(const hull::Coordinate &A,
+                                              const hull::Coordinate &B,
+                                              const hull::Coordinate &C);
 
 hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,
                                       const hull::Coordinate &P2,
                                       const hull::Coordinate &P3,
                                       const hull::Coordinate &Pother);
 
-inline hull::Coordinate mix2(const hull::Coordinate &A,
-                             const hull::Coordinate &B,
-                             const Coefficients &coeff) {
-  hull::Coordinate result = A;
-  prod(result, coeff[0]);
-  result.x += coeff[1] * B.x;
-  result.y += coeff[1] * B.y;
-  result.z += coeff[1] * B.z;
-  return result;
-};
+hull::Coordinate mix2(const hull::Coordinate &A, const hull::Coordinate &B,
+                      const std::array<float, 2> &coeff);
 
-inline hull::Coordinate mix3(const hull::Coordinate &A,
-                             const hull::Coordinate &B,
-                             const hull::Coordinate &C,
-                             const Coefficients &coeff) {
-  auto result = mix2(A, B, coeff);
-  result.x += coeff[2] * C.x;
-  result.y += coeff[2] * C.y;
-  result.z += coeff[2] * C.z;
-  return result;
-};
+hull::Coordinate mix3(const hull::Coordinate &A, const hull::Coordinate &B,
+                      const hull::Coordinate &C,
+                      const std::array<float, 3> &coeff);
 
 struct ShapePair {
   const shape::ConvexShape &shape_a;

@@ -11,11 +11,11 @@
 #include "Plex.h"
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
-namespace flx {
+namespace flx::epa {
 CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                    ,
                    diagnostic::Diagnostic &log
 #endif
 );
-} // namespace flx
+} // namespace flx::epa

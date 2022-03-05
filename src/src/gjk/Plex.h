@@ -7,19 +7,33 @@
 
 #pragma once
 
-#include "Commons.h"
-#include "Diagnostic.h"
+#include "../Commons.h"
+#include "../Diagnostic.h"
 
-#include <array>
 #include <memory>
 #include <variant>
 
-namespace flx {
+namespace flx::gjk {
 using MinkowskiCoordinates =
     std::array<std::unique_ptr<MinkowskiDiffCoordinate>, 4>;
 
+class SearcDirection {
+public:
+  // direction is normalized before updating the internal value
+  void udpate(const hull::Coordinate &new_direction);
+
+  void udpateAsIs(const hull::Coordinate &new_direction) {
+    search_direction = new_direction;
+  };
+
+  const hull::Coordinate &get() const { return search_direction; };
+
+private:
+  hull::Coordinate search_direction = hull::Coordinate{1.f, 0, 0};
+};
+
 struct PlexData {
-  hull::Coordinate search_direction;
+  SearcDirection search_direction;
   MinkowskiCoordinates vertices = {std::make_unique<MinkowskiDiffCoordinate>(),
                                    std::make_unique<MinkowskiDiffCoordinate>(),
                                    std::make_unique<MinkowskiDiffCoordinate>(),
@@ -57,4 +71,4 @@ PlexUpdateResult update_plex(const Plex &subject
 );
 
 VertexCase set_to_vertex(const PlexDataPtr &data);
-} // namespace flx
+} // namespace flx::gjk

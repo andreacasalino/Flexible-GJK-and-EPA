@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "Diagnostic.h"
+#include "../Diagnostic.h"
 #include "Plex.h"
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
-namespace flx {
+namespace flx::gjk {
 struct InitialLoopResult {
   bool collision_present;
   Plex last_plex;
@@ -30,4 +30,4 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
                                   diagnostic::Diagnostic &log
 #endif
 );
-} // namespace flx
+} // namespace flx::gjk
