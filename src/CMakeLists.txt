@@ -25,7 +25,7 @@ if(GJK_EPA_DIAGNOSTIC)
   )
   FetchContent_MakeAvailable(nlohmann_json)
 
-  target_compile_definitions(${PROJECT_SHORTNAME} PUBLIC 
+  target_compile_definitions(${PROJECT_SHORTNAME} PRIVATE 
     GJK_EPA_DIAGNOSTIC
   )
 

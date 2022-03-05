@@ -42,7 +42,7 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair
   support_finder.findSupport();
   if (hull::normSquared(plex_data->vertices[0]->vertex_in_Minkowski_diff) <=
       GEOMETRIC_TOLLERANCE_SQUARED) {
-    *plex_data->vertices[0] = *plex_data->vertices[1];
+    *plex_data->vertices[1] = *plex_data->vertices[0];
     return InitialLoopResult{true, VertexCase{plex_data}};
   }
 

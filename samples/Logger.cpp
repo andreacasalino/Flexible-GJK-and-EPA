@@ -145,6 +145,7 @@ void SubPlot::addShape(const flx::shape::ConvexShape &shape) {
   } else if (2 == shapes.size()) {
     color = {0, 0, 1};
   } else {
+    color.resize(3);
     for (std::size_t k = 0; k < 3; ++k) {
       color[k] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Hull/Coordinate.h>
+#include <memory>
 #include <vector>
 
 /**
@@ -39,22 +40,26 @@ std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
 #include <Flexible-GJK-and-EPA/shape/PointCloud.h>
 
-class Vector3dStorer {
+class Vector3dCloud : public flx::shape::ConvexShape {
 public:
-  Vector3dStorer(const std::vector<Vector3d> &buffer) : points(buffer){};
+  Vector3dCloud(const std::vector<Vector3d> &buffer) : points(buffer){};
 
   const std::vector<Vector3d> &getPoints() const { return points; }
 
-protected:
-  const std::vector<Vector3d> points;
-};
+  void getSupport(hull::Coordinate &support,
+                  const hull::Coordinate &direction) const final {
+    auto it_max = points.begin();
+    float dot_max = dot_product(it_max, direction);
+    for (auto it = points.begin(); it != points.end(); ++it) {
+      float dot = dot_product(it, direction);
+      if (dot > dot_max) {
+        dot_max = dot;
+        it_max = it;
+      }
+    }
+    support = to_coordinate(it_max);
+  }
 
-class Vector3dCloud
-    : public Vector3dStorer,
-      public flx::shape::PointCloud<std::vector<Vector3d>::const_iterator> {
-public:
-  Vector3dCloud(const std::vector<Vector3d> &buffer)
-      : Vector3dStorer(buffer),
-        flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>(
-            points.begin(), points.end(), dot_product, to_coordinate){};
+private:
+  const std::vector<Vector3d> points;
 };

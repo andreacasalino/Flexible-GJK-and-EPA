@@ -34,6 +34,7 @@ Vector3dCloud getPoligon(const std::size_t N_edges) {
   float delta_angle = 2.f * 3.14159f / static_cast<float>(N_edges);
   float angle = 0.f;
   float temp[2];
+  cloud.reserve(N_edges * 2);
   for (std::size_t k = 0; k < N_edges; k++) {
     temp[0] = cosf(angle);
     temp[1] = sinf(angle);
@@ -71,10 +72,11 @@ int main() {
 
   // get the closest points
   {
-    auto query_result =
-        flx::get_closest_points_or_penetration_info(*shapeA, *shapeB);
+    auto query_result = flx::get_closest_points_or_penetration_info(
+        shapeA_translated, shapeB_translated);
     // log results
-    logger.logSingleQuery(*shapeA, *shapeB, query_result, "Result_2_b.json");
+    logger.logSingleQuery(shapeA_translated, shapeB_translated, query_result,
+                          "Result_2_b.json");
   }
 
   return EXIT_SUCCESS;

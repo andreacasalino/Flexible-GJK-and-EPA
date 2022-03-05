@@ -19,6 +19,8 @@ using MinkowskiCoordinates =
 
 class SearcDirection {
 public:
+  SearcDirection() = default;
+
   // direction is normalized before updating the internal value
   void udpate(const hull::Coordinate &new_direction);
 

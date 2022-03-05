@@ -103,8 +103,8 @@ hull::Coordinate mix3(const hull::Coordinate &A, const hull::Coordinate &B,
                       const std::array<float, 3> &coeff) {
   hull::Coordinate result = A;
   prod(result, coeff[0]);
-  add_scaled(result, B, coeff[2]);
-  add_scaled(result, C, coeff[3]);
+  add_scaled(result, B, coeff[1]);
+  add_scaled(result, C, coeff[2]);
   return result;
 };
 

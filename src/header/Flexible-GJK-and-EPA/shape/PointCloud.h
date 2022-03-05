@@ -45,8 +45,8 @@ public:
   };
 
 private:
-  PointCollectionIt begin;
-  PointCollectionIt end;
+  const PointCollectionIt begin;
+  const PointCollectionIt end;
 
   const std::function<float(const PointCollectionIt &,
                             const hull::Coordinate &)>

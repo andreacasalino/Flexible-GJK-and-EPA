@@ -30,26 +30,11 @@ int main() {
       logger.logSingleQuery(shapeA, *shapeB, query_result, "Result_1_a.json");
     }
 
-    // {
-    //   // translate one of the shape away: no collision is expected now
-    //   flx::shape::TransformDecorator shapeB_translated(
-    //       std::move(shapeB),
-    //       flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
-
-    //   auto query_result = flx::get_closest_points_or_penetration_info(
-    //       shapeA, shapeB_translated);
-    //   // log results
-    //   logger.logSingleQuery(shapeA, shapeB_translated, query_result,
-    //                         "Result_1_b.json");
-    // }
     {
       // translate one of the shape away: no collision is expected now
-      auto points = shapeB->getPoints();
-      for (auto &point : points) {
-        Vector3d temp(point.x() + 3.f, point.y() + 3.f, point.z() + 3.f);
-        point = temp;
-      }
-      Vector3dCloud shapeB_translated(points);
+      flx::shape::TransformDecorator shapeB_translated(
+          std::move(shapeB),
+          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
 
       auto query_result = flx::get_closest_points_or_penetration_info(
           shapeA, shapeB_translated);
@@ -74,26 +59,11 @@ int main() {
       logger.logSingleQuery(shapeA, *shapeB, query_result, "Result_1_c.json");
     }
 
-    // {
-    //   // translate one of the shape away: no collision is expected now
-    //   flx::shape::TransformDecorator shapeB_translated(
-    //       std::move(shapeB),
-    //       flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
-
-    //   auto query_result = flx::get_closest_points_or_penetration_info(
-    //       shapeA, shapeB_translated);
-    //   // log results
-    //   logger.logSingleQuery(shapeA, shapeB_translated, query_result,
-    //                         "Result_1_d.json");
-    // }
     {
       // translate one of the shape away: no collision is expected now
-      auto points = shapeB->getPoints();
-      for (auto &point : points) {
-        Vector3d temp(point.x() + 3.f, point.y() + 3.f, point.z() + 3.f);
-        point = temp;
-      }
-      Vector3dCloud shapeB_translated(points);
+      flx::shape::TransformDecorator shapeB_translated(
+          std::move(shapeB),
+          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
 
       auto query_result = flx::get_closest_points_or_penetration_info(
           shapeA, shapeB_translated);
