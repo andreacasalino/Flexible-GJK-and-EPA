@@ -12,14 +12,13 @@
 #include "../gjk/Plex.h"
 #include <Hull/Hull.h>
 
-#include <algorithm>
 #include <map>
 
 namespace flx::epa {
 
 class EpaHull : public hull::Observer {
 public:
-  EpaHull(const ShapePair &pair, const Plex &initial_plex);
+  EpaHull(const ShapePair &pair, const gjk::Plex &initial_plex);
 
   bool update();
 

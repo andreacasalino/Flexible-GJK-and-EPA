@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include "Diagnostic.h"
-#include "Plex.h"
+#include "../gjk/Plex.h"
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
 namespace flx::epa {
-CoordinatePair EPA(const ShapePair &pair, const Plex &initial_plex
+CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex
 #ifdef GJK_EPA_DIAGNOSTIC
                    ,
                    diagnostic::Diagnostic &log
