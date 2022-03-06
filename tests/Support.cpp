@@ -7,24 +7,23 @@
 
 float to_rad(const float angle) { return 3.14159f * angle / 180.f; }
 
-std::vector<float> get_angles(const std::size_t size) {
+std::vector<float> make_angles(const std::size_t size) {
   std::vector<float> angles;
   angles.reserve(size);
   float delta_angle = to_rad(360.f) / static_cast<float>(size);
   float angle = 0.f;
   for (std::size_t v = 0; v < size; ++v) {
-    angles.emplace_back(angle);
+    angles.push_back(angle);
     angle += delta_angle;
   }
   return angles;
 }
 
-std::vector<Vector3d> get_polygon(const std::size_t size) {
-  std::vector<Vector3d> vertices;
-  vertices.reserve(size * 2);
-  for (const auto &angle : get_angles(size)) {
-    vertices.emplace_back(cosf(angle), sinf(angle), 0.25f);
-    vertices.emplace_back(cosf(angle), sinf(angle), -0.25f);
+std::vector<Point2D> make_polygon(const std::size_t size) {
+  std::vector<Point2D> vertices;
+  vertices.reserve(size);
+  for (const auto &angle : make_angles(size)) {
+    vertices.push_back(Point2D{cosf(angle), sinf(angle)});
   }
   return vertices;
 }
@@ -32,12 +31,12 @@ std::vector<Vector3d> get_polygon(const std::size_t size) {
 TEST_CASE("Polygon", "[support]") {
   auto polygon_size = GENERATE(3, 5, 9);
 
-  Vector3dCloud polygon(get_polygon(polygon_size));
+  Vector3dCloudTest polygon(make_prism(make_polygon(polygon_size), 0.5f));
 
-  for (const auto &angle : get_angles(polygon_size)) {
+  hull::Coordinate support;
+  for (const auto &angle : make_angles(polygon_size)) {
     const float angle_cos = cosf(angle);
     const float angle_sin = sinf(angle);
-    hull::Coordinate support;
     polygon.getSupport(support, hull::Coordinate{angle_cos, angle_sin, 0});
     CHECK(almost_equal(angle_cos, support.x));
     CHECK(almost_equal(angle_sin, support.y));
@@ -46,43 +45,27 @@ TEST_CASE("Polygon", "[support]") {
 
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 TEST_CASE("Transform decorator", "[support]") {
-  const std::size_t polygon_size = 5;
-  Vector3dCloud polygon(get_polygon(polygon_size));
+  auto polygon_size = GENERATE(3, 5, 9);
 
-  SECTION("Traslations") {
-    auto traslation = GENERATE(
-        hull::Coordinate{2.f, 0, 0}, hull::Coordinate{0, 2.f, 0},
-        hull::Coordinate{0, 2.f, 0}, hull::Coordinate{0.f, 2.f, 0},
-        hull::Coordinate{-2.f, 3.f, 0}, hull::Coordinate{2.f, -3.f, 0});
+  float delta_x = 1.5f;
+  float delta_y = -0.5f;
+  float delta_rot_z = to_rad(25);
 
-    auto polygon_points = polygon.getPoints();
-    flx::shape::TransformDecorator polygon_translated(
-        std::make_unique<Vector3dCloud>(std::move(polygon_points)),
-        flx::shape::Transformation{traslation});
+  flx::shape::Transformation transform(
+      hull::Coordinate{delta_x, delta_y, 0},
+      flx::shape::RotationXYZ{0, 0, delta_rot_z});
 
-    for (const auto &angle : get_angles(polygon_size)) {
-      hull::Coordinate direction =
-          hull::Coordinate{cosf(angle), sinf(angle), 0};
+  flx::shape::TransformDecorator polygon_transformed(
+      make_cloud_test(make_prism(make_polygon(polygon_size), 0.5f)), transform);
 
-      hull::Coordinate polygon_support;
-      polygon.getSupport(polygon_support, direction);
-
-      hull::Coordinate polygon_traslated_support;
-      polygon_translated.getSupport(polygon_support, direction);
-
-      CHECK(almost_equal(polygon_traslated_support.x,
-                         polygon_support.x + traslation.x));
-      CHECK(almost_equal(polygon_traslated_support.y,
-                         polygon_support.y + traslation.y));
-    }
-  }
-
-  SECTION("Rotations") {
-    throw 0; // TODO
-  }
-
-  SECTION("Traslations and rotations") {
-    throw 0; // TODO
+  hull::Coordinate support;
+  for (const auto &angle : make_angles(polygon_size)) {
+    const float angle_cos = cosf(angle + delta_rot_z);
+    const float angle_sin = sinf(angle + delta_rot_z);
+    polygon_transformed.getSupport(support,
+                                   hull::Coordinate{angle_cos, angle_sin, 0});
+    CHECK(almost_equal(angle_cos + delta_x, support.x));
+    CHECK(almost_equal(angle_sin + delta_y, support.y));
   }
 }
 
@@ -90,22 +73,18 @@ TEST_CASE("Transform decorator", "[support]") {
 TEST_CASE("Round decorator", "[support]") {
   auto polygon_size = GENERATE(3, 5, 9);
 
-  Vector3dCloud polygon(get_polygon(polygon_size));
+  float ray = 2.5f;
 
-  const float ray = 1.5f;
-  auto polygon_points = polygon.getPoints();
   flx::shape::RoundDecorator polygon_inflated(
-      std::make_unique<Vector3dCloud>(std::move(polygon_points)), ray);
+      make_cloud_test(make_prism(make_polygon(polygon_size), 0.5f)), ray);
 
-  for (const auto &angle : get_angles(polygon_size)) {
-    hull::Coordinate direction = hull::Coordinate{cosf(angle), sinf(angle), 0};
-
-    hull::Coordinate polygon_support;
-    polygon.getSupport(polygon_support, direction);
-
-    hull::Coordinate polygon_inflated_support;
-    polygon_inflated.getSupport(polygon_support, direction);
-    CHECK(almost_equal(polygon_inflated_support.x, polygon_support.x + ray));
-    CHECK(almost_equal(polygon_inflated_support.y, polygon_support.y + ray));
+  hull::Coordinate support;
+  for (const auto &angle : make_angles(polygon_size)) {
+    const float angle_cos = cosf(angle);
+    const float angle_sin = sinf(angle);
+    polygon_inflated.getSupport(support,
+                                hull::Coordinate{angle_cos, angle_sin, 0});
+    CHECK(almost_equal(angle_cos * (1.f + ray), support.x));
+    CHECK(almost_equal(angle_sin * (1.f + ray), support.y));
   }
 }

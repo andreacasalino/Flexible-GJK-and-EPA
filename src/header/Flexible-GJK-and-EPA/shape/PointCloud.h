@@ -19,8 +19,8 @@ template <typename PointCollectionIt> class PointCloud : public ConvexShape {
 public:
   template <typename SupportPredicate, typename ToCoordinatePredicate>
   PointCloud(const PointCollectionIt &begin, const PointCollectionIt &end,
-             SupportPredicate &&support_pred,
-             ToCoordinatePredicate &&convert_pred)
+             const SupportPredicate &support_pred,
+             const ToCoordinatePredicate &convert_pred)
       : begin(begin), end(end), support_predicate(support_pred),
         convert_predicate(convert_pred) {
     if (begin == end) {
@@ -30,18 +30,19 @@ public:
 
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const final {
+    auto support_point = begin;
+    float support_point_distance = dot_product(support_point, direction);
+    float distance;
     auto it = begin;
-    float max_support_value = support_predicate(it, direction), support_value;
-    auto max_support_point = it;
     ++it;
     for (it; it != end; ++it) {
-      support_value = support_predicate(it, direction);
-      if (support_value > max_support_value) {
-        max_support_value = support_value;
-        max_support_point = it;
+      distance = dot_product(it, direction);
+      if (distance > support_point_distance) {
+        support_point = it;
+        support_point_distance = distance;
       }
     }
-    support = convert_predicate(max_support_point);
+    support = convert_predicate(support_point);
   };
 
 private:

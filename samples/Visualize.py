@@ -49,6 +49,10 @@ class PlotLimitsAware:
         self.y_limits.update(new_point[1])
         self.z_limits.update(new_point[2])
 
+    def update2(self, other):
+        self.update([other.x_limits.min(), other.y_limits.min(), other.z_limits.min()])
+        self.update([other.x_limits.max(), other.y_limits.max(), other.z_limits.max()])
+    
     def resize(self, ax):
         min = self.x_limits.min()
         if(self.y_limits.min() < min):
@@ -70,7 +74,7 @@ class PlotLimitsAware:
         ax.set_ylim3d(min, max)
         ax.set_zlim3d(min, max)        
 
-def plot_vertices_cloud(Vertices, color, ax):  
+def plot_vertices_cloud(Vertices, color, ax) -> PlotLimitsAware:  
     limits = PlotLimitsAware()
     for point in Vertices:
         limits.update(point)
@@ -80,7 +84,7 @@ def plot_vertices_cloud(Vertices, color, ax):
         s = np.append(s, s[0])  # Here we cycle back to the first coordinate
         plot_facet(Vertices_array[s, 0], Vertices_array[s, 1], Vertices_array[s, 2], ax, color, 0.4)
         ax.plot(Vertices_array[s, 0], Vertices_array[s, 1], Vertices_array[s, 2] , '.', color=color, markersize=1)
-    limits.resize(ax)
+    return limits
     
 def plot_line(Vertices, ax):
     L_x =[Vertices[0][0], Vertices[1][0]]
@@ -93,9 +97,12 @@ def plot_line(Vertices, ax):
 
 def plot_result(subplot_json_data, ax):
     for line in subplot_json_data["Lines"]:
-        plot_line(line["Peers"] ,ax)
+        plot_line(line["Peers"] ,ax)  
+    limits = PlotLimitsAware()
     for politope in subplot_json_data["Politopes"]:
-        plot_vertices_cloud(politope["Vertices"], politope["Color"], ax)
+        new_limits = plot_vertices_cloud(politope["Vertices"], politope["Color"], ax)
+        limits.update2(new_limits)
+    limits.resize(ax)
 
 
 

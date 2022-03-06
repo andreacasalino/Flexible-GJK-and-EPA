@@ -65,10 +65,10 @@ int main() {
   // get two random rototraslations for both the shapes
   flx::shape::TransformDecorator shapeA_translated(
       std::move(shapeA),
-      flx::shape::Transformation{getRandomTransformation(2.f, 3.5f)});
+      flx::shape::Transformation{getRandomTransformation(1.f, 2.f)});
   flx::shape::TransformDecorator shapeB_translated(
       std::move(shapeB),
-      flx::shape::Transformation{getRandomTransformation(-3.5f, -2.f)});
+      flx::shape::Transformation{getRandomTransformation(-2.f, -1.f)});
 
   // get the closest points
   {

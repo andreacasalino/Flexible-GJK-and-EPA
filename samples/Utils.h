@@ -8,11 +8,9 @@
 #pragma once
 
 #include <Hull/Coordinate.h>
-#include <memory>
-#include <vector>
 
 /**
- * @brief Just an example of a coordinate representation
+ * @brief Just an example of a 3D coordinate representation
  **/
 class Vector3d {
 public:
@@ -30,6 +28,8 @@ private:
   float data[3];
 };
 
+#include <vector>
+
 hull::Coordinate
 to_coordinate(const std::vector<Vector3d>::const_iterator &subject);
 
@@ -40,26 +40,5 @@ std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
 #include <Flexible-GJK-and-EPA/shape/PointCloud.h>
 
-class Vector3dCloud : public flx::shape::ConvexShape {
-public:
-  Vector3dCloud(const std::vector<Vector3d> &buffer) : points(buffer){};
-
-  const std::vector<Vector3d> &getPoints() const { return points; }
-
-  void getSupport(hull::Coordinate &support,
-                  const hull::Coordinate &direction) const final {
-    auto it_max = points.begin();
-    float dot_max = dot_product(it_max, direction);
-    for (auto it = points.begin(); it != points.end(); ++it) {
-      float dot = dot_product(it, direction);
-      if (dot > dot_max) {
-        dot_max = dot;
-        it_max = it;
-      }
-    }
-    support = to_coordinate(it_max);
-  }
-
-private:
-  const std::vector<Vector3d> points;
-};
+using Vector3dCloud =
+    flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>;

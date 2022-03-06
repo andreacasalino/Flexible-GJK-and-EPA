@@ -19,7 +19,8 @@ class CloudsMemoizer {
 public:
   CloudsMemoizer() = default;
 
-  std::vector<Vector3d> &getCloudVertices(const flx::shape::ConvexShape &shape);
+  const std::vector<Vector3d> &
+  getCloudVertices(const flx::shape::ConvexShape &shape);
 
 private:
   std::map<const flx::shape::ConvexShape *, std::vector<Vector3d>> clouds;
@@ -72,7 +73,7 @@ std::vector<Vector3d> get_sphere_cloud(const float ray) {
 };
 } // namespace
 
-std::vector<Vector3d> &
+const std::vector<Vector3d> &
 CloudsMemoizer::getCloudVertices(const flx::shape::ConvexShape &shape) {
   auto clouds_it = clouds.find(&shape);
   if (clouds_it == clouds.end()) {
@@ -109,6 +110,7 @@ CloudsMemoizer::getCloudVertices(const flx::shape::ConvexShape &shape) {
       }
       goto label;
     }
+    throw std::runtime_error{"Unrecognized shape"};
 
   label:
     clouds_it = clouds.emplace(&shape, std::move(points)).first;
@@ -118,7 +120,10 @@ CloudsMemoizer::getCloudVertices(const flx::shape::ConvexShape &shape) {
 
 namespace {
 void to_json(nlohmann::json &recipient, const Vector3d &point) {
-  recipient = std::array<float, 3>{point.x(), point.y(), point.z()};
+  recipient = nlohmann::json::array();
+  recipient.emplace_back() = point.x();
+  recipient.emplace_back() = point.y();
+  recipient.emplace_back() = point.z();
 }
 
 void to_json(nlohmann::json &recipient, const std::vector<Vector3d> &points) {
@@ -188,7 +193,7 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
                              const std::string &file_name) {
   Figure fig = this->makeFigure();
   {
-    auto &subplot = fig.addSubPlot("Shapes object of the GJK-EPA query");
+    auto &subplot = fig.addSubPlot("Shapes in their original positions");
     subplot.addLine(result.result.point_in_shape_a,
                     result.result.point_in_shape_b);
     subplot.addShape(shape_a);
@@ -199,13 +204,11 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
     hull::Coordinate delta;
     hull::diff(delta, result.result.point_in_shape_a,
                result.result.point_in_shape_b);
-    if (result.is_closest_pair_or_penetration_info) {
-      title = "Original positions of the shapes";
-    } else {
-      title = "METTERE ... TODO";
+    if (!result.is_closest_pair_or_penetration_info) {
       hull::invert(delta);
     }
-    auto &subplot = fig.addSubPlot(title);
+    auto &subplot = fig.addSubPlot("After applying minimal traslation to let "
+                                   "the shapes hav only 1 point in common");
 
     subplot.addShape(shape_a);
 
@@ -216,7 +219,7 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
           Vector3d{shape_b_point.x() + delta.x, shape_b_point.y() + delta.y,
                    shape_b_point.z() + delta.z};
     }
-    Vector3dCloud shape_b_transformed(std::move(shape_b_points));
+    Vector3dCloud shape_b_transformed(shape_b_points);
     subplot.addShape(shape_b_transformed);
   }
   fig.log(file_name);

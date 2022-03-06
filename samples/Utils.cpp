@@ -35,3 +35,8 @@ float dot_product(const std::vector<Vector3d>::const_iterator &subject,
   result += subject->z() * direction.z;
   return result;
 };
+
+Vector3dCloud make_cloud(std::vector<Vector3d> &points) {
+  return Vector3dCloud{points.begin(), points.end(), dot_product,
+                       to_coordinate};
+}
