@@ -4,10 +4,10 @@
 
 TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
   SECTION("Far away") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
 
-    std::vector<Vector3d> polygon_b = make_prism(
+    auto polygon_b = make_prism(
         std::vector<Point2D>{{2.f, 0.f}, {3.f, 1.f}, {3.f, -1.f}}, 1.f);
 
     auto query = make_test_query(polygon_a, polygon_b);
@@ -18,10 +18,10 @@ TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
   }
 
   SECTION("Just in touch") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
 
-    std::vector<Vector3d> polygon_b = make_prism(
+    auto polygon_b = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {3.f, 1.f}, {3.f, -1.f}}, 1.f);
 
     auto query = make_test_query(polygon_a, polygon_b);
@@ -33,10 +33,10 @@ TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
 
 TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
   SECTION("Far away") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
 
-    std::vector<Vector3d> polygon_b = make_prism(
+    auto polygon_b = make_prism(
         std::vector<Point2D>{{2.f, 1.f}, {2.f, -1.f}, {3.f, 0.f}}, 1.f);
 
     auto query = make_test_query(polygon_a, polygon_b);
@@ -47,10 +47,10 @@ TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
   }
 
   SECTION("Just in touch") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
 
-    std::vector<Vector3d> polygon_b =
+    auto polygon_b =
         make_prism(std::vector<Point2D>{{0, 1.f}, {0, -1.f}, {3.f, 0.f}}, 1.f);
 
     auto query = make_test_query(polygon_a, polygon_b);
@@ -62,12 +62,12 @@ TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
 
 TEST_CASE("Polygons, edge-edge proximity", "[prisms][polygons]") {
   SECTION("Far away") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{
             {0.f, 1.f}, {0.f, -1.f}, {-1.f, 1.f}, {-1.f, -1.f}},
         1.f);
 
-    std::vector<Vector3d> polygon_b = make_prism(
+    auto polygon_b = make_prism(
         std::vector<Point2D>{{2.f, 1.f}, {2.f, -1.f}, {3.f, 1.f}, {3.f, -1.f}},
         1.f);
 
@@ -79,12 +79,12 @@ TEST_CASE("Polygons, edge-edge proximity", "[prisms][polygons]") {
   }
 
   SECTION("In collision") {
-    std::vector<Vector3d> polygon_a = make_prism(
+    auto polygon_a = make_prism(
         std::vector<Point2D>{
             {0.f, 1.f}, {0.f, -1.f}, {-1.f, 1.f}, {-1.f, -1.f}},
         1.f);
 
-    std::vector<Vector3d> polygon_b = make_prism(
+    auto polygon_b = make_prism(
         std::vector<Point2D>{
             {-0.5f, 1.f}, {-0.5f, -1.f}, {1.f, 1.f}, {1.f, -1.f}},
         1.f);

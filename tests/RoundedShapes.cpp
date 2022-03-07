@@ -5,12 +5,15 @@
 #include <Flexible-GJK-and-EPA/shape/Sphere.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
+Points make_tethreadron_points() {
+  std::vector<Vector3d> points{Vector3d{0, 0, 0}, Vector3d{-1.f, -1.f, 0},
+                               Vector3d{-1.f, 1.f, 0}, Vector3d{-1.f, 0, 1.f}};
+  return std::make_shared<std::vector<Vector3d>>(points);
+}
+
 TEST_CASE("Polygons and sphere", "[prisms][inflation]") {
-  std::vector<Vector3d> tethraedron_a =
-      std::vector<Vector3d>{Vector3d{0, 0, 0}, Vector3d{-1.f, -1.f, 0},
-                            Vector3d{-1.f, 1.f, 0}, Vector3d{-1.f, 0, 1.f}};
-  Vector3dCloud shape_a(tethraedron_a.begin(), tethraedron_a.end(), dot_product,
-                        to_coordinate);
+  auto tethreadron_points = make_tethreadron_points();
+  Vector3dCloud shape_a(tethreadron_points);
 
   flx::shape::Sphere sphere_b(0.5f, hull::Coordinate{5.f, 0, 0});
 
@@ -22,17 +25,14 @@ TEST_CASE("Polygons and sphere", "[prisms][inflation]") {
 }
 
 TEST_CASE("Polygons and round inflation", "[prisms][inflation]") {
-  std::vector<Vector3d> tethraedron_a =
-      std::vector<Vector3d>{Vector3d{0, 0, 0}, Vector3d{-1.f, -1.f, 0},
-                            Vector3d{-1.f, 1.f, 0}, Vector3d{-1.f, 0, 1.f}};
-  Vector3dCloud shape_a(tethraedron_a.begin(), tethraedron_a.end(), dot_product,
-                        to_coordinate);
+  auto tethreadron_points = make_tethreadron_points();
+  Vector3dCloud shape_a(tethreadron_points);
 
-  std::vector<Vector3d> square_b = make_prism(
-      std::vector<Point2D>{{1.f, 1.f}, {-1.f, 1.f}, {-1.f, -1.f}, {1.f, -1.f}},
-      1.f);
-  std::unique_ptr<Vector3dCloud> shape_b = std::make_unique<Vector3dCloud>(
-      square_b.begin(), square_b.end(), dot_product, to_coordinate);
+  std::unique_ptr<Vector3dCloud> shape_b =
+      std::make_unique<Vector3dCloud>(make_prism(
+          std::vector<Point2D>{
+              {1.f, 1.f}, {-1.f, 1.f}, {-1.f, -1.f}, {1.f, -1.f}},
+          1.f));
 
   SECTION("Traslation") {
     flx::shape::Transformation trsf(hull::Coordinate{5.f, 0, 0});

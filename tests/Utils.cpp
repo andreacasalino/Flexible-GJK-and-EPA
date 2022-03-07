@@ -1,25 +1,18 @@
 #include "Utils.h"
 
-flx::QueryResult make_test_query(const std::vector<Vector3d> &a,
-                                 const std::vector<Vector3d> &b) {
+flx::QueryResult make_test_query(const Points &a, const Points &b) {
   return flx::get_closest_points_or_penetration_info(Vector3dCloud{a},
                                                      Vector3dCloud{b});
 }
 
-std::vector<Vector3d> make_prism(const std::vector<Point2D> &polygon,
-                                 const float height) {
-  std::vector<Vector3d> points;
-  points.reserve(polygon.size() * 2);
+Points make_prism(const std::vector<Point2D> &polygon, const float height) {
+  Points points = std::make_shared<std::vector<Vector3d>>();
+  points->reserve(polygon.size() * 2);
   for (const auto &point : polygon) {
-    points.emplace_back(point.x, point.y, height);
-    points.emplace_back(point.x, point.y, -height);
+    points->emplace_back(point.x, point.y, height);
+    points->emplace_back(point.x, point.y, -height);
   }
   return points;
-}
-
-std::unique_ptr<Vector3dCloudTest>
-make_cloud_test(const std::vector<Vector3d> &points) {
-  return std::make_unique<Vector3dCloudTest>(points);
 }
 
 float delta_squared_lenght(const flx::CoordinatePair &coordinates) {

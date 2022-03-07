@@ -31,7 +31,8 @@ std::vector<Point2D> make_polygon(const std::size_t size) {
 TEST_CASE("Polygon", "[support]") {
   auto polygon_size = GENERATE(3, 5, 9);
 
-  Vector3dCloudTest polygon(make_prism(make_polygon(polygon_size), 0.5f));
+  auto points = make_prism(make_polygon(polygon_size), 0.5f);
+  Vector3dCloud polygon(points);
 
   hull::Coordinate support;
   for (const auto &angle : make_angles(polygon_size)) {
@@ -55,8 +56,9 @@ TEST_CASE("Transform decorator", "[support]") {
       hull::Coordinate{delta_x, delta_y, 0},
       flx::shape::RotationXYZ{0, 0, delta_rot_z});
 
+  auto points = make_prism(make_polygon(polygon_size), 0.5f);
   flx::shape::TransformDecorator polygon_transformed(
-      make_cloud_test(make_prism(make_polygon(polygon_size), 0.5f)), transform);
+      std::make_unique<Vector3dCloud>(points), transform);
 
   hull::Coordinate support;
   for (const auto &angle : make_angles(polygon_size)) {
@@ -75,8 +77,9 @@ TEST_CASE("Round decorator", "[support]") {
 
   float ray = 2.5f;
 
+  auto points = make_prism(make_polygon(polygon_size), 0.5f);
   flx::shape::RoundDecorator polygon_inflated(
-      make_cloud_test(make_prism(make_polygon(polygon_size), 0.5f)), ray);
+      std::make_unique<Vector3dCloud>(points), ray);
 
   hull::Coordinate support;
   for (const auto &angle : make_angles(polygon_size)) {
