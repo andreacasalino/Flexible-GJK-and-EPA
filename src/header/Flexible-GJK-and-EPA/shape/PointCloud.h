@@ -45,7 +45,7 @@ public:
     support = convert_predicate(support_point);
   };
 
-protected:
+private:
   const PointCollectionIt begin;
   const PointCollectionIt end;
 

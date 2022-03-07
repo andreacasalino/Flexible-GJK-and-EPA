@@ -15,13 +15,13 @@ float get_sample() {
 }
 } // namespace
 
-std::vector<Vector3d> make_random_cloud(const std::size_t samples) {
+Points make_random_cloud(const std::size_t samples) {
   std::vector<Vector3d> result;
   result.reserve(samples);
   for (std::size_t k = 0; k < samples; ++k) {
     result.emplace_back(get_sample(), get_sample(), get_sample());
   }
-  return result;
+  return std::make_shared<std::vector<Vector3d>>(std::move(result));
 }
 
 hull::Coordinate
@@ -36,12 +36,3 @@ float dot_product(const std::vector<Vector3d>::const_iterator &subject,
   result += subject->z() * direction.z;
   return result;
 };
-
-std::vector<Vector3d> Vector3dCloud::getPoints() const {
-  std::vector<Vector3d> result;
-  result.reserve(std::distance(begin, end));
-  std::for_each(begin, end, [&result](const Vector3d &element) {
-    result.push_back(element);
-  });
-  return result;
-}

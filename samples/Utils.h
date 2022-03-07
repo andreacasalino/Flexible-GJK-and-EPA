@@ -36,16 +36,23 @@ to_coordinate(const std::vector<Vector3d>::const_iterator &subject);
 float dot_product(const std::vector<Vector3d>::const_iterator &subject,
                   const hull::Coordinate &direction);
 
-std::vector<Vector3d> make_random_cloud(const std::size_t samples);
-
 #include <Flexible-GJK-and-EPA/shape/PointCloud.h>
+#include <memory>
+
+using Points = std::shared_ptr<std::vector<Vector3d>>;
+Points make_random_cloud(const std::size_t samples);
 
 class Vector3dCloud
     : public flx::shape::PointCloud<std::vector<Vector3d>::const_iterator> {
 public:
-  Vector3dCloud(std::vector<Vector3d> &wrapped)
+  Vector3dCloud(const Points &wrapped)
       : flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>(
-            wrapped.begin(), wrapped.end(), dot_product, to_coordinate){};
+            wrapped->begin(), wrapped->end(), dot_product, to_coordinate) {
+    this->points = wrapped;
+  };
 
-  std::vector<Vector3d> getPoints() const;
+  const std::vector<Vector3d> &getPoints() const { return *points; };
+
+private:
+  Points points;
 };
