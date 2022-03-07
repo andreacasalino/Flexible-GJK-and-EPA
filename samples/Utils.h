@@ -40,5 +40,12 @@ std::vector<Vector3d> make_random_cloud(const std::size_t samples);
 
 #include <Flexible-GJK-and-EPA/shape/PointCloud.h>
 
-using Vector3dCloud =
-    flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>;
+class Vector3dCloud
+    : public flx::shape::PointCloud<std::vector<Vector3d>::const_iterator> {
+public:
+  Vector3dCloud(std::vector<Vector3d> &wrapped)
+      : flx::shape::PointCloud<std::vector<Vector3d>::const_iterator>(
+            wrapped.begin(), wrapped.end(), dot_product, to_coordinate){};
+
+  std::vector<Vector3d> getPoints() const;
+};

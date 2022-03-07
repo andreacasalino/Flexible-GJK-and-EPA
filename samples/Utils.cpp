@@ -6,6 +6,7 @@
  **/
 
 #include "Utils.h"
+#include <algorithm>
 #include <math.h>
 
 namespace {
@@ -36,7 +37,11 @@ float dot_product(const std::vector<Vector3d>::const_iterator &subject,
   return result;
 };
 
-Vector3dCloud make_cloud(std::vector<Vector3d> &points) {
-  return Vector3dCloud{points.begin(), points.end(), dot_product,
-                       to_coordinate};
+std::vector<Vector3d> Vector3dCloud::getPoints() const {
+  std::vector<Vector3d> result;
+  result.reserve(std::distance(begin, end));
+  std::for_each(begin, end, [&result](const Vector3d &element) {
+    result.push_back(element);
+  });
+  return result;
 }

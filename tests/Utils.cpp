@@ -2,9 +2,8 @@
 
 flx::QueryResult make_test_query(const std::vector<Vector3d> &a,
                                  const std::vector<Vector3d> &b) {
-  return flx::get_closest_points_or_penetration_info(
-      Vector3dCloud{a.begin(), a.end(), dot_product, to_coordinate},
-      Vector3dCloud{b.begin(), b.end(), dot_product, to_coordinate});
+  return flx::get_closest_points_or_penetration_info(Vector3dCloud{a},
+                                                     Vector3dCloud{b});
 }
 
 std::vector<Vector3d> make_prism(const std::vector<Point2D> &polygon,
