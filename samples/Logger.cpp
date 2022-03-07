@@ -125,9 +125,9 @@ void SubPlot::toJson(nlohmann::json &recipient) const {
 void SubPlot::addShape(const flx::shape::ConvexShape &shape) {
   if (shapes_ptr.find(&shape) == shapes_ptr.end()) {
     std::vector<float> color;
-    if (1 == shapes.size()) {
+    if (0 == shapes.size()) {
       color = {1, 0, 0};
-    } else if (2 == shapes.size()) {
+    } else if (1 == shapes.size()) {
       color = {0, 0, 1};
     } else {
       color.resize(3);
@@ -137,7 +137,8 @@ void SubPlot::addShape(const flx::shape::ConvexShape &shape) {
     }
     auto &new_politope = shapes.emplace_back();
     new_politope["Color"] = color;
-    to_json(new_politope["Vertices"], getCloudVertices(shape));
+    const auto shape_points = getCloudVertices(shape);
+    to_json(new_politope["Vertices"], shape_points);
 
     shapes_ptr.emplace(&shape);
   }
