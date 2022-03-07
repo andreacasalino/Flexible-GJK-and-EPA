@@ -8,8 +8,8 @@
 #pragma once
 
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
-#include <map>
 #include <nlohmann/json.hpp>
+#include <set>
 
 namespace logger {
 // You can dig into the sources to understand the functionalities
@@ -19,10 +19,6 @@ namespace logger {
 //
 // In essence, this class is simply generating json files
 // in order to later display the results in cool python plots.
-
-class CloudsMemoizer;
-
-using CloudMemoizerPtr = std::shared_ptr<CloudsMemoizer>;
 
 class SubPlot {
   friend class Figure;
@@ -35,42 +31,28 @@ public:
   void toJson(nlohmann::json &recipient) const;
 
 private:
-  SubPlot(const CloudMemoizerPtr &collection, const std::string &title)
-      : title(title), collection(collection){};
+  SubPlot(const std::string &title) : title(title){};
 
   const std::string title;
-  CloudMemoizerPtr collection;
+  std::set<const flx::shape::ConvexShape *> shapes_ptr;
   std::vector<nlohmann::json> shapes;
   std::vector<nlohmann::json> lines;
 };
 
 class Figure {
-  friend class Manager;
-
 public:
+  Figure() = default;
+
   SubPlot &addSubPlot(const std::string &title);
 
   void log(const std::string &file_name) const;
 
 private:
-  Figure(const CloudMemoizerPtr &collection) : collection(collection){};
-
-  CloudMemoizerPtr collection;
   std::vector<SubPlot> sub_plots;
 };
 
-class Manager {
-public:
-  Manager();
-
-  Figure makeFigure() const;
-
-  void logSingleQuery(const flx::shape::ConvexShape &shape_a,
-                      const flx::shape::ConvexShape &shape_b,
-                      const flx::QueryResult &result,
-                      const std::string &file_name);
-
-private:
-  CloudMemoizerPtr collection;
-};
+void logSingleQuery(const flx::shape::ConvexShape &shape_a,
+                    const flx::shape::ConvexShape &shape_b,
+                    const flx::QueryResult &result,
+                    const std::string &file_name);
 } // namespace logger

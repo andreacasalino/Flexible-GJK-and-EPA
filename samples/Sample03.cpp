@@ -13,15 +13,10 @@
 #include <iostream>
 using namespace std;
 
-using Points = std::shared_ptr<std::vector<Vector3d>>;
 using ShapePtr = std::unique_ptr<flx::shape::ConvexShape>;
 
-struct PointsAndShape {
-  Points points;
-  ShapePtr shape;
-};
 // Get a random poligon, shifted with a random position and orientation
-PointsAndShape makeRandomShape() {
+ShapePtr makeRandomShape() {
   auto randUnif = [](const float &min_val, const float &max_val) {
     float delta = max_val - min_val;
     return min_val +
@@ -34,35 +29,29 @@ PointsAndShape makeRandomShape() {
                                  randUnif(-3.14159f, 3.14159f),
                                  randUnif(-3.14159f, 3.14159f)};
 
-  Points points = std::make_shared<std::vector<Vector3d>>(
-      make_random_cloud(rand() % 9 + 5));
-  ShapePtr new_shape = std::make_unique<Vector3dCloud>(*points);
-  return PointsAndShape{
-      points,
-      std::make_unique<flx::shape::TransformDecorator>(
-          std::move(new_shape), flx::shape::Transformation{trasl, rot})};
+  ShapePtr shape =
+      std::make_unique<Vector3dCloud>(make_random_cloud(rand() % 9 + 5));
+  return std::make_unique<flx::shape::TransformDecorator>(
+      std::move(shape), flx::shape::Transformation{trasl, rot});
 }
 
 // see Sample_01 and Sample_02 before this one
 int main() {
-  logger::Manager logger;
-
   std::size_t N_shapes = 5;
-  vector<PointsAndShape> shapes;
+  vector<ShapePtr> shapes;
   shapes.reserve(N_shapes);
   // get some random shapes in space
   for (std::size_t k = 0; k < N_shapes; ++k) {
     shapes.emplace_back(makeRandomShape());
   }
 
-  auto logger_figure = logger.makeFigure();
-  auto &logger_plot = logger_figure.addSubPlot("Random shapes queries");
-
+  logger::Figure logger;
+  auto &logger_plot = logger.addSubPlot("Random shapes queries");
   // check all the possible pair of shapes
   for (std::size_t r = 0; r < shapes.size(); ++r) {
     for (std::size_t c = r + 1; c < shapes.size(); ++c) {
-      const auto &shape_A = *shapes[r].shape;
-      const auto &shape_B = *shapes[c].shape;
+      const auto &shape_A = *shapes[r];
+      const auto &shape_B = *shapes[c];
       auto query_result =
           flx::get_closest_points_or_penetration_info(shape_A, shape_B);
       // log results
@@ -73,7 +62,7 @@ int main() {
     }
   }
   // Result_3
-  logger_figure.log("Result_3.json");
+  logger.log("Result_3.json");
 
   return EXIT_SUCCESS;
 }

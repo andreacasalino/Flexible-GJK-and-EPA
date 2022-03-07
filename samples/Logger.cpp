@@ -14,18 +14,6 @@
 #include <iostream>
 
 namespace logger {
-
-class CloudsMemoizer {
-public:
-  CloudsMemoizer() = default;
-
-  const std::vector<Vector3d> &
-  getCloudVertices(const flx::shape::ConvexShape &shape);
-
-private:
-  std::map<const flx::shape::ConvexShape *, std::vector<Vector3d>> clouds;
-};
-
 namespace {
 class Interval {
 public:
@@ -73,49 +61,42 @@ std::vector<Vector3d> get_sphere_cloud(const float ray) {
 };
 } // namespace
 
-const std::vector<Vector3d> &
-CloudsMemoizer::getCloudVertices(const flx::shape::ConvexShape &shape) {
-  auto clouds_it = clouds.find(&shape);
-  if (clouds_it == clouds.end()) {
-    std::vector<Vector3d> points;
-    const auto *as_cloud = dynamic_cast<const Vector3dCloud *>(&shape);
-    const auto *as_transformer =
-        dynamic_cast<const flx::shape::TransformDecorator *>(&shape);
-    const auto *as_rounded =
-        dynamic_cast<const flx::shape::RoundDecorator *>(&shape);
-    if (nullptr != as_cloud) {
-      points = as_cloud->getPoints();
-      goto label;
-    }
-    if (nullptr != as_transformer) {
-      points = this->getCloudVertices(as_transformer->getShape());
-      hull::Coordinate temp;
-      for (auto &point : points) {
-        temp.x = point.x();
-        temp.y = point.y();
-        temp.z = point.z();
-        as_transformer->getTransformation().transform(temp);
-        point = Vector3d{temp.x, temp.y, temp.z};
-      }
-      goto label;
-    }
-    if (nullptr != as_rounded) {
-      auto sphere = get_sphere_cloud(as_rounded->getRay());
-      for (const auto &point : this->getCloudVertices(as_rounded->getShape())) {
-        for (const auto &point_sphere : sphere) {
-          points.emplace_back(point.x() + point_sphere.x(),
-                              point.y() + point_sphere.y(),
-                              point.z() + point_sphere.z());
-        }
-      }
-      goto label;
-    }
-    throw std::runtime_error{"Unrecognized shape"};
-
-  label:
-    clouds_it = clouds.emplace(&shape, std::move(points)).first;
+std::vector<Vector3d> getCloudVertices(const flx::shape::ConvexShape &shape) {
+  const auto *as_cloud = dynamic_cast<const Vector3dCloud *>(&shape);
+  if (nullptr != as_cloud) {
+    return as_cloud->getPoints();
   }
-  return clouds_it->second;
+
+  std::vector<Vector3d> points;
+  const auto *as_transformer =
+      dynamic_cast<const flx::shape::TransformDecorator *>(&shape);
+  if (nullptr != as_transformer) {
+    points = getCloudVertices(as_transformer->getShape());
+    hull::Coordinate temp;
+    for (auto &point : points) {
+      temp.x = point.x();
+      temp.y = point.y();
+      temp.z = point.z();
+      as_transformer->getTransformation().transform(temp);
+      point = Vector3d{temp.x, temp.y, temp.z};
+    }
+    return points;
+  }
+
+  const auto *as_rounded =
+      dynamic_cast<const flx::shape::RoundDecorator *>(&shape);
+  if (nullptr != as_rounded) {
+    auto sphere = get_sphere_cloud(as_rounded->getRay());
+    for (const auto &point : getCloudVertices(as_rounded->getShape())) {
+      for (const auto &point_sphere : sphere) {
+        points.emplace_back(point.x() + point_sphere.x(),
+                            point.y() + point_sphere.y(),
+                            point.z() + point_sphere.z());
+      }
+    }
+    return points;
+  }
+  throw std::runtime_error{"Unrecognized shape"};
 }
 
 namespace {
@@ -142,20 +123,24 @@ void SubPlot::toJson(nlohmann::json &recipient) const {
 }
 
 void SubPlot::addShape(const flx::shape::ConvexShape &shape) {
-  auto &new_politope = shapes.emplace_back();
-  to_json(new_politope["Vertices"], collection->getCloudVertices(shape));
-  std::vector<float> color;
-  if (1 == shapes.size()) {
-    color = {1, 0, 0};
-  } else if (2 == shapes.size()) {
-    color = {0, 0, 1};
-  } else {
-    color.resize(3);
-    for (std::size_t k = 0; k < 3; ++k) {
-      color[k] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+  if (shapes_ptr.find(&shape) == shapes_ptr.end()) {
+    std::vector<float> color;
+    if (1 == shapes.size()) {
+      color = {1, 0, 0};
+    } else if (2 == shapes.size()) {
+      color = {0, 0, 1};
+    } else {
+      color.resize(3);
+      for (std::size_t k = 0; k < 3; ++k) {
+        color[k] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+      }
     }
+    auto &new_politope = shapes.emplace_back();
+    new_politope["Color"] = color;
+    to_json(new_politope["Vertices"], getCloudVertices(shape));
+
+    shapes_ptr.emplace(&shape);
   }
-  new_politope["Color"] = color;
 }
 
 void SubPlot::addLine(const hull::Coordinate &a, const hull::Coordinate &b) {
@@ -167,7 +152,7 @@ void SubPlot::addLine(const hull::Coordinate &a, const hull::Coordinate &b) {
 }
 
 SubPlot &Figure::addSubPlot(const std::string &title) {
-  SubPlot new_sub_plot(collection, title);
+  SubPlot new_sub_plot(title);
   return this->sub_plots.emplace_back(std::move(new_sub_plot));
 }
 
@@ -185,13 +170,11 @@ void Figure::log(const std::string &file_name) const {
             << "` to see the results" << std::endl;
 }
 
-Figure Manager::makeFigure() const { return Figure{collection}; }
-
-void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
-                             const flx::shape::ConvexShape &shape_b,
-                             const flx::QueryResult &result,
-                             const std::string &file_name) {
-  Figure fig = this->makeFigure();
+void logSingleQuery(const flx::shape::ConvexShape &shape_a,
+                    const flx::shape::ConvexShape &shape_b,
+                    const flx::QueryResult &result,
+                    const std::string &file_name) {
+  Figure fig;
   {
     auto &subplot = fig.addSubPlot("Shapes in their original positions");
     subplot.addLine(result.result.point_in_shape_a,
@@ -212,9 +195,9 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
 
     subplot.addShape(shape_a);
 
-    std::vector<Vector3d> shape_b_points =
-        collection->getCloudVertices(shape_b);
-    for (auto &shape_b_point : shape_b_points) {
+    Points shape_b_points =
+        std::make_shared<std::vector<Vector3d>>(getCloudVertices(shape_b));
+    for (auto &shape_b_point : *shape_b_points) {
       shape_b_point =
           Vector3d{shape_b_point.x() + delta.x, shape_b_point.y() + delta.y,
                    shape_b_point.z() + delta.z};
@@ -224,6 +207,4 @@ void Manager::logSingleQuery(const flx::shape::ConvexShape &shape_a,
   }
   fig.log(file_name);
 }
-
-Manager::Manager() { collection = std::make_shared<CloudsMemoizer>(); }
 } // namespace logger

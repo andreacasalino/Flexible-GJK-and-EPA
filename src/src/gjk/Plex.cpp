@@ -6,6 +6,7 @@
  **/
 
 #include "Plex.h"
+#include <Flexible-GJK-and-EPA/Error.h>
 
 #include <limits>
 
@@ -148,8 +149,9 @@ void tp_json_closest(nlohmann::json &recipient,
 }
 #endif
 
-PlexUpdateResult update_segment(const VertexCase &subject,
+PlexUpdateResult update_segment(const VertexCase &subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                                ,
                                 nlohmann::json &log
 #endif
 ) {
@@ -179,8 +181,9 @@ PlexUpdateResult update_segment(const VertexCase &subject,
   return set_to_segment(subject.data, SegmentUpdateCase::AB);
 }
 
-PlexUpdateResult update_facet(const SegmentCase &subject,
+PlexUpdateResult update_facet(const SegmentCase &subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                              ,
                               nlohmann::json &log
 #endif
 ) {
@@ -222,11 +225,12 @@ PlexUpdateResult update_facet(const SegmentCase &subject,
   case ClosestRegionToOrigin::edge_AC:
     return set_to_segment(subject.data, SegmentUpdateCase::AC);
   }
-  throw std::runtime_error{"Internal error updating plex"};
+  throw Error{"Internal error updating plex"};
 }
 
-PlexUpdateResult update_tethreadron(const FacetCase &subject,
+PlexUpdateResult update_tethreadron(const FacetCase &subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                                    ,
                                     nlohmann::json &log
 #endif
 ) {
@@ -342,7 +346,7 @@ PlexUpdateResult update_tethreadron(const FacetCase &subject,
     else
       return set_to_segment(subject.data, SegmentUpdateCase::AD);
   }
-  throw std::runtime_error{"Internal error updating plex"};
+  throw Error{"Internal error updating plex"};
 }
 } // namespace
 
@@ -359,24 +363,27 @@ PlexUpdateResult update_plex(const Plex &subject
     mutable PlexUpdateResult result;
 
     void operator()(const VertexCase &subject) const {
-      result = update_segment(subject,
+      result = update_segment(subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                              ,
                               log
 #endif
       );
     };
 
     void operator()(const SegmentCase &subject) const {
-      result = update_facet(subject,
+      result = update_facet(subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                            ,
                             log
 #endif
       );
     };
 
     void operator()(const FacetCase &subject) const {
-      result = update_tethreadron(subject,
+      result = update_tethreadron(subject
 #ifdef GJK_EPA_DIAGNOSTIC
+                                  ,
                                   log
 #endif
       );
