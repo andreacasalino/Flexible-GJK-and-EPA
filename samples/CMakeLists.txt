@@ -12,7 +12,7 @@ macro(COPY_SCRIPT TARGET SCRIPT)
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}.py ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT}.py)    
 endmacro()
 
-macro(MAKE_SAMPLE NAME SCRIPT)
+macro(MAKE_SAMPLE NAME)
     add_executable(${NAME} ${NAME}.cpp 
         Utils.h Utils.cpp
         Logger.h Logger.cpp
@@ -22,11 +22,10 @@ macro(MAKE_SAMPLE NAME SCRIPT)
         nlohmann_json::nlohmann_json
     )
 
-    # COPY_SCRIPT(${NAME} Plotter)
-    # COPY_SCRIPT(${NAME} ${SCRIPT})
     COPY_SCRIPT(${NAME} Visualize)	
 endmacro()
 
-MAKE_SAMPLE(Sample01 Visualize01)
-MAKE_SAMPLE(Sample02 Visualize02)
-MAKE_SAMPLE(Sample03 Visualize03)
+MAKE_SAMPLE(Sample01)
+MAKE_SAMPLE(Sample02)
+MAKE_SAMPLE(Sample03)
+MAKE_SAMPLE(Sample04)

@@ -34,10 +34,13 @@ TEST_CASE("Polygons and round inflation", "[prisms][inflation]") {
               {1.f, 1.f}, {-1.f, 1.f}, {-1.f, -1.f}, {1.f, -1.f}},
           1.f));
 
+  std::unique_ptr<flx::shape::RoundDecorator> shape_b_inflated =
+      std::make_unique<flx::shape::RoundDecorator>(std::move(shape_b), 0.5f);
+
   SECTION("Traslation") {
     flx::shape::Transformation trsf(hull::Coordinate{5.f, 0, 0});
-    flx::shape::TransformDecorator shape_b_trsf(
-        flx::shape::RoundDecorator{std::move(shape_b), 0.5f}, trsf);
+    flx::shape::TransformDecorator shape_b_trsf(std::move(shape_b_inflated),
+                                                trsf);
 
     auto query =
         flx::get_closest_points_or_penetration_info(shape_a, shape_b_trsf);
@@ -51,8 +54,8 @@ TEST_CASE("Polygons and round inflation", "[prisms][inflation]") {
     flx::shape::Transformation trsf(
         hull::Coordinate{5.f, 0, 0},
         flx::shape::RotationXYZ{0, 0.5f * 3.141f, 0});
-    flx::shape::TransformDecorator shape_b_trsf(
-        flx::shape::RoundDecorator{std::move(shape_b), 0.5f}, trsf);
+    flx::shape::TransformDecorator shape_b_trsf(std::move(shape_b_inflated),
+                                                trsf);
     auto query =
         flx::get_closest_points_or_penetration_info(shape_a, shape_b_trsf);
 
