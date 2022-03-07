@@ -17,9 +17,9 @@ using namespace std;
 int main() {
   {
     // get random shapes with few points
-    auto shapeA_points = make_random_cloud(20);
-    auto shapeB_points = make_random_cloud(20);
-    const float ray = 0.2f;
+    auto shapeA_points = make_random_cloud(6);
+    auto shapeB_points = make_random_cloud(6);
+    const float ray = 1.f;
 
     // build inflated shapes
     std::unique_ptr<flx::shape::ConvexShape> shapeA =

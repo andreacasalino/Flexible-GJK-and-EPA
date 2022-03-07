@@ -15,47 +15,35 @@
 
 namespace logger {
 namespace {
-class Interval {
-public:
-  Interval(const float &min, const float &max, const std::size_t &nPoints)
-      : delta((max - min) / static_cast<float>(nPoints - 1)), min(min) {
-    this->reset();
-  };
-
-  inline void reset() { this->value = this->min; };
-
-  inline Interval &operator++() {
-    this->value += this->delta;
-    return *this;
-  };
-
-  inline const float &eval() const { return this->value; };
-
-private:
-  float value;
-  const float delta;
-  const float min;
-};
 constexpr float PI = 3.14159f;
-constexpr std::uint8_t N_ALFA = 5;
-constexpr std::uint8_t N_BETA = 10;
+
+std::vector<float> linspace(const float min, const float max,
+                            const std::size_t intervals) {
+  std::vector<float> result;
+  result.reserve(intervals + 1);
+  const float delta = (max - min) / static_cast<float>(intervals);
+  result.push_back(min);
+  for (std::size_t k = 0; k < intervals; ++k) {
+    result.push_back(result.back() + delta);
+  }
+  return result;
+}
+
+constexpr std::uint8_t N_ALFA = 7;
+constexpr std::uint8_t N_BETA = 14;
 std::vector<Vector3d> get_sphere_cloud(const float ray) {
   std::vector<Vector3d> result;
   float Calfa, Salfa, Cbeta, Sbeta;
-  Interval alfaInterval(-0.5f * PI, 0.5f * PI, N_ALFA);
-  Interval betaInterval(0.f, 2.f * PI, N_BETA);
-  for (std::uint8_t beta = 0; beta < N_BETA; ++beta) {
-    Cbeta = cosf(betaInterval.eval());
-    Sbeta = sinf(betaInterval.eval());
-    alfaInterval.reset();
-    for (std::uint8_t alfa = 0; alfa < N_ALFA; ++alfa) {
-      Calfa = cosf(alfaInterval.eval());
-      Salfa = sinf(alfaInterval.eval());
+  auto alfas = linspace(-0.5f * PI, 0.5f * PI, N_ALFA);
+  for (const auto beta : linspace(0.f, 2.f * PI, N_BETA)) {
+    Cbeta = cosf(beta);
+    Sbeta = sinf(beta);
+    for (const auto alfa : alfas) {
+      Calfa = cosf(alfa);
+      Salfa = sinf(alfa);
       result.emplace_back(Calfa * Cbeta * ray, Calfa * Sbeta * ray,
                           Salfa * ray);
-      ++betaInterval;
     }
-    ++alfaInterval;
   }
   return result;
 };
