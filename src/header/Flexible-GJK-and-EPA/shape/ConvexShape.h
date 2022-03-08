@@ -10,20 +10,16 @@
 #include <Hull/Coordinate.h>
 
 namespace flx::shape {
-/** @brief A general interface for describing a convex shape
+/** @brief A general interface for describing a convex solid
  */
 class ConvexShape {
 public:
-  ConvexShape() = default;
-  ConvexShape(const ConvexShape &) = delete;
-  ConvexShape &operator=(const ConvexShape &) = delete;
-  ConvexShape(ConvexShape &&) = delete;
-  ConvexShape &operator=(ConvexShape &&) = delete;
+  virtual ~ConvexShape() = default;
 
   /** @param[out] the support point in the passed direction
-   *  @param[out] the search direction
+   *  @param[in] the search direction
    */
-  virtual void getSupport(hull::Coordinate &result,
+  virtual void getSupport(hull::Coordinate &support,
                           const hull::Coordinate &direction) const = 0;
 };
 } // namespace flx::shape

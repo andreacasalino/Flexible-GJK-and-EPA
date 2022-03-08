@@ -11,20 +11,24 @@
 namespace flx::shape {
 RoundDecorator::RoundDecorator(std::unique_ptr<ConvexShape> shape,
                                const float &ray)
-    : ray(ray), ConvexDecorator(std::move(shape)) {
-  if (ray <= 0.f)
-    throw flx::Error("invalid ray for RoundDecorator");
-  if (nullptr == this->shape)
-    throw flx::Error("found null shape when building RoundDecorator");
-  if (nullptr != dynamic_cast<RoundDecorator *>(this->shape.get()))
-    throw flx::Error("found null shape when building RoundDecorator");
+    : ConvexDecorator(std::move(shape)), ray(ray) {
+  if (ray <= 0) {
+    throw Error{"invalid ray"};
+  }
 }
 
-void RoundDecorator::getSupport(hull::Coordinate &result,
+RoundDecorator::RoundDecorator(ConvexDecorator &&decorator_o, const float &ray)
+    : ConvexDecorator(std::move(decorator_o)), ray(ray) {
+  if (ray <= 0) {
+    throw Error{"invalid ray"};
+  }
+}
+
+void RoundDecorator::getSupport(hull::Coordinate &support,
                                 const hull::Coordinate &direction) const {
-  this->shape->getSupport(result, direction);
-  result.x += this->ray * direction.x;
-  result.y += this->ray * direction.y;
-  result.z += this->ray * direction.z;
+  this->getShape().getSupport(support, direction);
+  support.x += this->ray * direction.x;
+  support.y += this->ray * direction.y;
+  support.z += this->ray * direction.z;
 }
 } // namespace flx::shape

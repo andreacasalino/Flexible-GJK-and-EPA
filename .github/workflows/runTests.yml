@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  unitTests:
+    strategy:
+      matrix:
+        name: [ubuntu-gcc, ubuntu-clang, windows-VS]
+        include:
+            - name: ubuntu-gcc
+              os: ubuntu-latest
+              compiler_opt: "-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G \"Unix Makefiles\""
+            - name: ubuntu-clang
+              os: ubuntu-latest
+              compiler_opt: "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G \"Unix Makefiles\""
+            - name: windows-VS
+              os: windows-latest
+              compiler_opt: ""
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.0.0
+    - name: Checkout submodules
+      run:  git submodule update --init --recursive
+    - name: CMake configure
+      run:  cmake -B./build -DCMAKE_INSTALL_PREFIX:STRING=./artifacts/ -DBUILD_GJK_EPA_TESTS=ON -DCMAKE_CONFIGURATION_TYPES="Release" -DCMAKE_BUILD_TYPE:STRING=Release ${{ matrix.compiler_opt }}     
+    - name: Build
+      run:  cmake --build ./build --config Release
+    - name: Install
+      run:  cmake --install ./build --config Release
+    - name: Tests
+      run: ./artifacts/bin/Tests
+    - uses: actions/upload-artifact@v2
+      with:
+        path: artifacts
+        name: ${{ matrix.name }}

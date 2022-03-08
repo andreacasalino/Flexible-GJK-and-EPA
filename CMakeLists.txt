@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 option(LIB_OPT "Compile shared libraries (ON) or static (OFF)" OFF)
-option(BUILD_SAMPLES "Build the samples showing how to use the package" ON)
 project(Flexible-GJK-and-EPA)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,9 +14,17 @@ include(GroupSources)
 include(AutoCollect)
 include(MakeLibrary)
 
-option(LOGGER_OPT "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
+option(GJK_EPA_DIAGNOSTIC "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
 add_subdirectory(src)
 
-if(BUILD_SAMPLES)
-    add_subdirectory(Samples)
+option(BUILD_GJK_EPA_SAMPLES "Build the samples showing how to use the package" ON)
+if(BUILD_GJK_EPA_SAMPLES)
+    project(Flexible-GJK-and-EPA-Samples)
+    add_subdirectory(samples)
+endif()
+
+option(BUILD_GJK_EPA_TESTS "" OFF)
+if(BUILD_GJK_EPA_TESTS)
+    project(Flexible-GJK-and-EPA-Tests)
+    add_subdirectory(tests)
 endif()
