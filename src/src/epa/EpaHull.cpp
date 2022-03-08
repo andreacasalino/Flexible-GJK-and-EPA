@@ -3,98 +3,10 @@
 #include <algorithm>
 
 namespace flx::epa {
-namespace {
-MinkowskiDiffCoordinate find_vertex_trying_direction_and_opposite(
-    const MinkowskiDifference &mink_diff,
-    const MinkowskiDiffCoordinate &existing_vertex,
-    hull::Coordinate direction) {
-  hull::normalizeInPlace(direction);
-  MinkowskiDiffCoordinate result;
-  mink_diff.getSupport(result, direction);
-  hull::Coordinate delta;
-  hull::diff(delta, result.vertex_in_Minkowski_diff,
-             existing_vertex.vertex_in_Minkowski_diff);
-  if (is_greater(hull::dot(direction, delta),
-                 hull::HULL_GEOMETRIC_TOLLERANCE)) {
-    hull::invert(direction);
-    mink_diff.getSupport(result, direction);
-  }
-  return result;
-}
-
-std::vector<MinkowskiDiffCoordinate>
-initial_thetraedron(const ShapePair &pair, const gjk::Plex &initial_plex) {
-  struct Visitor {
-    mutable std::vector<MinkowskiDiffCoordinate> result;
-
-    void operator()(const gjk::VertexCase &subject) const {
-      if (hull::squaredDistance(
-              subject.data->vertices[0]->vertex_in_Minkowski_diff,
-              subject.data->vertices[1]->vertex_in_Minkowski_diff) <=
-          GEOMETRIC_TOLLERANCE_SQUARED) {
-        result =
-            std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0]};
-      } else {
-        result = std::vector<MinkowskiDiffCoordinate>{
-            *subject.data->vertices[0], *subject.data->vertices[1]};
-      }
-    }
-
-    void operator()(const gjk::SegmentCase &subject) const {
-      result = std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0],
-                                                    *subject.data->vertices[1],
-                                                    *subject.data->vertices[2]};
-    }
-
-    void operator()(const gjk::FacetCase &subject) const {
-      result = std::vector<MinkowskiDiffCoordinate>{
-          *subject.data->vertices[0], *subject.data->vertices[1],
-          *subject.data->vertices[2], *subject.data->vertices[3]};
-    }
-  } visitor;
-  std::visit(visitor, initial_plex);
-  std::vector<MinkowskiDiffCoordinate> result = std::move(visitor.result);
-
-  MinkowskiDifference mink_diff(pair);
-
-  while (result.size() < 4) {
-    switch (result.size()) {
-    case 1:
-      result.push_back(find_vertex_trying_direction_and_opposite(
-          mink_diff, result.front(), hull::Coordinate{1.f, 0, 0}));
-      break;
-    case 2: {
-      hull::Coordinate delta;
-      hull::diff(delta, result[1].vertex_in_Minkowski_diff,
-                 result[0].vertex_in_Minkowski_diff);
-      auto direction1 = hull::cross(delta, hull::Coordinate{1.f, 0, 0});
-      auto direction2 = hull::cross(delta, hull::Coordinate{0, 1.f, 0});
-      auto &direction = direction1;
-      if (hull::normSquared(direction2) > hull::normSquared(direction1)) {
-        direction = direction2;
-      }
-      result.push_back(find_vertex_trying_direction_and_opposite(
-          mink_diff, result.front(), direction));
-    } break;
-    case 3:
-      hull::Coordinate delta_AB;
-      hull::diff(delta_AB, result[0].vertex_in_Minkowski_diff,
-                 result[1].vertex_in_Minkowski_diff);
-      hull::Coordinate delta_AC;
-      hull::diff(delta_AC, result[0].vertex_in_Minkowski_diff,
-                 result[2].vertex_in_Minkowski_diff);
-      result.push_back(find_vertex_trying_direction_and_opposite(
-          mink_diff, result.front(), hull::cross(delta_AB, delta_AC)));
-      break;
-    }
-  }
-  return result;
-};
-} // namespace
-
-EpaHull::EpaHull(const ShapePair &pair, const gjk::Plex &initial_plex)
-    : mink_diff(pair) {
-  this->vertices = initial_thetraedron(pair, initial_plex);
+EpaHull::EpaHull(const MinkowskiDifference &minkowski_diff,
+                 const std::vector<MinkowskiDiffCoordinate> &initial_vertices)
+    : mink_diff(minkowski_diff) {
+  this->vertices = initial_vertices;
   this->hull =
       std::make_unique<hull::Hull>(vertices[0].vertex_in_Minkowski_diff,
                                    vertices[1].vertex_in_Minkowski_diff,

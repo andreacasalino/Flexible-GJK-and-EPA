@@ -17,7 +17,8 @@ namespace flx::epa {
 
 class EpaHull : public hull::Observer {
 public:
-  EpaHull(const ShapePair &pair, const gjk::Plex &initial_plex);
+  EpaHull(const MinkowskiDifference &minkowski_diff,
+          const std::vector<MinkowskiDiffCoordinate> &initial_vertices);
 
   bool update();
 
