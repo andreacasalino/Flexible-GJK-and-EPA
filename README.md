@@ -59,6 +59,8 @@ if (std::nullopt != result) {
 If we suspect the shapes ARE NOT in collision, we can get the
 closest pair of points on the 2 shapes by calling:
 ```cpp
+std::optional<flx::CoordinatePair> result =
+    flx::get_closest_points(shapeA, shapeB);
 // this will call only initial iterations of the GJK + refining iterations
 // of the GJK, evolving the plex till finding the closest region of the
 // Minkowski difference to the origin. This is actually done only in case
