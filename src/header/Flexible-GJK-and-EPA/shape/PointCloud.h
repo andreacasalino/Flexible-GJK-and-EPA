@@ -35,7 +35,7 @@ public:
     float distance;
     auto it = begin;
     ++it;
-    for (it; it != end; ++it) {
+    for (; it != end; ++it) {
       distance = dot_product(it, direction);
       if (distance > support_point_distance) {
         support_point = it;
