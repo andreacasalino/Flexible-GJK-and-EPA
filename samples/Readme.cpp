@@ -1,12 +1,17 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 
+#include <memory>
+
 int main() {
-  // build the first convex shape ... have a look at the samples to understand
-  // how to do it
-  const flx::shape::ConvexShape &shapeA = ;
+  std::unique_ptr<flx::shape::ConvexShape> shapeA_fake_container;
+  std::unique_ptr<flx::shape::ConvexShape> shapeB_fake_container;
+
+  // build the first convex shape ... have a look at the samples to
+  // understand how to do it
+  const flx::shape::ConvexShape &shapeA = *shapeA_fake_container;
   // build the second convex shape ... have a look at the samples to understand
   // how to do it
-  const flx::shape::ConvexShape &shapeB = ;
+  const flx::shape::ConvexShape &shapeB = *shapeB_fake_container;
 
   {
     // you can simply check that the shapes are in collision or not by calling
