@@ -25,6 +25,7 @@ macro(MAKE_SAMPLE NAME)
     COPY_SCRIPT(${NAME} Visualize)	
 endmacro()
 
+MAKE_SAMPLE(Readme)
 MAKE_SAMPLE(Sample01)
 MAKE_SAMPLE(Sample02)
 MAKE_SAMPLE(Sample03)
