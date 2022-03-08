@@ -23,11 +23,10 @@ ShapePtr makeRandomShape() {
            delta * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
   };
 
-  hull::Coordinate trasl = {randUnif(-5.f, 5.f), randUnif(-5.f, 5.f),
-                            randUnif(-5.f, 5.f)};
-  flx::shape::RotationXYZ rot = {randUnif(-3.14159f, 3.14159f),
-                                 randUnif(-3.14159f, 3.14159f),
-                                 randUnif(-3.14159f, 3.14159f)};
+  hull::Coordinate trasl = {randUnif(-7.f, 7.f), randUnif(-7.f, 7.f),
+                            randUnif(-7.f, 7.f)};
+  flx::shape::RotationXYZ rot = {randUnif(0, 3.14159f), randUnif(0, 3.14159f),
+                                 randUnif(0, 3.14159f)};
 
   ShapePtr shape =
       std::make_unique<Vector3dCloud>(make_random_cloud(rand() % 9 + 5));
@@ -47,18 +46,20 @@ int main() {
 
   logger::Figure logger;
   auto &logger_plot = logger.addSubPlot("Random shapes queries");
-  // check all the possible pair of shapes
+  // compute the closest points in all the possible pair of shapes
   for (std::size_t r = 0; r < shapes.size(); ++r) {
     for (std::size_t c = r + 1; c < shapes.size(); ++c) {
       const auto &shape_A = *shapes[r];
       const auto &shape_B = *shapes[c];
-      auto query_result =
-          flx::get_closest_points_or_penetration_info(shape_A, shape_B);
+      auto query_result = flx::get_closest_points(shape_A, shape_B);
+
       // log results
       logger_plot.addShape(shape_A);
       logger_plot.addShape(shape_B);
-      logger_plot.addLine(query_result.result.point_in_shape_a,
-                          query_result.result.point_in_shape_b);
+      if (query_result != std::nullopt) {
+        logger_plot.addLine(query_result->point_in_shape_a,
+                            query_result->point_in_shape_b);
+      }
     }
   }
   // Result_3

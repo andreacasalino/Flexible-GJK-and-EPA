@@ -180,7 +180,7 @@ void logSingleQuery(const flx::shape::ConvexShape &shape_a,
       hull::invert(delta);
     }
     auto &subplot = fig.addSubPlot("After applying minimal traslation to let "
-                                   "the shapes hav only 1 point in common");
+                                   "the shapes have only 1 common point");
 
     subplot.addShape(shape_a);
 

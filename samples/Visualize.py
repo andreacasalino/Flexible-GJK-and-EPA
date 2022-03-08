@@ -92,8 +92,8 @@ def plot_line(Vertices, ax):
     L_z =[Vertices[0][2], Vertices[1][2]]
     ax.plot( L_x ,L_y , L_z, 'k--', linewidth=0.5)
     ax.plot( L_x ,L_y , L_z, 'go', markersize=10)
-    ax.text(L_x[0] ,L_y[0] , L_z[0], r"$\rho_A$", color='black')
-    ax.text(L_x[1] ,L_y[1] , L_z[1], r"$\rho_B$", color='black')
+    ax.text(L_x[0] ,L_y[0] , L_z[0], r"$\rho_A$", color='black', fontsize = 15)
+    ax.text(L_x[1] ,L_y[1] , L_z[1], r"$\rho_B$", color='black', fontsize = 15)
 
 def plot_result(subplot_json_data, ax):
     for line in subplot_json_data["Lines"]:
@@ -110,12 +110,12 @@ log_name = sys.argv[1]
 data_json = get_json_from_file(log_name)
 
 fig = plt.figure(figsize=plt.figaspect(0.5))
-fig.suptitle(log_name, fontsize=14)
+fig.suptitle(log_name, fontsize=20)
 
 k = 1
 for subplot_json_data in data_json:
     ax = fig.add_subplot(1, len(data_json), k, projection='3d')
-    ax.set_ylabel(subplot_json_data["title"])
+    ax.set_title(subplot_json_data["title"], fontsize=20)
     plot_result(subplot_json_data, ax)
     k = k + 1
 
