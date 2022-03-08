@@ -14,7 +14,8 @@ MinkowskiDiffCoordinate find_vertex_trying_direction_and_opposite(
   hull::Coordinate delta;
   hull::diff(delta, result.vertex_in_Minkowski_diff,
              existing_vertex.vertex_in_Minkowski_diff);
-  if (hull::dot(direction, delta) <= hull::HULL_GEOMETRIC_TOLLERANCE) {
+  if (is_greater(hull::dot(direction, delta),
+                 hull::HULL_GEOMETRIC_TOLLERANCE)) {
     hull::invert(direction);
     mink_diff.getSupport(result, direction);
   }
@@ -107,12 +108,12 @@ bool EpaHull::update() {
   hull::Coordinate improvement =
       delta(vertices.back().vertex_in_Minkowski_diff,
             vertices[closest_facet.vertexA].vertex_in_Minkowski_diff);
-  if (hull::dot(improvement, closest_facet.normal) <=
-      hull::HULL_GEOMETRIC_TOLLERANCE) {
-    return false;
+  if (is_greater(hull::dot(improvement, closest_facet.normal),
+                 hull::HULL_GEOMETRIC_TOLLERANCE)) {
+    hull->update(vertices.back().vertex_in_Minkowski_diff);
+    return true;
   }
-  hull->update(vertices.back().vertex_in_Minkowski_diff);
-  return true;
+  return false;
 };
 
 std::array<const MinkowskiDiffCoordinate *, 3>

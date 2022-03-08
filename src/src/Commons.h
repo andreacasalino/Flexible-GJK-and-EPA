@@ -18,6 +18,9 @@ constexpr float GEOMETRIC_TOLLERANCE_SQUARED =
 constexpr float GEOMETRIC_TOLLERANCE_SQUARED_SQUARED =
     GEOMETRIC_TOLLERANCE_SQUARED * GEOMETRIC_TOLLERANCE_SQUARED;
 
+bool is_greater(const float value, const float threshold);
+bool is_lower(const float value, const float threshold);
+
 // returns (first-second)
 hull::Coordinate delta(const hull::Coordinate &first,
                        const hull::Coordinate &second);

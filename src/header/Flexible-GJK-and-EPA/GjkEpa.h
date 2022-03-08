@@ -13,45 +13,42 @@
 #include <optional>
 
 namespace flx {
-/** @brief Returns true if the passed set of shapes is in collision,
-otherwise
- * returns false. IMPORTANT!!!! this method is not thread safe: use
- different
- * GjkEpa solvers to implement multi-threading strategies
+/** @brief Returns true if the passed pair is in collision,
+ * otherwise false.
  */
 bool is_collision_present(const shape::ConvexShape &shape_a,
                           const shape::ConvexShape &shape_b);
 
-// TODO spiegare
+/** @brief Returns closest pair of points in the pair, if they actually aren't
+ * in collision. Otherwise returns a nullopt.
+ *
+ * This might be used to call the primal and finishing GJK, but avoid the EPA if
+ * a collision exists.
+ */
 std::optional<CoordinatePair>
 get_closest_points(const shape::ConvexShape &shape_a,
                    const shape::ConvexShape &shape_b);
 
-// TODO spiegare
+/** @brief Returns penetration info of the shapes pair, if they actually are
+ * in collision. Otherwise returns a nullopt.
+ *
+ * This might be used to call the primal and EPA, but avoid the finishing GJK if
+ * a collision does not exist.
+ */
 std::optional<CoordinatePair>
 get_penetration_info(const shape::ConvexShape &shape_a,
                      const shape::ConvexShape &shape_b);
 
 /** @brief Perform a complex query on the passed pair of shapes.
- *  The pair of coordinates returned as result has the following meaning:
+ * The pair of coordinates returned as result might have 2 different meanings:
  *
- * 		- if the shapes are not in collision are the closest
- points.
- *        The norm of the difference of these 2 vectors represent the
- distance
- * between the shapes.
+ * - be the closest pair of points in the shapes, when they are not in
+ * collision. Notice that the norm of the difference of the 2 vectors in the
+ * result represents the distance between the shapes.
  *
- * 		- if the shapes are in collision is the penetration
- vector
- *        The norm of the difference of these 2 vectors represent the
- * penetration depth.
- *
- *  @return the meaning of result
- *  @param the pair of shapes involved in the query
- *  @param the result of the query
- * IMPORTANT!!!! this method is not thread safe: use different GjkEpa
- solvers
- * to implement multi-threading strategies
+ * - if the shapes are in collision, the difference of the 2 vectors in the
+ * result represents the penetration vector. Notice that the norm of the
+ * penetration vector represents the penetration depth.
  */
 struct QueryResult {
   bool is_closest_pair_or_penetration_info;

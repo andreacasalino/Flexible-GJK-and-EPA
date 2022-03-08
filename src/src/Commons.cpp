@@ -1,6 +1,13 @@
 #include "Commons.h"
 
 namespace flx {
+bool is_greater(const float value, const float threshold) {
+  return value >= threshold;
+}
+bool is_lower(const float value, const float threshold) {
+  return value <= -threshold;
+}
+
 hull::Coordinate delta(const hull::Coordinate &first,
                        const hull::Coordinate &second) {
   hull::Coordinate delta;
@@ -73,10 +80,14 @@ hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,
   hull::Coordinate Delta1 = delta(P2, P1);
   hull::Coordinate Delta2 = delta(P3, P1);
   hull::Coordinate N = hull::cross(Delta1, Delta2);
+  hull::normalizeInPlace(N);
 
-  hull::diff(Delta1, Pother, P1);
-  if (hull::dot(N, Delta1) > hull::HULL_GEOMETRIC_TOLLERANCE)
-    hull::invert(N);
+  hull::diff(Delta1, P1, Pother);
+  if (is_greater(hull::dot(N, Delta1), hull::HULL_GEOMETRIC_TOLLERANCE)) {
+    return N;
+  }
+
+  hull::invert(N);
   hull::normalizeInPlace(N);
   return N;
 }

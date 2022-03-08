@@ -26,18 +26,21 @@ public:
   void setTraslation(const hull::Coordinate &new_traslation);
   void setRotationXYZ(const RotationXYZ &new_rotation_XYZ);
 
-  /** @brief Get the passed position, as seen from the frame describing the
-   * roto-traslation of this object.
+  /** @brief Transform the point into the global world coordinate system,
+   * assuming that the passed value intially stores the point coordinates as
+   * seen from the frame represented by this transformation
    */
   void transform(hull::Coordinate &point) const;
 
+  /** @brief Representative of a rotation matrix [rows][columns]
+   */
   using Rotation = std::array<std::array<float, 3>, 3>;
 
   const Rotation &getRotation() const { return rotation; };
   const hull::Coordinate &getTraslation() const { return traslation; };
 
 private:
-  Rotation rotation; //[rows][columns]
+  Rotation rotation;
   hull::Coordinate traslation;
 };
 
@@ -52,6 +55,9 @@ public:
 
   const Transformation &getTransformation() const { return transformation; };
   Transformation &getTransformation() { return transformation; };
+  void setTransformation(const Transformation &new_transformation) {
+    transformation = new_transformation;
+  };
 
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const override;

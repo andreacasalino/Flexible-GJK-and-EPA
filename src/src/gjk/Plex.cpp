@@ -90,7 +90,7 @@ bool are_outwardnormal_and_origin_in_same_direction(
     const hull::Coordinate &third, const hull::Coordinate &other,
     hull::Coordinate &normal) {
   normal = computeOutsideNormal(first, second, third, other);
-  return hull::dot(normal, first) <= hull::HULL_GEOMETRIC_TOLLERANCE;
+  return is_lower(hull::dot(normal, first), hull::HULL_GEOMETRIC_TOLLERANCE);
 };
 
 constexpr float MAX_DISTANCE = std::numeric_limits<float>::max();

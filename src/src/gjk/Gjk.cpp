@@ -49,9 +49,9 @@ InitialLoopResult initial_GJK_loop(const ShapePair &pair
   Plex plex = set_to_vertex(plex_data);
   do {
     support_finder.findSupport();
-    if (hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
-                  plex_data->search_direction.get()) <=
-        -hull::HULL_GEOMETRIC_TOLLERANCE) {
+    if (is_lower(hull::dot(plex_data->vertices[0]->vertex_in_Minkowski_diff,
+                           plex_data->search_direction.get()),
+                 hull::HULL_GEOMETRIC_TOLLERANCE)) {
       return InitialLoopResult{false, plex};
     }
 #ifdef GJK_EPA_DIAGNOSTIC
@@ -84,8 +84,8 @@ CoordinatePair finishing_GJK_loop(const ShapePair &pair,
   SupportFinder support_finder(pair, plex_data);
   auto plex = initial_plex;
   hull::Coordinate delta = support_finder.getImprovment();
-  while (dot(plex_data->search_direction.get(), delta) >
-         hull::HULL_GEOMETRIC_TOLLERANCE) {
+  while (is_greater(dot(plex_data->search_direction.get(), delta),
+                    hull::HULL_GEOMETRIC_TOLLERANCE)) {
 #ifdef GJK_EPA_DIAGNOSTIC
     nlohmann::json gjk_iter_json;
 #endif
