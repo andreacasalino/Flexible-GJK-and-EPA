@@ -4,15 +4,14 @@ option(LIB_OPT "Compile shared libraries (ON) or static (OFF)" OFF)
 project(Flexible-GJK-and-EPA)
 
 set(CMAKE_CXX_STANDARD 17)
-
-# set macro-directory and find scripts
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # include cmake custom functions
 set(WITH_SOURCE_TREE ON)
-include(GroupSources)
-include(AutoCollect)
-include(MakeLibrary)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/GroupSources.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AutoCollect.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/MakeLibrary.cmake)
 
 option(GJK_EPA_DIAGNOSTIC "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
 add_subdirectory(src)
