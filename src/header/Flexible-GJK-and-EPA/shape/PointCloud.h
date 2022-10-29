@@ -46,12 +46,12 @@ public:
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const final {
     auto support_point = begin;
-    float support_point_distance = dot_product(support_point, direction);
+    float support_point_distance = support_predicate(support_point, direction);
     float distance;
     auto it = begin;
     ++it;
     for (; it != end; ++it) {
-      distance = dot_product(it, direction);
+      distance = support_predicate(it, direction);
       if (distance > support_point_distance) {
         support_point = it;
         support_point_distance = distance;
