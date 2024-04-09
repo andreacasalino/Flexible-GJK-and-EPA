@@ -8,15 +8,17 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
-#include "Logger.h"
-#include "Utils.h"
+#include <Utils.h>
+
 #include <iostream>
 using namespace std;
 
+using namespace flx::utils;
+
 int main() {
   {
-    // get random shapes with few points, centred around the origin: a collision
-    // detection is expected
+    // get a random point clouds, both centred around the origin: a
+    // collision detection is expected among the 2
     Vector3dCloud shapeA(make_random_cloud(50));
     auto shapeB_points = make_random_cloud(50);
 
@@ -25,27 +27,27 @@ int main() {
       auto query_result =
           flx::get_closest_points_or_penetration_info(shapeA, shapeB);
       // log results
-      logger::logSingleQuery(shapeA, shapeB, query_result, "Result_1_a.json");
+
+      ShapesLog::logSample("Result_1_a", shapeA, shapeB, query_result);
     }
 
     {
       // translate one of the shape away: no collision is expected now
       flx::shape::TransformDecorator shapeB_translated(
           std::make_unique<Vector3dCloud>(shapeB_points),
-          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
+          flx::shape::TransformationBuilder{}.setTraslation(
+              hull::Coordinate{3.f, 3.f, 3.f}));
 
       auto query_result = flx::get_closest_points_or_penetration_info(
           shapeA, shapeB_translated);
       // log results
-      logger::logSingleQuery(shapeA, shapeB_translated, query_result,
-                             "Result_1_b.json");
+      ShapesLog::logSample("Result_1_b", shapeA, shapeB_translated,
+                           query_result);
     }
   }
 
-  // repeat above steps with bigger point clouds
+  // repeat above steps with a point cloud with more points
   {
-    // get random shapes with few points, centred around the origin: a collision
-    // detection is expected
     Vector3dCloud shapeA(make_random_cloud(500));
     auto shapeB_points = make_random_cloud(500);
 
@@ -54,20 +56,21 @@ int main() {
       auto query_result =
           flx::get_closest_points_or_penetration_info(shapeA, shapeB);
       // log results
-      logger::logSingleQuery(shapeA, shapeB, query_result, "Result_1_c.json");
+      ShapesLog::logSample("Result_1_c", shapeA, shapeB, query_result);
     }
 
     {
       // translate one of the shape away: no collision is expected now
       flx::shape::TransformDecorator shapeB_translated(
           std::make_unique<Vector3dCloud>(shapeB_points),
-          flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
+          flx::shape::TransformationBuilder{}.setTraslation(
+              hull::Coordinate{3.f, 3.f, 3.f}));
 
       auto query_result = flx::get_closest_points_or_penetration_info(
           shapeA, shapeB_translated);
       // log results
-      logger::logSingleQuery(shapeA, shapeB_translated, query_result,
-                             "Result_1_d.json");
+      ShapesLog::logSample("Result_1_d", shapeA, shapeB_translated,
+                           query_result);
     }
   }
   return EXIT_SUCCESS;

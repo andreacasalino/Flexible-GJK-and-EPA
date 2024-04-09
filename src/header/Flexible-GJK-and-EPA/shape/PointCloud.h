@@ -9,7 +9,10 @@
 
 #include <Flexible-GJK-and-EPA/Error.h>
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
+
+#include <algorithm>
 #include <functional>
+#include <limits>
 
 namespace flx::shape {
 /**
@@ -18,6 +21,8 @@ namespace flx::shape {
  */
 template <typename PointCollectionIt> class PointCloud : public ConvexShape {
 public:
+  using T = typename PointCollectionIt::value_type;
+
   /**
    * @param begin, the starting iterator of the points collection
    * @param end, the ending iterator of the points collection
@@ -32,43 +37,39 @@ public:
    * this class and should remain valid for the entire life of an instance of
    * this class.
    */
-  template <typename SupportPredicate, typename ToCoordinatePredicate>
+  template <typename SupportPredT, typename ConvertPredT>
   PointCloud(const PointCollectionIt &begin, const PointCollectionIt &end,
-             const SupportPredicate &support_pred,
-             const ToCoordinatePredicate &convert_pred)
-      : begin(begin), end(end), support_predicate(support_pred),
-        convert_predicate(convert_pred) {
-    if (begin == end) {
+             SupportPredT &&support_pred, ConvertPredT &&convert_pred)
+      : begin_(begin), end_(end),
+        support_predicate(std::forward<SupportPredT>(support_pred)),
+        convert_predicate(std::forward<ConvertPredT>(convert_pred)) {
+    if (begin_ == end_) {
       throw Error{"Empty points collection"};
     }
   };
 
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const final {
-    auto support_point = begin;
-    float support_point_distance = support_predicate(support_point, direction);
-    float distance;
-    auto it = begin;
-    ++it;
-    for (; it != end; ++it) {
-      distance = support_predicate(it, direction);
-      if (distance > support_point_distance) {
-        support_point = it;
-        support_point_distance = distance;
+    float distance_max = std::numeric_limits<float>::lowest();
+    const T *best = nullptr;
+    std::for_each(begin_, end_, [&](const T &candidate) {
+      float d = support_predicate(candidate, direction);
+      if (distance_max < d) {
+        distance_max = d;
+        best = &candidate;
       }
-    }
-    support = convert_predicate(support_point);
+    });
+    support = convert_predicate(*best);
   };
 
+  auto begin() const { return begin_; }
+  auto end() const { return end_; }
+
 private:
-  const PointCollectionIt begin;
-  const PointCollectionIt end;
+  PointCollectionIt begin_;
+  PointCollectionIt end_;
 
-  const std::function<float(const PointCollectionIt &,
-                            const hull::Coordinate &)>
-      support_predicate;
-
-  const std::function<hull::Coordinate(const PointCollectionIt &)>
-      convert_predicate;
+  std::function<float(const T &, const hull::Coordinate &)> support_predicate;
+  std::function<hull::Coordinate(const T &)> convert_predicate;
 };
 } // namespace flx::shape

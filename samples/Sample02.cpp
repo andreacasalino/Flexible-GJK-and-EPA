@@ -8,25 +8,29 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
-#include "Logger.h"
-#include "Utils.h"
+#include <Utils.h>
+
 #include <iostream>
 using namespace std;
 
-flx::shape::Transformation getRandomTransformation(const float &min_val,
-                                                   const float &max_val) {
+using namespace flx::utils;
+
+flx::shape::Transformation getRandomTransformation(float min_val,
+                                                   float max_val) {
   auto randUnif = [](const float &min_val, const float &max_val) {
     float delta = max_val - min_val;
     return min_val +
            delta * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
   };
 
-  return flx::shape::Transformation{
-      hull::Coordinate{randUnif(min_val, max_val), randUnif(min_val, max_val),
-                       randUnif(min_val, max_val)},
-      flx::shape::RotationXYZ{randUnif(0.f, 0.5f * 3.14159f),
-                              randUnif(0.f, 0.5f * 3.14159f),
-                              randUnif(0.f, 0.5f * 3.14159f)}};
+  flx::shape::Transformation res;
+  res.setTraslation(hull::Coordinate{randUnif(min_val, max_val),
+                                     randUnif(min_val, max_val),
+                                     randUnif(min_val, max_val)});
+  res.setRotationXYZ(flx::shape::RotationXYZ{randUnif(0.f, 0.5f * 3.14159f),
+                                             randUnif(0.f, 0.5f * 3.14159f),
+                                             randUnif(0.f, 0.5f * 3.14159f)});
+  return res;
 }
 
 std::shared_ptr<std::vector<Vector3d>> getPoligon(const std::size_t N_edges) {
@@ -57,7 +61,7 @@ int main() {
     auto query_result =
         flx::get_closest_points_or_penetration_info(shapeA, shapeB);
     // log results
-    logger::logSingleQuery(shapeA, shapeB, query_result, "Result_2_a.json");
+    ShapesLog::logSample("Result_2_a", shapeA, shapeB, query_result);
   }
 
   // get the closest points
@@ -73,8 +77,8 @@ int main() {
     auto query_result = flx::get_closest_points_or_penetration_info(
         shapeA_translated, shapeB_translated);
     // log results
-    logger::logSingleQuery(shapeA_translated, shapeB_translated, query_result,
-                           "Result_2_b.json");
+    ShapesLog::logSample("Result_2_b", shapeA_translated, shapeB_translated,
+                         query_result);
   }
 
   return EXIT_SUCCESS;

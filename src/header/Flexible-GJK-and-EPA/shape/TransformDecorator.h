@@ -8,22 +8,20 @@
 #pragma once
 
 #include <Flexible-GJK-and-EPA/shape/ConvexDecorator.h>
+
 #include <array>
+#include <optional>
 
 namespace flx::shape {
 using RotationXYZ = std::array<float, 3>;
 
 class Transformation {
 public:
-  Transformation();
+  Transformation() = default;
 
-  Transformation(const hull::Coordinate &traslation);
-  Transformation(const RotationXYZ &rotation_XYZ);
-
-  Transformation(const hull::Coordinate &traslation,
-                 const RotationXYZ &rotation_XYZ);
-
-  void setTraslation(const hull::Coordinate &new_traslation);
+  void setTraslation(const hull::Coordinate &new_traslation) {
+    traslation.emplace(new_traslation);
+  }
   void setRotationXYZ(const RotationXYZ &new_rotation_XYZ);
 
   /** @brief Transform the point into the global world coordinate system,
@@ -34,14 +32,35 @@ public:
 
   /** @brief Representative of a rotation matrix [rows][columns]
    */
-  using Rotation = std::array<std::array<float, 3>, 3>;
+  using RotationMatrix = std::array<std::array<float, 3>, 3>;
 
-  const Rotation &getRotation() const { return rotation; };
-  const hull::Coordinate &getTraslation() const { return traslation; };
+  const auto &getRotation() const { return rotation; };
+  const auto &getTraslation() const { return traslation; };
 
 private:
-  Rotation rotation;
-  hull::Coordinate traslation;
+  std::optional<RotationMatrix> rotation;
+  std::optional<hull::Coordinate> traslation;
+};
+
+struct TransformationBuilder {
+  TransformationBuilder() = default;
+
+  TransformationBuilder &setTraslation(const hull::Coordinate &new_traslation) {
+    traslation = new_traslation;
+    return *this;
+  }
+  TransformationBuilder &setRotationXYZ(const RotationXYZ &new_rotation_XYZ) {
+    rotation = new_rotation_XYZ;
+    return *this;
+  }
+
+  Transformation make() const;
+
+  operator Transformation() const { return make(); }
+
+private:
+  std::optional<RotationXYZ> rotation;
+  std::optional<hull::Coordinate> traslation;
 };
 
 /** @brief An object representing a roto-traslated convex shape.
@@ -55,9 +74,6 @@ public:
 
   const Transformation &getTransformation() const { return transformation; };
   Transformation &getTransformation() { return transformation; };
-  void setTransformation(const Transformation &new_transformation) {
-    transformation = new_transformation;
-  };
 
   void getSupport(hull::Coordinate &support,
                   const hull::Coordinate &direction) const override;

@@ -1,13 +1,6 @@
-#include "Commons.h"
+#include <Flexible-GJK-and-EPA/Commons.h>
 
 namespace flx {
-bool is_greater(const float value, const float threshold) {
-  return value >= threshold;
-}
-bool is_lower(const float value, const float threshold) {
-  return value <= -threshold;
-}
-
 hull::Coordinate delta(const hull::Coordinate &first,
                        const hull::Coordinate &second) {
   hull::Coordinate delta;
@@ -23,10 +16,12 @@ ClosestResult<2> getClosestToOriginInSegment(const hull::Coordinate &A,
   if (miximg_coeff[1] <= 0.f) {
     miximg_coeff[0] = 1.f;
     miximg_coeff[1] = 0.f;
-    return ClosestResult<2>{vertex_A, std::move(miximg_coeff)};
+    return ClosestResult<2>{ClosestRegionToOrigin::vertex_A,
+                            std::move(miximg_coeff)};
   }
   miximg_coeff[0] = 1.f - miximg_coeff[1];
-  return ClosestResult<2>{edge_AB, std::move(miximg_coeff)};
+  return ClosestResult<2>{ClosestRegionToOrigin::edge_AB,
+                          std::move(miximg_coeff)};
 }
 
 ClosestResult<3> getClosestToOriginInTriangle(const hull::Coordinate &A,
@@ -53,7 +48,8 @@ ClosestResult<3> getClosestToOriginInTriangle(const hull::Coordinate &A,
 
   if (temp[0] && temp[1] && temp[2]) {
     miximg_coeff[0] = 1.f - miximg_coeff[1] - miximg_coeff[2];
-    return ClosestResult<3>{face_ABC, std::move(miximg_coeff)};
+    return ClosestResult<3>{ClosestRegionToOrigin::face_ABC,
+                            std::move(miximg_coeff)};
   }
   auto [closest_AB, miximg_coeff_AB] = getClosestToOriginInSegment(A, B);
   hull::Coordinate V_AB = mix2(A, B, miximg_coeff_AB);
@@ -66,8 +62,8 @@ ClosestResult<3> getClosestToOriginInTriangle(const hull::Coordinate &A,
         closest_AB,
         std::array<float, 3>{miximg_coeff_AB[0], miximg_coeff_AB[1], 0}};
 
-  if (closest_AC == edge_AB)
-    closest_AC = edge_AC;
+  if (closest_AC == ClosestRegionToOrigin::edge_AB)
+    closest_AC = ClosestRegionToOrigin::edge_AC;
   return ClosestResult<3>{
       closest_AC,
       std::array<float, 3>{miximg_coeff_AC[0], 0, miximg_coeff_AC[1]}};
@@ -94,7 +90,7 @@ hull::Coordinate computeOutsideNormal(const hull::Coordinate &P1,
 
 namespace {
 void add_scaled(hull::Coordinate &result, const hull::Coordinate &to_add,
-                const float scale) {
+                float scale) {
   result.x += scale * to_add.x;
   result.y += scale * to_add.y;
   result.z += scale * to_add.z;

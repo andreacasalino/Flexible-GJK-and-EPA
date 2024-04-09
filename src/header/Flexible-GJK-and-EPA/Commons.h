@@ -10,6 +10,7 @@
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 #include <Hull/Coordinate.h>
 #include <Hull/Definitions.h>
+
 #include <array>
 
 namespace flx {
@@ -18,14 +19,18 @@ constexpr float GEOMETRIC_TOLLERANCE_SQUARED =
 constexpr float GEOMETRIC_TOLLERANCE_SQUARED_SQUARED =
     GEOMETRIC_TOLLERANCE_SQUARED * GEOMETRIC_TOLLERANCE_SQUARED;
 
-bool is_greater(const float value, const float threshold);
-bool is_lower(const float value, const float threshold);
+inline bool is_greater(float value, float threshold) {
+  return value >= threshold;
+}
+inline bool is_lower(float value, float threshold) {
+  return value <= -threshold;
+}
 
 // returns (first-second)
 hull::Coordinate delta(const hull::Coordinate &first,
                        const hull::Coordinate &second);
 
-enum ClosestRegionToOrigin { vertex_A, edge_AB, edge_AC, face_ABC };
+enum class ClosestRegionToOrigin { vertex_A, edge_AB, edge_AC, face_ABC };
 
 template <std::size_t N> struct ClosestResult {
   ClosestRegionToOrigin region;

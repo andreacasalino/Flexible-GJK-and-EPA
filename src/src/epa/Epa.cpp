@@ -6,7 +6,8 @@
  **/
 
 #include "Epa.h"
-#include "EpaHull.h"
+#include <Flexible-GJK-and-EPA/Diagnostic.h>
+#include <Flexible-GJK-and-EPA/epa/EpaHull.h>
 
 #include <optional>
 
@@ -107,16 +108,15 @@ closest_in_boundaries(const MinkowskiDifference &mink_diff,
                       const std::vector<MinkowskiDiffCoordinate> &initial_points
 #ifdef GJK_EPA_DIAGNOSTIC
                       ,
-                      diagnostic::Diagnostic &log
+                      Observer *obsv
 #endif
 ) {
   EpaHull epa_hull(mink_diff, initial_points);
-#ifdef GJK_EPA_DIAGNOSTIC
-  log.addEpaIter(epa_hull.toJson());
-#endif
   while (epa_hull.update()) {
 #ifdef GJK_EPA_DIAGNOSTIC
-    log.addEpaIter(epa_hull.toJson());
+    if (obsv) {
+      obsv->onUpdate(EpaIteration{epa_hull});
+    }
 #endif
   }
   auto closest_facet = epa_hull.getClosestFacetToOrigin();
@@ -183,43 +183,33 @@ void extend_initial_points(
 }
 } // namespace
 
-CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex
+CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex) {
 #ifdef GJK_EPA_DIAGNOSTIC
-                   ,
-                   diagnostic::Diagnostic &log
+  if (initial_plex.obsv) {
+    initial_plex.obsv->onEvent(Observer::Event::EpaStarted);
+  }
 #endif
-) {
-  struct Visitor {
-    mutable std::vector<MinkowskiDiffCoordinate> result;
 
-    void operator()(const gjk::VertexCase &subject) const {
-      if (hull::squaredDistance(
-              subject.data->vertices[0]->vertex_in_Minkowski_diff,
-              subject.data->vertices[1]->vertex_in_Minkowski_diff) <=
-          GEOMETRIC_TOLLERANCE_SQUARED) {
-        result =
-            std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0]};
-      } else {
-        result = std::vector<MinkowskiDiffCoordinate>{
-            *subject.data->vertices[0], *subject.data->vertices[1]};
-      }
-    }
-
-    void operator()(const gjk::SegmentCase &subject) const {
-      result = std::vector<MinkowskiDiffCoordinate>{*subject.data->vertices[0],
-                                                    *subject.data->vertices[1],
-                                                    *subject.data->vertices[2]};
-    }
-
-    void operator()(const gjk::FacetCase &subject) const {
-      result = std::vector<MinkowskiDiffCoordinate>{
-          *subject.data->vertices[0], *subject.data->vertices[1],
-          *subject.data->vertices[2], *subject.data->vertices[3]};
-    }
-  } visitor;
-  std::visit(visitor, initial_plex);
-  std::vector<MinkowskiDiffCoordinate> initial_points =
-      std::move(visitor.result);
+  std::vector<MinkowskiDiffCoordinate> initial_points;
+  switch (initial_plex.size) {
+  case 0: {
+    initial_points.emplace_back(*initial_plex.vertices[0]);
+  } break;
+  case 1: {
+    initial_points = std::vector<MinkowskiDiffCoordinate>{
+        *initial_plex.vertices[0], *initial_plex.vertices[1]};
+  } break;
+  case 2: {
+    initial_points = std::vector<MinkowskiDiffCoordinate>{
+        *initial_plex.vertices[0], *initial_plex.vertices[1],
+        *initial_plex.vertices[2]};
+  } break;
+  case 3: {
+    initial_points = std::vector<MinkowskiDiffCoordinate>{
+        *initial_plex.vertices[0], *initial_plex.vertices[1],
+        *initial_plex.vertices[2], *initial_plex.vertices[3]};
+  } break;
+  }
 
   MinkowskiDifference mink_diff(pair);
   extend_initial_points(mink_diff, initial_points);
@@ -235,6 +225,11 @@ CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex
   default:
     break;
   }
-  return closest_in_boundaries(mink_diff, initial_points);
+  return closest_in_boundaries(mink_diff, initial_points
+#ifdef GJK_EPA_DIAGNOSTIC
+                               ,
+                               initial_plex.obsv
+#endif
+  );
 }
 } // namespace flx::epa

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
+#include <Flexible-GJK-and-EPA/Diagnostic.h>
 #include <Flexible-GJK-and-EPA/shape/ConvexShape.h>
 
 #include <optional>
@@ -17,7 +18,12 @@ namespace flx {
  * otherwise false.
  */
 bool is_collision_present(const shape::ConvexShape &shape_a,
-                          const shape::ConvexShape &shape_b);
+                          const shape::ConvexShape &shape_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                          ,
+                          Observer *obsv = nullptr
+#endif
+);
 
 /** @brief Returns closest pair of points in the pair, if they actually aren't
  * in collision. Otherwise returns a nullopt.
@@ -27,7 +33,12 @@ bool is_collision_present(const shape::ConvexShape &shape_a,
  */
 std::optional<CoordinatePair>
 get_closest_points(const shape::ConvexShape &shape_a,
-                   const shape::ConvexShape &shape_b);
+                   const shape::ConvexShape &shape_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                   ,
+                   Observer *obsv = nullptr
+#endif
+);
 
 /** @brief Returns penetration info of the shapes pair, if they actually are
  * in collision. Otherwise returns a nullopt.
@@ -37,7 +48,12 @@ get_closest_points(const shape::ConvexShape &shape_a,
  */
 std::optional<CoordinatePair>
 get_penetration_info(const shape::ConvexShape &shape_a,
-                     const shape::ConvexShape &shape_b);
+                     const shape::ConvexShape &shape_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                     ,
+                     Observer *obsv = nullptr
+#endif
+);
 
 /** @brief Perform a complex query on the passed pair of shapes.
  * The pair of coordinates returned as result might have 2 different meanings:
@@ -56,5 +72,10 @@ struct QueryResult {
 };
 QueryResult
 get_closest_points_or_penetration_info(const shape::ConvexShape &shape_a,
-                                       const shape::ConvexShape &shape_b);
+                                       const shape::ConvexShape &shape_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                       ,
+                                       Observer *obsv = nullptr
+#endif
+);
 } // namespace flx
