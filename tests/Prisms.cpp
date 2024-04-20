@@ -1,8 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Utils.h"
+#include "UtilsMore.h"
 
-TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
+using namespace flx::utils;
+
+TEST_CASE("Polygons vertex-vertex proximity", "[prisms][polygons]") {
   SECTION("Far away") {
     auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
@@ -10,7 +12,12 @@ TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
     auto polygon_b = make_prism(
         std::vector<Point2D>{{2.f, 0.f}, {3.f, 1.f}, {3.f, -1.f}}, 1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-vertex-vertex-far-away"
+#endif
+    );
 
     CHECK(query.is_closest_pair_or_penetration_info);
     CHECK(almost_equal2(query.result.point_in_shape_a, 0, 0));
@@ -24,14 +31,19 @@ TEST_CASE("Polygons, vertex-vertex proximity", "[prisms][polygons]") {
     auto polygon_b = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {3.f, 1.f}, {3.f, -1.f}}, 1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-vertex-vertex-in-touch"
+#endif
+    );
 
     CHECK(almost_equal2(query.result.point_in_shape_a, 0, 0));
     CHECK(almost_equal2(query.result.point_in_shape_b, 0, 0));
   }
 }
 
-TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
+TEST_CASE("Polygons vertex-edge proximity", "[prisms][polygons]") {
   SECTION("Far away") {
     auto polygon_a = make_prism(
         std::vector<Point2D>{{0.f, 0.f}, {-1.f, 1.f}, {-1.f, -1.f}}, 1.f);
@@ -39,7 +51,12 @@ TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
     auto polygon_b = make_prism(
         std::vector<Point2D>{{2.f, 1.f}, {2.f, -1.f}, {3.f, 0.f}}, 1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-vertex-edge-far-away"
+#endif
+    );
 
     CHECK(query.is_closest_pair_or_penetration_info);
     CHECK(almost_equal2(query.result.point_in_shape_a, 0, 0));
@@ -53,14 +70,19 @@ TEST_CASE("Polygons, vertex-edge proximity", "[prisms][polygons]") {
     auto polygon_b =
         make_prism(std::vector<Point2D>{{0, 1.f}, {0, -1.f}, {3.f, 0.f}}, 1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-vertex-edge-in-touch"
+#endif
+    );
 
     CHECK(almost_equal2(query.result.point_in_shape_a, 0, 0));
     CHECK(almost_equal2(query.result.point_in_shape_b, 0, 0));
   }
 }
 
-TEST_CASE("Polygons, edge-edge proximity", "[prisms][polygons]") {
+TEST_CASE("Polygons edge-edge proximity", "[prisms][polygons]") {
   SECTION("Far away") {
     auto polygon_a = make_prism(
         std::vector<Point2D>{
@@ -71,7 +93,12 @@ TEST_CASE("Polygons, edge-edge proximity", "[prisms][polygons]") {
         std::vector<Point2D>{{2.f, 1.f}, {2.f, -1.f}, {3.f, 1.f}, {3.f, -1.f}},
         1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-edge-edge-far-away"
+#endif
+    );
 
     CHECK(query.is_closest_pair_or_penetration_info);
     CHECK(almost_equal(query.result.point_in_shape_a.x, 0));
@@ -89,7 +116,12 @@ TEST_CASE("Polygons, edge-edge proximity", "[prisms][polygons]") {
             {-0.5f, 1.f}, {-0.5f, -1.f}, {1.f, 1.f}, {1.f, -1.f}},
         1.f);
 
-    auto query = make_test_query(polygon_a, polygon_b);
+    auto query = make_test_query(polygon_a, polygon_b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 "Polygons-edge-edge-in-touch"
+#endif
+    );
 
     CHECK_FALSE(query.is_closest_pair_or_penetration_info);
     hull::Coordinate penetration_vector;

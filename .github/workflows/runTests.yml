@@ -1,3 +1,5 @@
+name: Unit Tests
+
 on:
   push:
     branches:
@@ -14,22 +16,31 @@ jobs:
         include:
             - name: ubuntu-gcc
               os: ubuntu-latest
-              compiler_opt: "-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G \"Unix Makefiles\""
+              compiler_opt: "-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+              build_system: '-G Ninja'
             - name: ubuntu-clang
               os: ubuntu-latest
-              compiler_opt: "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G \"Unix Makefiles\""
+              compiler_opt: "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
+              build_system: '-G Ninja'
             - name: windows-VS
               os: windows-latest
               compiler_opt: ""
+              build_system: ''
 
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2.0.0
-    - name: Checkout submodules
-      run:  git submodule update --init --recursive
+    - name: show HEAD
+      run: git rev-parse HEAD
+    - name: Install openMp
+      if: matrix.name == 'ubuntu-clang'
+      run: sudo apt-get update; sudo apt-get install -y libomp5 libomp-dev
+    - name: Install Ninja
+      if: matrix.build_system == '-G Ninja'
+      uses: seanmiddleditch/gha-setup-ninja@master
     - name: CMake configure
-      run:  cmake -B./build -DCMAKE_INSTALL_PREFIX:STRING=./artifacts/ -DBUILD_GJK_EPA_TESTS=ON -DCMAKE_CONFIGURATION_TYPES="Release" -DCMAKE_BUILD_TYPE:STRING=Release ${{ matrix.compiler_opt }}     
+      run:  cmake -B./build -DCMAKE_INSTALL_PREFIX:STRING=./artifacts/ -DBUILD_GJK_EPA_SAMPLES=OFF -DBUILD_GJK_EPA_TESTS=ON -DCMAKE_CONFIGURATION_TYPES="Release" -DCMAKE_BUILD_TYPE:STRING=Release ${{ matrix.build_system }} ${{ matrix.compiler_opt }}
     - name: Build
       run:  cmake --build ./build --config Release
     - name: Install

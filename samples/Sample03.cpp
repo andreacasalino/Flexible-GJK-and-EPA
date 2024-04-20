@@ -8,10 +8,12 @@
 #include <Flexible-GJK-and-EPA/GjkEpa.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
-#include "Logger.h"
-#include "Utils.h"
+#include <Utils.h>
+
 #include <iostream>
 using namespace std;
+
+using namespace flx::utils;
 
 using ShapePtr = std::unique_ptr<flx::shape::ConvexShape>;
 
@@ -31,39 +33,36 @@ ShapePtr makeRandomShape() {
   ShapePtr shape =
       std::make_unique<Vector3dCloud>(make_random_cloud(rand() % 9 + 5));
   return std::make_unique<flx::shape::TransformDecorator>(
-      std::move(shape), flx::shape::Transformation{trasl, rot});
+      std::move(shape),
+      flx::shape::TransformationBuilder{}.setTraslation(trasl).setRotationXYZ(
+          rot));
 }
 
 // see Sample_01 and Sample_02 before this one
 int main() {
+  ShapesLog logger("Result_3");
+
   std::size_t N_shapes = 5;
   vector<ShapePtr> shapes;
   shapes.reserve(N_shapes);
   // get some random shapes in space
   for (std::size_t k = 0; k < N_shapes; ++k) {
-    shapes.emplace_back(makeRandomShape());
+    auto &added = shapes.emplace_back(makeRandomShape());
+    logger.add(*added);
   }
 
-  logger::Figure logger;
-  auto &logger_plot = logger.addSubPlot("Random shapes queries");
   // compute the closest points in all the possible pair of shapes
   for (std::size_t r = 0; r < shapes.size(); ++r) {
     for (std::size_t c = r + 1; c < shapes.size(); ++c) {
       const auto &shape_A = *shapes[r];
       const auto &shape_B = *shapes[c];
       auto query_result = flx::get_closest_points(shape_A, shape_B);
-
       // log results
-      logger_plot.addShape(shape_A);
-      logger_plot.addShape(shape_B);
       if (query_result != std::nullopt) {
-        logger_plot.addLine(query_result->point_in_shape_a,
-                            query_result->point_in_shape_b);
+        logger.add(query_result.value(), false);
       }
     }
   }
-  // Result_3
-  logger.log("Result_3.json");
 
   return EXIT_SUCCESS;
 }

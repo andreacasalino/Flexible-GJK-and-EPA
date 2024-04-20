@@ -11,10 +11,5 @@
 #include <Flexible-GJK-and-EPA/CoordinatePair.h>
 
 namespace flx::epa {
-CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex
-#ifdef GJK_EPA_DIAGNOSTIC
-                   ,
-                   diagnostic::Diagnostic &log
-#endif
-);
+CoordinatePair EPA(const ShapePair &pair, const gjk::Plex &initial_plex);
 } // namespace flx::epa

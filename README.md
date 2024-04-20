@@ -7,10 +7,10 @@ They are used a lot in the domain of computer graphics, to:
  
 ![Sample](sample.png)
 
-With respect to other similar solvers, the one proposed allows to easily:
+With respect to similar implementations, this one allows to easily:
 
- * account for roto-traslation for the shapes, without explicitly computes the vertices coordinates after the roto-traslation
- * possibility to use a template container to describe your the convex shape, using the 3D coordinate representation
+ * account for roto-traslation, without explicitly computes the vertices coordinates after the roto-traslation
+ * use a template container to describe your the convex shape, using the 3D coordinate representation
    of your favourite algebra library ([Eigen](https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html), etc...)
  
 Before diving into the code, it is strongly recomended to have a look at the [documentation](./doc/GJK_EPA.pdf).
@@ -102,9 +102,9 @@ if (result_meaning) {
 
 ## SAMPLES
 
-The relevant code is contained in ./src, while ./Samples contains samples showing how to use this library.
-In particular, after running the samples, some .json files will be produced storing the results.
-A python script can be later used to visualize the results.
+The relevant code is contained in the [src](./src) folder, while [samples](./samples) contains examples showing how to use this library.
+In particular, after running each sample, some .json files will be produced storing the results.
+A python script can be later used to visualize the results. The syntax to use will appear in the console after computing each individual result.
 
 ## CMAKE SUPPORT
 

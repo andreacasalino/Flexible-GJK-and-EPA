@@ -3,11 +3,13 @@
 
 #include <math.h>
 
-#include "Utils.h"
+#include "UtilsMore.h"
 
-float to_rad(const float angle) { return 3.14159f * angle / 180.f; }
+using namespace flx::utils;
 
-std::vector<float> make_angles(const std::size_t size) {
+float to_rad(float angle) { return 3.14159f * angle / 180.f; }
+
+std::vector<float> make_angles(std::size_t size) {
   std::vector<float> angles;
   angles.reserve(size);
   float delta_angle = to_rad(360.f) / static_cast<float>(size);
@@ -19,11 +21,11 @@ std::vector<float> make_angles(const std::size_t size) {
   return angles;
 }
 
-std::vector<Point2D> make_polygon(const std::size_t size) {
+std::vector<Point2D> make_polygon(std::size_t size) {
   std::vector<Point2D> vertices;
   vertices.reserve(size);
   for (const auto &angle : make_angles(size)) {
-    vertices.push_back(Point2D{cosf(angle), sinf(angle)});
+    vertices.emplace_back(Point2D{cosf(angle), sinf(angle)});
   }
   return vertices;
 }
@@ -52,9 +54,9 @@ TEST_CASE("Transform decorator", "[support]") {
   float delta_y = -0.5f;
   float delta_rot_z = to_rad(25);
 
-  flx::shape::Transformation transform(
-      hull::Coordinate{delta_x, delta_y, 0},
-      flx::shape::RotationXYZ{0, 0, delta_rot_z});
+  flx::shape::Transformation transform;
+  transform.setTraslation(hull::Coordinate{delta_x, delta_y, 0});
+  transform.setRotationXYZ(flx::shape::RotationXYZ{0, 0, delta_rot_z});
 
   auto points = make_prism(make_polygon(polygon_size), 0.5f);
   flx::shape::TransformDecorator polygon_transformed(
@@ -62,8 +64,8 @@ TEST_CASE("Transform decorator", "[support]") {
 
   hull::Coordinate support;
   for (const auto &angle : make_angles(polygon_size)) {
-    const float angle_cos = cosf(angle + delta_rot_z);
-    const float angle_sin = sinf(angle + delta_rot_z);
+    float angle_cos = cosf(angle + delta_rot_z);
+    float angle_sin = sinf(angle + delta_rot_z);
     polygon_transformed.getSupport(support,
                                    hull::Coordinate{angle_cos, angle_sin, 0});
     CHECK(almost_equal(angle_cos + delta_x, support.x));

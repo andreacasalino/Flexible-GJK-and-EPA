@@ -12,10 +12,10 @@
 namespace flx::shape {
 class Sphere : public ConvexShape {
 public:
-  Sphere(const float &ray);
-  Sphere(const float &ray, const hull::Coordinate &center);
+  Sphere(float ray);
+  Sphere(float ray, const hull::Coordinate &center);
 
-  const float &getRay() const { return this->ray; };
+  float getRay() const { return this->ray; };
   const hull::Coordinate &getCenter() const { return this->center; };
 
   void getSupport(hull::Coordinate &support,

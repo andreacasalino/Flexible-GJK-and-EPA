@@ -9,10 +9,12 @@
 #include <Flexible-GJK-and-EPA/shape/RoundDecorator.h>
 #include <Flexible-GJK-and-EPA/shape/TransformDecorator.h>
 
-#include "Logger.h"
-#include "Utils.h"
+#include <Utils.h>
+
 #include <iostream>
 using namespace std;
+
+using namespace flx::utils;
 
 int main() {
   {
@@ -29,15 +31,16 @@ int main() {
     std::unique_ptr<flx::shape::ConvexShape> shapeB =
         std::make_unique<flx::shape::RoundDecorator>(
             std::make_unique<Vector3dCloud>(shapeB_points), ray);
+
     // traslateaway the second shape
     shapeB = std::make_unique<flx::shape::TransformDecorator>(
-        std::move(shapeB),
-        flx::shape::Transformation{hull::Coordinate{3.f, 3.f, 3.f}});
+        std::move(shapeB), flx::shape::TransformationBuilder{}.setTraslation(
+                               hull::Coordinate{3.f, 3.f, 3.f}));
 
     auto query_result =
         flx::get_closest_points_or_penetration_info(*shapeA, *shapeB);
     // log results
-    logger::logSingleQuery(*shapeA, *shapeB, query_result, "Result_4.json");
+    ShapesLog::logSample("Result_4", *shapeA, *shapeB, query_result);
   }
   return EXIT_SUCCESS;
 }

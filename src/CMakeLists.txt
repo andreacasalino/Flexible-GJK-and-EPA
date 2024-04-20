@@ -1,35 +1,32 @@
-message(STATUS "fetching Hull")
-include(FetchContent)
-FetchContent_Declare(
-  hull
-  GIT_REPOSITORY https://github.com/andreacasalino/Hull.git
-  GIT_TAG        90f09a1baefcfe02ef8d5a3cb44a42536efe5060
+FetchDep(https://github.com/andreacasalino/Hull.git bed032cbfb6c9f36ff581ca132803a250809d37e "Fetching Hull" hull)
+
+set(LIBRARY_NAME GJK-EPA)
+
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+if(LIB_OPT)
+	if (WIN32)
+		set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+	endif ()	
+	
+	add_library(${LIBRARY_NAME} SHARED ${SOURCES})
+else()
+	add_library(${LIBRARY_NAME} STATIC ${SOURCES})
+endif()
+
+target_include_directories(${LIBRARY_NAME} PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/header
 )
-FetchContent_MakeAvailable(hull)
 
-set(PROJECT_SHORTNAME GJK-EPA)
-
-MakeLibrary(${PROJECT_SHORTNAME} header)
-
-target_link_libraries(${PROJECT_SHORTNAME} PUBLIC
-Hull
+target_link_libraries(${LIBRARY_NAME} PUBLIC
+  Hull
 )
 
 if(GJK_EPA_DIAGNOSTIC)
-  message(STATUS "fetching nlohmann json for diagnostics")
-  include(FetchContent)
-  FetchContent_Declare(
-    nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG        7194245a314d142a5560f6906a87f7c67ebbcf2e
-  )
-  FetchContent_MakeAvailable(nlohmann_json)
-
-  target_compile_definitions(${PROJECT_SHORTNAME} PRIVATE 
-    GJK_EPA_DIAGNOSTIC
-  )
-
-  target_link_libraries(${PROJECT_SHORTNAME} PRIVATE 
-    nlohmann_json::nlohmann_json
-  )
+target_compile_definitions(${LIBRARY_NAME} PUBLIC 
+  GJK_EPA_DIAGNOSTIC
+)
 endif()
+
+install(TARGETS ${LIBRARY_NAME})
+install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_DIR}/ DESTINATION include/${LIBRARY_NAME} FILES_MATCHING PATTERN "*.h*")

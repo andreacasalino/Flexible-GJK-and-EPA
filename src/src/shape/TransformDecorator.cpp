@@ -11,26 +11,9 @@
 
 namespace flx::shape {
 namespace {
-Transformation::Rotation get_identity_matrix() {
-  Transformation::Rotation rotation;
-
-  rotation[0][0] = 1.f;
-  rotation[1][0] = 0.f;
-  rotation[2][0] = 0.f;
-
-  rotation[0][1] = 0.f;
-  rotation[1][1] = 1.f;
-  rotation[2][1] = 0.f;
-
-  rotation[0][2] = 0.f;
-  rotation[1][2] = 0.f;
-  rotation[2][2] = 1.f;
-
-  return rotation;
-}
-
-Transformation::Rotation get_rotation_matrix(const RotationXYZ &rotation_XYZ) {
-  Transformation::Rotation rotation;
+Transformation::RotationMatrix
+get_rotation_matrix(const RotationXYZ &rotation_XYZ) {
+  Transformation::RotationMatrix rotation;
 
   float C1 = cosf(rotation_XYZ[0]), S1 = sinf(rotation_XYZ[0]);
   float C2 = cosf(rotation_XYZ[1]), S2 = sinf(rotation_XYZ[1]);
@@ -53,28 +36,38 @@ Transformation::Rotation get_rotation_matrix(const RotationXYZ &rotation_XYZ) {
 } // namespace
 
 void Transformation::transform(hull::Coordinate &point) const {
-  hull::Coordinate result;
-  result.x = this->rotation[0][0] * point.x + this->rotation[0][1] * point.y +
-             this->rotation[0][2] * point.z + this->traslation.x;
-  result.y = this->rotation[1][0] * point.x + this->rotation[1][1] * point.y +
-             this->rotation[1][2] * point.z + this->traslation.y;
-  result.z = this->rotation[2][0] * point.x + this->rotation[2][1] * point.y +
-             this->rotation[2][2] * point.z + this->traslation.z;
-  point = result;
+  if (rotation.has_value()) {
+    const auto &rot = rotation.value();
+    hull::Coordinate point_trsm;
+    point_trsm.x =
+        rot[0][0] * point.x + rot[0][1] * point.y + rot[0][2] * point.z;
+    point_trsm.y =
+        rot[1][0] * point.x + rot[1][1] * point.y + rot[1][2] * point.z;
+    point_trsm.z =
+        rot[2][0] * point.x + rot[2][1] * point.y + rot[2][2] * point.z;
+    point = point_trsm;
+  }
+  if (traslation.has_value()) {
+    point.x += traslation->x;
+    point.y += traslation->y;
+    point.z += traslation->z;
+  }
 };
 
-Transformation::Transformation()
-    : rotation(get_identity_matrix()), traslation(hull::Coordinate{0, 0, 0}) {}
+void Transformation::setRotationXYZ(const RotationXYZ &new_rotation_XYZ) {
+  rotation = get_rotation_matrix(new_rotation_XYZ);
+}
 
-Transformation::Transformation(const hull::Coordinate &traslation)
-    : rotation(get_identity_matrix()), traslation(traslation) {}
-Transformation::Transformation(const RotationXYZ &rotation_XYZ)
-    : rotation(get_rotation_matrix(rotation_XYZ)),
-      traslation(hull::Coordinate{0, 0, 0}) {}
-
-Transformation::Transformation(const hull::Coordinate &traslation,
-                               const RotationXYZ &rotation_XYZ)
-    : rotation(get_rotation_matrix(rotation_XYZ)), traslation(traslation) {}
+Transformation TransformationBuilder::make() const {
+  Transformation res;
+  if (rotation.has_value()) {
+    res.setRotationXYZ(rotation.value());
+  }
+  if (traslation.has_value()) {
+    res.setTraslation(traslation.value());
+  }
+  return res;
+}
 
 TransformDecorator::TransformDecorator(std::unique_ptr<ConvexShape> shape,
                                        const Transformation &transformation)
@@ -86,18 +79,22 @@ TransformDecorator::TransformDecorator(ConvexDecorator &&decorator_o,
 
 void TransformDecorator::getSupport(hull::Coordinate &result,
                                     const hull::Coordinate &direction) const {
-  const auto &rotation = transformation.getRotation();
+  const auto &maybe_rotation = transformation.getRotation();
   hull::Coordinate transformedDirection;
-
-  transformedDirection.x = rotation[0][0] * direction.x +
-                           rotation[1][0] * direction.y +
-                           rotation[2][0] * direction.z;
-  transformedDirection.y = rotation[0][1] * direction.x +
-                           rotation[1][1] * direction.y +
-                           rotation[2][1] * direction.z;
-  transformedDirection.z = rotation[0][2] * direction.x +
-                           rotation[1][2] * direction.y +
-                           rotation[2][2] * direction.z;
+  if (maybe_rotation.has_value()) {
+    const auto &rotation = maybe_rotation.value();
+    transformedDirection.x = rotation[0][0] * direction.x +
+                             rotation[1][0] * direction.y +
+                             rotation[2][0] * direction.z;
+    transformedDirection.y = rotation[0][1] * direction.x +
+                             rotation[1][1] * direction.y +
+                             rotation[2][1] * direction.z;
+    transformedDirection.z = rotation[0][2] * direction.x +
+                             rotation[1][2] * direction.y +
+                             rotation[2][2] * direction.z;
+  } else {
+    transformedDirection = direction;
+  }
   getShape().getSupport(result, transformedDirection);
   transformation.transform(result);
 }

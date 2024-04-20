@@ -1,8 +1,30 @@
-#include "Utils.h"
+#include "UtilsMore.h"
 
-flx::QueryResult make_test_query(const Points &a, const Points &b) {
-  return flx::get_closest_points_or_penetration_info(Vector3dCloud{a},
-                                                     Vector3dCloud{b});
+namespace flx::utils {
+flx::QueryResult make_test_query(const Points &a, const Points &b
+#ifdef GJK_EPA_DIAGNOSTIC
+                                 ,
+                                 const std::string &subpath
+#endif
+) {
+
+#ifdef GJK_EPA_DIAGNOSTIC
+  GjkEpaLogger logger{subpath};
+#endif
+  auto query = flx::get_closest_points_or_penetration_info(Vector3dCloud{a},
+                                                           Vector3dCloud{b}
+#ifdef GJK_EPA_DIAGNOSTIC
+                                                           ,
+                                                           &logger
+#endif
+  );
+
+#ifdef GJK_EPA_DIAGNOSTIC
+  logger.addResult(Vector3dCloud{a}, Vector3dCloud{b}, query.result,
+                   !query.is_closest_pair_or_penetration_info);
+#endif
+
+  return query;
 }
 
 Points make_prism(const std::vector<Point2D> &polygon, const float height) {
@@ -32,3 +54,4 @@ bool almost_equal2(const hull::Coordinate &a, const float expected_x,
                    const float expected_y) {
   return almost_equal(a.x, expected_x) && almost_equal(a.y, expected_y);
 }
+} // namespace flx::utils

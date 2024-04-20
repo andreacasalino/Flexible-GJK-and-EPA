@@ -9,9 +9,9 @@
 #include <Flexible-GJK-and-EPA/shape/Sphere.h>
 
 namespace flx::shape {
-Sphere::Sphere(const float &ray) : Sphere(ray, hull::Coordinate{0, 0, 0}) {}
+Sphere::Sphere(float ray) : Sphere(ray, hull::Coordinate{0, 0, 0}) {}
 
-Sphere::Sphere(const float &ray, const hull::Coordinate &center)
+Sphere::Sphere(float ray, const hull::Coordinate &center)
     : ray(ray), center(center) {
   if (ray < 0.f) {
     throw Error{"Negative ray for sphere"};
